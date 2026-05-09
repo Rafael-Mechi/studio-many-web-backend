@@ -201,3 +201,5 @@ CREATE TABLE agendamento_itens(
                                   FOREIGN KEY (servico_id) REFERENCES servicos(id),
                                   FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
 );
+
+INSERT INTO perfis(perfil) VALUES ('ROLE_ADMIN'), ('ROLE_FUNCIONARIO'), ('ROLE_RECEPCIONISTA'), ('ROLE_CLIENTE');
