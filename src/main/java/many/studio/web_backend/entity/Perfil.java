@@ -9,7 +9,7 @@ public class Perfil {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "perfil")
+    @Column(name = "perfil", nullable = false)
     private String perfil;
 
     public Perfil() {}
