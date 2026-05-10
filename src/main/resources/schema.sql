@@ -141,11 +141,9 @@ CREATE TABLE IF NOT EXISTS pagamentos (
 
     agendamento_id INT,
     status_pagamento_id INT,
-    tipo_pagamentos_id INT,
 
     FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
-    FOREIGN KEY (status_pagamento_id) REFERENCES status_pagamentos(id),
-    FOREIGN KEY (tipo_pagamentos_id) REFERENCES tipo_pagamentos(id)
+    FOREIGN KEY (status_pagamento_id) REFERENCES status_pagamentos(id)
     );
 
 CREATE TABLE IF NOT EXISTS cliente_pacotes (

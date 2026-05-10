@@ -24,17 +24,12 @@ INSERT INTO status_pagamentos (estado) VALUES
                                            ('Pendente'),
                                            ('Pago');
 
-INSERT INTO tipos_sinais (tipo) VALUES
-                                    ('Sem sinal'),
-                                    ('Valor Fixo'),
-                                    ('Percentual');
-
 -- 2. Criando um Usuário e um Profissional
 INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('ana.estetica@email.com', 'hash123', 2, NOW());
 INSERT INTO profissionais (nome, usuario_id) VALUES ('Ana Silva', 1);
 
 -- 3. Criando um Serviço e um Pacote
-INSERT INTO servicos (nome, preco, duracao_minutos, ativo, tipos_sinais_id) VALUES ('Limpeza de Pele', 150.00, 60, TRUE, 1);
+INSERT INTO servicos (nome, preco, duracao_minutos, ativo) VALUES ('Limpeza de Pele', 150.00, 60, TRUE);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, 1);
 
 -- 4. Cadastrando um Cliente e sua Anamnese (Link para o PDF)
