@@ -24,12 +24,6 @@ INSERT INTO status_pagamentos (estado) VALUES
                                            ('Pendente'),
                                            ('Pago');
 
-INSERT INTO tipo_pagamentos (tipo) VALUES
-                                       ('PIX'),
-                                       ('Dinheiro'),
-                                       ('Cartão de débito'),
-                                       ('Cartão de crédito');
-
 INSERT INTO tipos_sinais (tipo) VALUES
                                     ('Sem sinal'),
                                     ('Valor Fixo'),

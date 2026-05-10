@@ -1,8 +1,3 @@
-CREATE TABLE IF NOT EXISTS tipo_pagamentos (
-                                               id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                               tipo VARCHAR(45) NOT NULL
-    );
-
 CREATE TABLE IF NOT EXISTS status_pagamentos (
                                                  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                                                  estado VARCHAR(45)
@@ -17,11 +12,6 @@ CREATE TABLE IF NOT EXISTS anamneses (
                                          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                                          informacao VARCHAR(45),
     arquivo_url VARCHAR(255)
-    );
-
-CREATE TABLE IF NOT EXISTS tipos_sinais (
-                                            id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                            tipo VARCHAR(45)
     );
 
 CREATE TABLE IF NOT EXISTS status_agendamentos (
@@ -75,11 +65,7 @@ CREATE TABLE IF NOT EXISTS servicos (
     preco DECIMAL(8,2),
     sinal_valor DECIMAL(8,2),
     ativo BOOLEAN,
-    criado_em TIMESTAMP,
-
-    tipos_sinais_id INT,
-
-    FOREIGN KEY (tipos_sinais_id) REFERENCES tipos_sinais(id)
+    criado_em TIMESTAMP
     );
 
 CREATE TABLE IF NOT EXISTS clientes (
