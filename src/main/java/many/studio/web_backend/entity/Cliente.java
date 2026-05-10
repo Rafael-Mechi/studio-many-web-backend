@@ -28,12 +28,6 @@ public class Cliente {
     @Column(name = "lgpd_consentimento")
     private Boolean lgpdConsentimento;
 
-    @Column(name = "criado_em")
-    private LocalDateTime criadoEm;
-
-    @Column(name = "ativo")
-    private Boolean ativo;
-
     @OneToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
@@ -48,8 +42,6 @@ public class Cliente {
         this.totalNoShows = totalNoShows;
         this.bloqueadoMotivo = bloqueadoMotivo;
         this.lgpdConsentimento = lgpdConsentimento;
-        this.criadoEm = criadoEm;
-        this.ativo = ativo;
         this.usuario = usuario;
     }
 
@@ -67,10 +59,6 @@ public class Cliente {
     public void setBloqueadoMotivo(String bloqueadoMotivo) { this.bloqueadoMotivo = bloqueadoMotivo; }
     public Boolean getLgpdConsentimento() { return lgpdConsentimento; }
     public void setLgpdConsentimento(Boolean lgpdConsentimento) { this.lgpdConsentimento = lgpdConsentimento; }
-    public LocalDateTime getCriadoEm() { return criadoEm; }
-    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
-    public Boolean getAtivo() { return ativo; }
-    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public Usuario getUsuario() { return usuario; }
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }

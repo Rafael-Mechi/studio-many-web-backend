@@ -12,6 +12,7 @@ import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.mapper.UsuarioMapper;
 import many.studio.web_backend.repository.PerfilRepository;
 import many.studio.web_backend.repository.UsuarioRepository;
+import many.studio.web_backend.strategy.UsuarioCriacaoStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,21 +44,35 @@ public class UsuarioService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private List<UsuarioCriacaoStrategy> strategies;
+
     public void criar(UsuarioCriacaoDto dto) {
 
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new EntityConflictException("Usuário com email existente");
         }
 
+        Perfil perfil = perfilRepository.findById(dto.getPerfilId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Perfil não encontrado"));
+
         Usuario novoUsuario = UsuarioMapper.of(dto);
 
-        Perfil perfil = perfilRepository.findById(dto.getPerfilId())
-                .orElseThrow(() -> new EntityNotFoundException("Perfil não encontrado"));
-
         novoUsuario.setPerfil(perfil);
-        novoUsuario.setSenha(passwordEncoder.encode(novoUsuario.getSenha()));
+        novoUsuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        novoUsuario.setAtivo(true);
+        novoUsuario.setCriadoEm(LocalDateTime.now());
 
         usuarioRepository.save(novoUsuario);
+
+        UsuarioCriacaoStrategy strategy = strategies.stream()
+                .filter(s -> s.suporta(dto.getPerfilId()))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Perfil inválido"));
+
+        strategy.criarDadosComplementares(novoUsuario, dto);
     }
 
     public UsuarioTokenDto autenticar(Usuario usuario) {

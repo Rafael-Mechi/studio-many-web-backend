@@ -1,205 +1,198 @@
-CREATE TABLE tipo_pagamentos(
-                                id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                tipo VARCHAR(45) NOT NULL
-);
+CREATE TABLE IF NOT EXISTS tipo_pagamentos (
+                                               id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                               tipo VARCHAR(45) NOT NULL
+    );
 
-CREATE TABLE status_pagamentos(
-                                  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                  estado VARCHAR(45)
-);
+CREATE TABLE IF NOT EXISTS status_pagamentos (
+                                                 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                                 estado VARCHAR(45)
+    );
 
-CREATE TABLE status_clientes_pacotes(
+CREATE TABLE IF NOT EXISTS status_clientes_pacotes (
+                                                       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                                       estado VARCHAR(45)
+    );
+
+CREATE TABLE IF NOT EXISTS anamneses (
+                                         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                         informacao VARCHAR(45),
+    arquivo_url VARCHAR(255)
+    );
+
+CREATE TABLE IF NOT EXISTS tipos_sinais (
+                                            id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                            tipo VARCHAR(45)
+    );
+
+CREATE TABLE IF NOT EXISTS status_agendamentos (
+                                                   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                                   estado VARCHAR(45)
+    );
+
+CREATE TABLE IF NOT EXISTS perfis (
+                                      id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                      perfil VARCHAR(45) NOT NULL
+    );
+
+CREATE TABLE IF NOT EXISTS usuarios (
                                         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                        estado VARCHAR(45)
-);
+                                        email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP,
 
-CREATE TABLE anamneses(
-                          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                          informacao VARCHAR(45)
-);
+    perfil_id INT NOT NULL,
 
-CREATE TABLE tipos_sinais(
-                             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                             tipo VARCHAR(45)
-);
+    FOREIGN KEY (perfil_id) REFERENCES perfis(id)
+    );
 
-CREATE TABLE status_agendamentos(
-                                    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                    estado VARCHAR(45)
-);
+CREATE TABLE IF NOT EXISTS profissionais (
+                                             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                             nome VARCHAR(75),
 
-CREATE TABLE perfis(
-                       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                       perfil VARCHAR(45) NOT NULL
-);
+    usuario_id INT UNIQUE,
 
-CREATE TABLE usuarios(
-                         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                         email VARCHAR(255) NOT NULL UNIQUE,
-                         senha VARCHAR(255) NOT NULL,
-                         ativo BOOLEAN DEFAULT TRUE,
-                         criado_em timestamp,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    );
 
-                         perfil_id INT NOT NULL,
+CREATE TABLE IF NOT EXISTS bloqueios (
+                                         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                         inicio TIMESTAMP NOT NULL,
+                                         fim TIMESTAMP NOT NULL,
+                                         motivo VARCHAR(255),
 
-                         FOREIGN KEY (perfil_id) REFERENCES perfis(id)
-);
+    profissional_id INT,
 
-CREATE TABLE profissionais(
-                              id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                              nome VARCHAR(75),
-                              foto_url VARCHAR(75),
-                              ativo BOOLEAN,
-                              criado_em timestamp,
+    FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
+    );
 
-                              usuario_id INT UNIQUE,
+CREATE TABLE IF NOT EXISTS servicos (
+                                        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                        nome VARCHAR(45) NOT NULL,
+    descricao VARCHAR(255),
+    foto_url VARCHAR(255),
+    duracao_minutos INT,
+    preco DECIMAL(8,2),
+    sinal_valor DECIMAL(8,2),
+    ativo BOOLEAN,
+    criado_em TIMESTAMP,
 
-                              FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
-);
+    tipos_sinais_id INT,
 
-CREATE TABLE bloqueios(
-                          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                          inicio timestamp NOT NULL,
-                          fim timestamp NOT NULL,
-                          motivo VARCHAR(255),
+    FOREIGN KEY (tipos_sinais_id) REFERENCES tipos_sinais(id)
+    );
 
-                          profissional_id INT,
+CREATE TABLE IF NOT EXISTS clientes (
+                                        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                        nome VARCHAR(75) NOT NULL,
+    telefone VARCHAR(30) NOT NULL,
+    documento VARCHAR(75),
+    total_no_shows INT,
+    bloqueado_motivo VARCHAR(255),
+    lgpd_consentimento BOOLEAN,
 
-                          FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
-);
+    usuario_id INT UNIQUE,
 
-CREATE TABLE servicos(
-                         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                         nome VARCHAR(45) NOT NULL,
-                         descricao VARCHAR(255),
-                         foto_url VARCHAR(255),
-                         duracao_minutos INT,
-                         preco DECIMAL(6,2),
-                         sinal_valor DECIMAL(5,2),
-                         ativo BOOLEAN,
-                         criado_em timestamp,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    );
 
-                         tipos_sinais_id INT,
+CREATE TABLE IF NOT EXISTS anamnese_clientes (
+                                                 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                                 anamneses_id INT NOT NULL,
+                                                 clientes_id INT NOT NULL,
 
-                         FOREIGN KEY (tipos_sinais_id) REFERENCES tipos_sinais(id)
-);
+                                                 FOREIGN KEY (anamneses_id) REFERENCES anamneses(id),
+    FOREIGN KEY (clientes_id) REFERENCES clientes(id)
+    );
 
-CREATE TABLE clientes(
-                         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                         nome VARCHAR(75) NOT NULL,
-                         telefone VARCHAR(30) NOT NULL,
-                         documento VARCHAR(75),
-                         total_no_shows INT,
-                         bloqueado_motivo VARCHAR(255),
-                         lgpd_consentimento BOOLEAN,
-                         criado_em timestamp,
-                         ativo BOOLEAN,
+CREATE TABLE IF NOT EXISTS servicos_profissionais (
+                                                      id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                                      servicos_id INT NOT NULL,
+                                                      profissionais_id INT NOT NULL,
 
-                         usuario_id INT UNIQUE,
+                                                      FOREIGN KEY (servicos_id) REFERENCES servicos(id),
+    FOREIGN KEY (profissionais_id) REFERENCES profissionais(id)
+    );
 
-                         FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
-);
-
-CREATE TABLE anamnese_clientes(
-                                  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                  anamneses_id INT NOT NULL,
-                                  clientes_id INT NOT NULL,
-
-                                  FOREIGN KEY (anamneses_id) REFERENCES anamneses(id),
-                                  FOREIGN KEY (clientes_id) REFERENCES clientes(id)
-);
-
-CREATE TABLE servicos_profissionais(
+CREATE TABLE IF NOT EXISTS pacotes (
                                        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                       servicos_id INT NOT NULL,
-                                       profissionais_id INT NOT NULL,
+                                       nome VARCHAR(45) NOT NULL,
+    total_sessoes INT,
+    preco_total DECIMAL(8,2),
+    validade_dias INT,
+    ativo BOOLEAN,
+    criado_em TIMESTAMP,
 
-                                       FOREIGN KEY (servicos_id) REFERENCES servicos(id),
-                                       FOREIGN KEY (profissionais_id) REFERENCES profissionais(id)
-);
+    servicos_id INT,
 
-CREATE TABLE pacotes(
-                        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                        nome VARCHAR(45) NOT NULL,
-                        total_sessoes INT,
-                        preco_total DECIMAL(6,2),
-                        validade_dias INT,
-                        ativo BOOLEAN,
+    FOREIGN KEY (servicos_id) REFERENCES servicos(id)
+    );
 
-                        servicos_id INT,
+CREATE TABLE IF NOT EXISTS agendamentos (
+                                            id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                            inicio TIMESTAMP,
+                                            fim TIMESTAMP,
+                                            cancelamento_motivo VARCHAR(255),
+    cancelado_em TIMESTAMP,
+    qtd_remarcacoes INT,
+    remarcacao_aprovacao_necessaria BOOLEAN,
+    criado_por_usuario_id INT,
+    criado_em TIMESTAMP,
 
-                        FOREIGN KEY (servicos_id) REFERENCES servicos(id)
-);
+    cliente_id INT,
+    status_agendamento_id INT,
 
-CREATE TABLE agendamentos(
-                             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                             inicio timestamp,
-                             fim timestamp,
-                             cancelamento_motivo VARCHAR(255),
-                             cancelado_em timestamp,
-                             qtd_remarcacoes INT,
-                             remarcacao_aprovacao_necessaria BOOLEAN,
-                             checkin_em timestamp,
-                             inicio_atendimento timestamp,
-                             fim_atendimento timestamp,
-                             criado_por_usuario_id INT,
-                             criado_em timestamp,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+    FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamentos(id),
+    FOREIGN KEY (criado_por_usuario_id) REFERENCES usuarios(id)
+    );
 
-                             cliente_id INT,
-                             status_agendamento_id INT,
+CREATE TABLE IF NOT EXISTS pagamentos (
+                                          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                          valor DECIMAL(8,2),
+    pago_em TIMESTAMP,
+    comprovante_url VARCHAR(255),
 
-                             FOREIGN KEY (cliente_id) REFERENCES clientes(id),
-                             FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamentos(id),
-                             FOREIGN KEY (criado_por_usuario_id) REFERENCES usuarios(id)
-);
+    agendamento_id INT,
+    status_pagamento_id INT,
+    tipo_pagamentos_id INT,
 
-CREATE TABLE pagamentos(
-                           id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                           valor DECIMAL(6,2),
-                           pago_em timestamp,
-                           comprovante_url VARCHAR(255),
+    FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
+    FOREIGN KEY (status_pagamento_id) REFERENCES status_pagamentos(id),
+    FOREIGN KEY (tipo_pagamentos_id) REFERENCES tipo_pagamentos(id)
+    );
 
-                           agendamento_id INT,
-                           status_pagamento_id INT,
-                           tipo_pagamentos_id INT,
+CREATE TABLE IF NOT EXISTS cliente_pacotes (
+                                               id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                               sessoes_restantes INT,
+                                               valido_ate TIMESTAMP,
+                                               criado_em TIMESTAMP,
 
-                           FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
-                           FOREIGN KEY (status_pagamento_id) REFERENCES status_pagamentos(id),
-                           FOREIGN KEY (tipo_pagamentos_id) REFERENCES tipo_pagamentos(id)
-);
+                                               cliente_id INT,
+                                               pacote_id INT,
+                                               pagamento_id INT,
+                                               status_cliente_pacote_id INT,
 
-CREATE TABLE cliente_pacotes(
-                                id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                sessoes_restantes INT,
-                                valido_ate timestamp,
-                                criado_em timestamp,
+                                               FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+    FOREIGN KEY (pacote_id) REFERENCES pacotes(id),
+    FOREIGN KEY (pagamento_id) REFERENCES pagamentos(id),
+    FOREIGN KEY (status_cliente_pacote_id) REFERENCES status_clientes_pacotes(id)
+    );
 
-                                cliente_id INT,
-                                pacote_id INT,
-                                pagamento_id INT,
-                                status_cliente_pacote_id INT,
+CREATE TABLE IF NOT EXISTS agendamento_itens (
+                                                 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                                 inicio_atendimento TIMESTAMP,
+                                                 fim_atendimento TIMESTAMP,
+                                                 checkin_em TIMESTAMP,
+                                                 preco DECIMAL(8,2),
+    desconto_porcentagem DECIMAL(5,2),
+    preco_final DECIMAL(8,2),
 
-                                FOREIGN KEY (cliente_id) REFERENCES clientes(id),
-                                FOREIGN KEY (pacote_id) REFERENCES pacotes(id),
-                                FOREIGN KEY (pagamento_id) REFERENCES pagamentos(id),
-                                FOREIGN KEY (status_cliente_pacote_id) REFERENCES status_clientes_pacotes(id)
-);
+    agendamento_id INT,
+    servico_id INT,
+    profissional_id INT,
 
-CREATE TABLE agendamento_itens(
-                                  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                                  inicio timestamp,
-                                  fim timestamp,
-                                  preco DECIMAL(6,2),
-                                  desconto_porcentagem DECIMAL(5,2),
-                                  preco_final DECIMAL(6,2),
-
-                                  agendamento_id INT,
-                                  servico_id INT,
-                                  profissional_id INT,
-
-                                  FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
-                                  FOREIGN KEY (servico_id) REFERENCES servicos(id),
-                                  FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
-);
-
-INSERT INTO perfis(perfil) VALUES ('ROLE_ADMIN'), ('ROLE_FUNCIONARIO'), ('ROLE_RECEPCIONISTA'), ('ROLE_CLIENTE');
+    FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
+    FOREIGN KEY (servico_id) REFERENCES servicos(id),
+    FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
+    );
