@@ -19,6 +19,12 @@ public class UsuarioCriacaoDto {
     @Schema(description = "Senha do usuário", example = "123456")
     private String senha;
 
+    @Schema(description = "Telefone do usuário", example = "987654321")
+    private String telefone;
+
+    @Schema(description = "cpf do usuário", example = "54345743331")
+    private String documento;
+
     @NotNull
     @Schema(description = "Perfil do usuário", example = "1")
     private Integer perfilId;
@@ -45,6 +51,22 @@ public class UsuarioCriacaoDto {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public String getDocumento() {
+        return documento;
+    }
+
+    public void setDocumento(String documento) {
+        this.documento = documento;
     }
 
     public Integer getPerfilId() {

@@ -35,65 +35,6 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping("/cadastrar")
-    @Operation(summary = "Cadastrar usuário")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Dados para cadastro",
-            required = true,
-            content = @Content(
-                    mediaType = "application/json",
-                    examples = @ExampleObject(value = """
-        {
-          "nome": "noa",
-          "email": "noa@gmail.com",
-          "senha": "123456",
-          "perfilId": 4
-        }
-        """)
-            )
-    )
-    @ApiResponses({
-
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Requisição inválida",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-            {}
-            """)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Requisição inválida",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-            {
-              "timestamp": "2026-04-29T01:26:37.647+00:00",
-              "status": 400,
-              "error": "Bad Request",
-              "path": "/usuarios/cadastrar"
-            }
-            """)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Conflito de entidade",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-            {
-              "timestamp": "2026-04-29T01:20:49.672+00:00",
-              "status": 409,
-              "error": "Conflict",
-              "path": "/usuarios/cadastrar"
-            }
-            """)
-                    )
-            )
-    })
     public ResponseEntity<Void> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
 
         this.usuarioService.criar(usuarioCriacaoDto);
@@ -102,42 +43,6 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    @Operation(
-            summary = "Autenticar usuário")
-    @ApiResponses(value = {
-
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Login é feito com êxito",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-            {
-              "userId": 3,
-              "nome": "Marina",
-              "email": "marina@gmail.com",
-              "token": "esJhbCciOiFIUzI1NiJ9.eyJzdWIiOiJuM29hQGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjoiQ0xJRU5URSIsImlhdCI6MTc3NzQyNjA4NCwiZXhwIjoxNzc3NDI5Njg0fQ.jsxIwNc_9rmKan6-RQXW302m9RAG9LcV_e6-KVaBE3Y"
-            }
-            """)
-                    )
-            ),
-
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Credenciais inválidas",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-            {
-              "timestamp": "2026-04-29T01:34:05.826+00:00",
-              "status": 401,
-              "error": "Unauthorized",
-              "path": "/usuarios/login"
-            }
-            """)
-                    )
-            )
-    })
     public ResponseEntity<UsuarioTokenDto> login(
             @RequestBody @Valid UsuarioLoginDto usuarioLoginDto,
             HttpServletResponse response
