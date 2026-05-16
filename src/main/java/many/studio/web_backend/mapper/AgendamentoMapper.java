@@ -2,9 +2,8 @@ package many.studio.web_backend.mapper;
 
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
-import many.studio.web_backend.entity.Agendamento;
-import many.studio.web_backend.entity.Cliente;
-import many.studio.web_backend.entity.Pacote;
+import many.studio.web_backend.dto.agendamento.AgendamentoItemResponse;
+import many.studio.web_backend.entity.*;
 
 import java.util.List;
 
@@ -18,14 +17,17 @@ public class AgendamentoMapper {
         Pacote pacote = new Pacote();
         pacote.setId(request.getPacoteId());
 
+        StatusAgendamento status = new StatusAgendamento(2L, "agendado");
+
         Agendamento agendamento = new Agendamento();
         agendamento.setCliente(cliente);
         agendamento.setPacote(pacote);
+        agendamento.setStatusAgendamento(status);
 
         return agendamento;
     }
 
-    public static AgendamentoCriacaoResponse toResponse(Agendamento agendamento, List<AgendamentoCriacaoResponse.AgendamentoItemResponse> itens) {
+    public static AgendamentoCriacaoResponse toResponse(Agendamento agendamento, List<AgendamentoItem> itens) {
 
         AgendamentoCriacaoResponse.ClienteResponse cliente = new AgendamentoCriacaoResponse.ClienteResponse();
         cliente.setId(agendamento.getCliente().getId());
@@ -50,8 +52,9 @@ public class AgendamentoMapper {
         response.setCliente(cliente);
         response.setProfissional(profissional);
         response.setPacote(pacote);
-        response.setItens(itens);
+        response.setItens(AgendamentoItemMapper.toResponseList(itens));
 
         return response;
     }
+
 }
