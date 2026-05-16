@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import many.studio.web_backend.dto.*;
+import many.studio.web_backend.dto.usuario.*;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.mapper.UsuarioMapper;
 import many.studio.web_backend.service.UsuarioService;
@@ -44,7 +44,7 @@ public class UsuarioController {
 
     @PostMapping("/login")
     public ResponseEntity<UsuarioTokenDto> login(
-            @RequestBody @Valid UsuarioLoginDto usuarioLoginDto,
+            @RequestBody @Valid UsuarioTokenDto.UsuarioLoginDto usuarioLoginDto,
             HttpServletResponse response
     ) {
 
@@ -76,8 +76,8 @@ public class UsuarioController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(value = """
-            {}
-            """)
+                                    {}
+                                    """)
                     )
             )
     })
@@ -109,19 +109,19 @@ public class UsuarioController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(value = """
-                    [
-                      {
-                        "id": 1,
-                        "nome": "Giovana Rocha",
-                        "email": "giovana@outlook.com"
-                      },
-                      {
-                        "id": 2,
-                        "nome": "Márcia",
-                        "email": "marcia@gmail.com"
-                      }
-                    ]
-            """)
+                                            [
+                                              {
+                                                "id": 1,
+                                                "nome": "Giovana Rocha",
+                                                "email": "giovana@outlook.com"
+                                              },
+                                              {
+                                                "id": 2,
+                                                "nome": "Márcia",
+                                                "email": "marcia@gmail.com"
+                                              }
+                                            ]
+                                    """)
                     )
             ),
             @ApiResponse(
@@ -130,8 +130,8 @@ public class UsuarioController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(value = """
-            {}
-            """)
+                                    {}
+                                    """)
                     )
             )
     })
@@ -141,13 +141,13 @@ public class UsuarioController {
             content = @Content(
                     mediaType = "application/json",
                     examples = @ExampleObject(value = """
-                {
-                  "timestamp": "2026-04-29T00:57:04.487+00:00",
-                  "status": 401,
-                  "error": "Unauthorized",
-                  "path": "/usuarios"
-                }
-            """)
+                                {
+                                  "timestamp": "2026-04-29T00:57:04.487+00:00",
+                                  "status": 401,
+                                  "error": "Unauthorized",
+                                  "path": "/usuarios"
+                                }
+                            """)
             )
     )
     public ResponseEntity<List<UsuarioListarDto>> listarTodos() {
@@ -169,10 +169,10 @@ public class UsuarioController {
             content = @Content(
                     mediaType = "application/json",
                     examples = @ExampleObject(value = """
-        {
-          "nome": "Marcela"
-        }
-        """)
+                            {
+                              "nome": "Marcela"
+                            }
+                            """)
             )
     )
     @ApiResponses({
@@ -183,8 +183,8 @@ public class UsuarioController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(value = """
-                    {}
-            """)
+                                            {}
+                                    """)
                     )
             ),
             @ApiResponse(
@@ -193,13 +193,13 @@ public class UsuarioController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(value = """
-            {
-              "timestamp": "2026-04-30T01:39:57.172+00:00",
-              "status": 404,
-              "error": "Not Found",
-              "path": "/usuarios/22"
-            }
-            """)
+                                    {
+                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+                                      "status": 404,
+                                      "error": "Not Found",
+                                      "path": "/usuarios/22"
+                                    }
+                                    """)
                     )
             )
     })
@@ -209,13 +209,13 @@ public class UsuarioController {
             content = @Content(
                     mediaType = "application/json",
                     examples = @ExampleObject(value = """
-                {
-                  "timestamp": "2026-04-29T00:57:04.487+00:00",
-                  "status": 401,
-                  "error": "Unauthorized",
-                  "path": "/usuarios/id"
-                }
-            """)
+                                {
+                                  "timestamp": "2026-04-29T00:57:04.487+00:00",
+                                  "status": 401,
+                                  "error": "Unauthorized",
+                                  "path": "/usuarios/id"
+                                }
+                            """)
             )
     )
     @PutMapping("/{id}")
@@ -236,8 +236,8 @@ public class UsuarioController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(value = """
-                    {}
-            """)
+                                            {}
+                                    """)
                     )
             ),
             @ApiResponse(
@@ -246,13 +246,13 @@ public class UsuarioController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(value = """
-            {
-              "timestamp": "2026-04-30T01:39:57.172+00:00",
-              "status": 404,
-              "error": "Not Found",
-              "path": "/usuarios/22"
-            }
-            """)
+                                    {
+                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+                                      "status": 404,
+                                      "error": "Not Found",
+                                      "path": "/usuarios/22"
+                                    }
+                                    """)
                     )
             )
     })
@@ -262,21 +262,211 @@ public class UsuarioController {
             content = @Content(
                     mediaType = "application/json",
                     examples = @ExampleObject(value = """
-                {
-                  "timestamp": "2026-04-29T00:57:04.487+00:00",
-                  "status": 401,
-                  "error": "Unauthorized",
-                  "path": "/usuarios/id"
-                }
-            """)
+                                {
+                                  "timestamp": "2026-04-29T00:57:04.487+00:00",
+                                  "status": 401,
+                                  "error": "Unauthorized",
+                                  "path": "/usuarios/id"
+                                }
+                            """)
             )
     )
     @SecurityRequirement(name = "Bearer")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removerUsuario(@PathVariable Integer id){
+    public ResponseEntity<Void> removerUsuario(@PathVariable Integer id) {
         usuarioService.removerPorId(id);
 
 
         return ResponseEntity.status(204).build();
+    }
+
+    @Operation(summary = "Atualizar senha do usuário autenticado")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Senha atual e nova senha",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(value = """
+                            {
+                              "senhaAtual": "123456",
+                              "senhaNova": "novaSenha789"
+                            }
+                            """)
+            )
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Senha atualizada com êxito",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                            {}
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Não autorizado ou senha atual inválida",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                        {
+                                          "timestamp": "2026-04-29T00:57:04.487+00:00",
+                                          "status": 401,
+                                          "error": "Unauthorized",
+                                          "path": "/usuarios/atualizar_senha"
+                                        }
+                                    """)
+                    )
+            )
+    })
+    @PutMapping("/atualizar_senha")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> atualizarSenha(@Valid @RequestBody UsuarioAtualizarSenhaDto dto) {
+        usuarioService.atualizarSenha(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Redefinir senha por e-mail")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "E-mail do usuário e nova senha",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(value = """
+                            {
+                              "email": "giovana@outlook.com",
+                              "senhaNova": "senhaRecuperada123"
+                            }
+                            """)
+            )
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Senha redefinida com êxito",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                            {}
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+                                      "status": 404,
+                                      "error": "Not Found",
+                                      "path": "/usuarios/redefinir_senha"
+                                    }
+                                    """)
+                    )
+            )
+    })
+    @PutMapping("/redefinir_senha")
+    public ResponseEntity<Void> redefinirSenha(@Valid @RequestBody UsuarioRedefinirSenhaDto dto) {
+        usuarioService.redefinirSenha(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Atualizar perfil do usuário autenticado")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Dados do perfil (campos opcionais)",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(value = """
+                            {
+                              "nome": "Giovana Rocha",
+                              "telefone": "11999998888",
+                              "documento": "12345678900",
+                              "email": "giovana.nova@outlook.com"
+                            }
+                            """)
+            )
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Perfil atualizado com êxito",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                            {}
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Nenhum campo para atualizar",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+                                      "status": 400,
+                                      "error": "Bad Request",
+                                      "path": "/usuarios/atualizar_perfil"
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário ou dados complementares não encontrados",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+                                      "status": 404,
+                                      "error": "Not Found",
+                                      "path": "/usuarios/atualizar_perfil"
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "E-mail já cadastrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+                                      "status": 409,
+                                      "error": "Conflict",
+                                      "path": "/usuarios/atualizar_perfil"
+                                    }
+                                    """)
+                    )
+            )
+    })
+    @ApiResponse(
+            responseCode = "401",
+            description = "Não autorizado",
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(value = """
+                                {
+                                  "timestamp": "2026-04-29T00:57:04.487+00:00",
+                                  "status": 401,
+                                  "error": "Unauthorized",
+                                  "path": "/usuarios/atualizar_perfil"
+                                }
+                            """)
+            )
+    )
+    @PutMapping("/atualizar_perfil")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> atualizarPerfil(@Valid @RequestBody UsuarioAtualizarPerfilDto dto) {
+        usuarioService.atualizarPerfil(dto);
+        return ResponseEntity.noContent().build();
     }
 }

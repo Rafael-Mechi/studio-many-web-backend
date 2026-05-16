@@ -54,6 +54,7 @@ public class SecurityConfiguracao {
             "/actuator/*",
             "/usuarios/cadastrar",
             "/usuarios/login/**",
+            "/usuarios/redefinir_senha",
             "/usuarios/logout/**",
             "/h2-console/**",
             "/h2-console/*/**",
