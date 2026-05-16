@@ -15,8 +15,7 @@ public class AgendamentoCriacaoRequest {
     private Long pacoteId;
 
     @NotNull
-    @Future
-    List<LocalDateTime> horarios;
+    List<@Future LocalDateTime> horarios;
 
     public Long getClienteId() {
         return clienteId;

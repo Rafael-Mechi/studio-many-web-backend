@@ -57,7 +57,7 @@ INSERT INTO anamnese_clientes (anamneses_id, clientes_id) VALUES (1, 1);
 -- -- Depois inserimos o item (serviço) dentro desse agendamento
 -- INSERT INTO agendamento_itens (agendamento_id, servico_id, profissional_id, preco, preco_final)
 -- VALUES (1, 1, 1, 150.00, 150.00);
--- 
+--
 -- -- 6. Registro de Pagamento
 -- INSERT INTO pagamentos (valor, pago_em, agendamento_id, status_pagamento_id)
 -- VALUES (150.00, NOW(), 1, 2);

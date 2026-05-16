@@ -1,6 +1,8 @@
 package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,6 +13,7 @@ public class Agendamento {
     private Long id;
 
     @Column(name = "criado_em")
+    @CreationTimestamp
     private LocalDateTime criadoEm;
 
     @ManyToOne
