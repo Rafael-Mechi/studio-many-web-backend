@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Pagamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "valor")
     private Double valor;
@@ -33,7 +33,7 @@ public class Pagamento {
 
     public Pagamento() {}
 
-    public Pagamento(Integer id, Double valor, LocalDateTime pagoEm, String comprovanteUrl, Agendamento agendamento, StatusPagamento statusPagamento, TipoPagamento tipoPagamento) {
+    public Pagamento(Long id, Double valor, LocalDateTime pagoEm, String comprovanteUrl, Agendamento agendamento, StatusPagamento statusPagamento, TipoPagamento tipoPagamento) {
         this.id = id;
         this.valor = valor;
         this.pagoEm = pagoEm;
@@ -43,8 +43,8 @@ public class Pagamento {
         this.tipoPagamento = tipoPagamento;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public Double getValor() { return valor; }
     public void setValor(Double valor) { this.valor = valor; }
     public LocalDateTime getPagoEm() { return pagoEm; }

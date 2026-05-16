@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Bloqueio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "inicio")
     private LocalDateTime inicio;
@@ -25,7 +25,7 @@ public class Bloqueio {
 
     public Bloqueio() {}
 
-    public Bloqueio(Integer id, LocalDateTime inicio, LocalDateTime fim, String motivo, Profissional profissional) {
+    public Bloqueio(Long id, LocalDateTime inicio, LocalDateTime fim, String motivo, Profissional profissional) {
         this.id = id;
         this.inicio = inicio;
         this.fim = fim;
@@ -33,8 +33,8 @@ public class Bloqueio {
         this.profissional = profissional;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public LocalDateTime getInicio() { return inicio; }
     public void setInicio(LocalDateTime inicio) { this.inicio = inicio; }
     public LocalDateTime getFim() { return fim; }
