@@ -1,10 +1,9 @@
 package many.studio.web_backend.strategy;
 
-import many.studio.web_backend.dto.UsuarioCriacaoDto;
+import many.studio.web_backend.dto.usuario.UsuarioCriacaoDto;
 import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.repository.ProfissionalRepository;
-import many.studio.web_backend.strategy.UsuarioCriacaoStrategy;
 import org.springframework.stereotype.Component;
 
 @Component

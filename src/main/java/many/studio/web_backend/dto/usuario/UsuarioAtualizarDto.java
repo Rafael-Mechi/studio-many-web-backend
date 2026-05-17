@@ -1,18 +1,15 @@
-package many.studio.web_backend.dto;
+package many.studio.web_backend.dto.usuario;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
-public class UsuarioLoginDto {
+public class UsuarioAtualizarDto {
 
-    @NotBlank
     @Email
-    @Schema(description = "E-mail do usuário", example = "noa@gmail.com")
+    @Schema(description = "Novo email do usuário", example = "novo@gmail.com")
     private String email;
 
-    @NotBlank
-    @Schema(description = "Senha do usuário", example = "123456")
+    @Schema(description = "Nova senha do usuário", example = "novaSenha123")
     private String senha;
 
     public String getEmail() {
@@ -31,4 +28,3 @@ public class UsuarioLoginDto {
         this.senha = senha;
     }
 }
-

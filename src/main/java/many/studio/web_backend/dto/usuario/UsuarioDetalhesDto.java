@@ -1,4 +1,4 @@
-package many.studio.web_backend.dto;
+package many.studio.web_backend.dto.usuario;
 
 import many.studio.web_backend.entity.Perfil;
 import many.studio.web_backend.entity.Usuario;
