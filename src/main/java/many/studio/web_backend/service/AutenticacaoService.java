@@ -1,7 +1,7 @@
 package many.studio.web_backend.service;
 
 
-import many.studio.web_backend.dto.UsuarioDetalhesDto;
+import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;

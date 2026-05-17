@@ -1,4 +1,4 @@
-package many.studio.web_backend.dto;
+package many.studio.web_backend.dto.usuario;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

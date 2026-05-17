@@ -1,13 +1,11 @@
 package many.studio.web_backend.strategy.usuario;
 
-import many.studio.web_backend.dto.UsuarioCriacaoDto;
+import many.studio.web_backend.dto.usuario.UsuarioCriacaoDto;
 import many.studio.web_backend.entity.Cliente;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.repository.ClienteRepository;
 import many.studio.web_backend.strategy.UsuarioCriacaoStrategy;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class ClienteCriacaoStrategy implements UsuarioCriacaoStrategy {

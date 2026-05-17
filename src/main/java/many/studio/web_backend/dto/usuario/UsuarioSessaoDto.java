@@ -1,4 +1,4 @@
-package many.studio.web_backend.dto;
+package many.studio.web_backend.dto.usuario;
 
 public class UsuarioSessaoDto {
 

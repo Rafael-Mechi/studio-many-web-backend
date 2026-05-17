@@ -1,6 +1,9 @@
 package many.studio.web_backend.mapper;
 
-import many.studio.web_backend.dto.*;
+import many.studio.web_backend.dto.usuario.UsuarioCriacaoDto;
+import many.studio.web_backend.dto.usuario.UsuarioListarDto;
+import many.studio.web_backend.dto.usuario.UsuarioSessaoDto;
+import many.studio.web_backend.dto.usuario.UsuarioTokenDto;
 import many.studio.web_backend.entity.Usuario;
 
 public class UsuarioMapper {
@@ -14,7 +17,7 @@ public class UsuarioMapper {
         return usuario;
     }
 
-    public static Usuario of(UsuarioLoginDto usuarioLoginDto) {
+    public static Usuario of(UsuarioTokenDto.UsuarioLoginDto usuarioLoginDto) {
         Usuario usuario = new Usuario();
 
         usuario.setEmail(usuarioLoginDto.getEmail());
