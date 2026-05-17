@@ -26,6 +26,11 @@ public class ServicoProfissional {
         this.profissional = profissional;
     }
 
+    public ServicoProfissional(Profissional profissional, Servico servico) {
+        this.servico = servico;
+        this.profissional = profissional;
+    }
+
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public Servico getServico() { return servico; }

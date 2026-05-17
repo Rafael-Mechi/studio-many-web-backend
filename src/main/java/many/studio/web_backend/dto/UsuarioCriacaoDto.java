@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 public class UsuarioCriacaoDto {
 
     @Size(min = 3, max = 10)
@@ -24,6 +26,9 @@ public class UsuarioCriacaoDto {
 
     @Schema(description = "cpf do usuário", example = "54345743331")
     private String documento;
+
+    @Schema(description = "Lista de serviços que o usuário faz", example = "[Limpeza de pele, Unha]")
+    private List<String> servicos;
 
     @NotNull
     @Schema(description = "Perfil do usuário", example = "1")
@@ -67,6 +72,14 @@ public class UsuarioCriacaoDto {
 
     public void setDocumento(String documento) {
         this.documento = documento;
+    }
+
+    public List<String> getServicos() {
+        return servicos;
+    }
+
+    public void setServicos(List<String> servicos) {
+        this.servicos = servicos;
     }
 
     public Integer getPerfilId() {
