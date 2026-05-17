@@ -1,6 +1,6 @@
 package many.studio.web_backend.service;
 
-import jakarta.persistence.EntityNotFoundException;
+import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.dto.usuario.UsuarioAtualizarPerfilDto;
 import many.studio.web_backend.dto.usuario.UsuarioAtualizarSenhaDto;
 import many.studio.web_backend.dto.usuario.UsuarioRedefinirSenhaDto;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UsuarioServiceTest {
+class UsuarioServiceTeste {
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -60,11 +60,11 @@ class UsuarioServiceTest {
     @BeforeEach
     void setUp() {
         perfilCliente = new Perfil();
-        perfilCliente.setId(3);
+        perfilCliente.setId(3L);
         perfilCliente.setPerfil("ROLE_CLIENTE");
 
         usuario = new Usuario();
-        usuario.setId(1);
+        usuario.setId(1L);
         usuario.setEmail("giovana@email.com");
         usuario.setSenha("hash-antigo");
         usuario.setPerfil(perfilCliente);
@@ -179,7 +179,7 @@ class UsuarioServiceTest {
         cliente.setUsuario(usuario);
 
         when(usuarioRepository.findByEmail("giovana@email.com")).thenReturn(Optional.of(usuario));
-        when(clienteRepository.findByUsuario_Id(1)).thenReturn(Optional.of(cliente));
+        when(clienteRepository.findByUsuario_Id(1L)).thenReturn(Optional.of(cliente));
 
         usuarioService.atualizarPerfil(dto);
 
@@ -204,7 +204,7 @@ class UsuarioServiceTest {
     @Test
     void atualizarPerfil_deveAtualizarNomeDoProfissional() {
         Perfil perfilProfissional = new Perfil();
-        perfilProfissional.setId(2);
+        perfilProfissional.setId(2L);
         perfilProfissional.setPerfil("ROLE_PROFISSIONAL");
         usuario.setPerfil(perfilProfissional);
         usuario.setEmail("ana@email.com");
@@ -218,7 +218,7 @@ class UsuarioServiceTest {
         profissional.setUsuario(usuario);
 
         when(usuarioRepository.findByEmail("ana@email.com")).thenReturn(Optional.of(usuario));
-        when(profissionalRepository.findByUsuario_Id(1)).thenReturn(Optional.of(profissional));
+        when(profissionalRepository.findByUsuario_Id(1L)).thenReturn(Optional.of(profissional));
 
         usuarioService.atualizarPerfil(dto);
 

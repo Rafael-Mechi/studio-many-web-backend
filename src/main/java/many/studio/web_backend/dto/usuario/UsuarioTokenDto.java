@@ -6,16 +6,16 @@ import jakarta.validation.constraints.NotBlank;
 
 public class UsuarioTokenDto {
 
-    private Integer userId;
+    private Long userId;
     private String nome;
     private String email;
     private String token;
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

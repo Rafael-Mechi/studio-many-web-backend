@@ -1,6 +1,6 @@
 package many.studio.web_backend.service;
 
-import jakarta.persistence.EntityNotFoundException;
+import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.config.GerenciadorTokenJwt;
 import many.studio.web_backend.dto.usuario.*;
 import many.studio.web_backend.entity.Cliente;
@@ -170,16 +170,16 @@ public class UsuarioService {
             usuarioRepository.save(usuario);
         }
 
-        Integer perfilId = usuario.getPerfil().getId();
+        Long perfilId = usuario.getPerfil().getId();
 
-        if (perfilId == 3) {
+        if (perfilId.equals(3L)) {
             Cliente cliente = clienteRepository.findByUsuario_Id(usuario.getId())
                     .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
             if (dto.getNome() != null) cliente.setNome(dto.getNome());
             if (dto.getTelefone() != null) cliente.setTelefone(dto.getTelefone());
             if (dto.getDocumento() != null) cliente.setDocumento(dto.getDocumento());
             clienteRepository.save(cliente);
-        } else if (perfilId == 2) {
+        } else if (perfilId.equals(2L)) {
             Profissional profissional = profissionalRepository.findByUsuario_Id(usuario.getId())
                     .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
             if (dto.getNome() != null) profissional.setNome(dto.getNome());
