@@ -27,7 +27,7 @@ public class UsuarioCriacaoDto {
 
     @NotNull
     @Schema(description = "Perfil do usuário", example = "1")
-    private Integer perfilId;
+    private Long perfilId;
 
     public String getNome() {
         return nome;
@@ -69,11 +69,11 @@ public class UsuarioCriacaoDto {
         this.documento = documento;
     }
 
-    public Integer getPerfilId() {
+    public Long getPerfilId() {
         return perfilId;
     }
 
-    public void setPerfilId(Integer perfilId) {
+    public void setPerfilId(Long perfilId) {
         this.perfilId = perfilId;
     }
 }

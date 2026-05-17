@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Pacote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "nome")
     private String nome;
@@ -31,7 +31,7 @@ public class Pacote {
 
     public Pacote() {}
 
-    public Pacote(Integer id, String nome, Integer totalSessoes, Double precoTotal, Integer validadeDias, Boolean ativo, Servico servico) {
+    public Pacote(Long id, String nome, Integer totalSessoes, Double precoTotal, Integer validadeDias, Boolean ativo, Servico servico) {
         this.id = id;
         this.nome = nome;
         this.totalSessoes = totalSessoes;
@@ -41,8 +41,8 @@ public class Pacote {
         this.servico = servico;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
     public Integer getTotalSessoes() { return totalSessoes; }

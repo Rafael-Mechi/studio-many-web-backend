@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "nome")
     private String nome;
@@ -34,7 +34,7 @@ public class Cliente {
 
     public Cliente() {}
 
-    public Cliente(Integer id, String nome, String telefone, String documento, Integer totalNoShows, String bloqueadoMotivo, Boolean lgpdConsentimento, LocalDateTime criadoEm, Boolean ativo, Usuario usuario) {
+    public Cliente(Long id, String nome, String telefone, String documento, Integer totalNoShows, String bloqueadoMotivo, Boolean lgpdConsentimento, LocalDateTime criadoEm, Boolean ativo, Usuario usuario) {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
@@ -45,8 +45,8 @@ public class Cliente {
         this.usuario = usuario;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
     public String getTelefone() { return telefone; }

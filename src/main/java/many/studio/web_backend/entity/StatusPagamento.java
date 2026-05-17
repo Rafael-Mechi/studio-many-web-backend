@@ -8,20 +8,20 @@ import java.time.LocalDateTime;
 public class StatusPagamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "estado")
     private String estado;
 
     public StatusPagamento() {}
 
-    public StatusPagamento(Integer id, String estado) {
+    public StatusPagamento(Long id, String estado) {
         this.id = id;
         this.estado = estado;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
 }

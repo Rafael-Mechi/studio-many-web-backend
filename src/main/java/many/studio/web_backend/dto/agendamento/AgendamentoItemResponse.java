@@ -1,29 +1,15 @@
-package many.studio.web_backend.entity;
+package many.studio.web_backend.dto.agendamento;
 
-import jakarta.persistence.*;
 import many.studio.web_backend.entity.enums.StatusAgendamentoItem;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "agendamento_itens")
-public class AgendamentoItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class AgendamentoItemResponse {
+
     private Long id;
-
-    @Column(name = "data_hora")
     private LocalDateTime dataHora;
-
-    @Column(name = "preco_unitario")
     private Double precoUnitario;
-
-    @Enumerated(EnumType.STRING)
     private StatusAgendamentoItem status;
-
-    @ManyToOne
-    @JoinColumn(name = "agendamento_id")
-    private Agendamento agendamento;
 
     public Long getId() {
         return id;
@@ -55,13 +41,5 @@ public class AgendamentoItem {
 
     public void setStatus(StatusAgendamentoItem status) {
         this.status = status;
-    }
-
-    public Agendamento getAgendamento() {
-        return agendamento;
-    }
-
-    public void setAgendamento(Agendamento agendamento) {
-        this.agendamento = agendamento;
     }
 }

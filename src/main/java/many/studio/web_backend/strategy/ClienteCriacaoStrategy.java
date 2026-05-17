@@ -19,8 +19,8 @@ public class ClienteCriacaoStrategy implements UsuarioCriacaoStrategy {
     }
 
     @Override
-    public boolean suporta(Integer perfilId) {
-        return perfilId == 3;
+    public boolean suporta(Long perfilId) {
+        return perfilId == 3L;
     }
 
     @Override

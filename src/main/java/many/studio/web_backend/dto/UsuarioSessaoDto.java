@@ -2,15 +2,15 @@ package many.studio.web_backend.dto;
 
 public class UsuarioSessaoDto {
 
-    private Integer userId;
+    private Long userId;
     private String nome;
     private String email;
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

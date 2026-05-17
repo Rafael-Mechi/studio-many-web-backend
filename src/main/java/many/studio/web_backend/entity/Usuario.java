@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "email")
     private String email;
@@ -28,7 +28,7 @@ public class Usuario {
 
     public Usuario() {}
 
-    public Usuario(Integer id, String email, String senha, Boolean ativo, LocalDateTime criadoEm, Perfil perfil) {
+    public Usuario(Long id, String email, String senha, Boolean ativo, LocalDateTime criadoEm, Perfil perfil) {
         this.id = id;
         this.email = email;
         this.senha = senha;
@@ -37,8 +37,8 @@ public class Usuario {
         this.perfil = perfil;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public String getSenha() { return senha; }

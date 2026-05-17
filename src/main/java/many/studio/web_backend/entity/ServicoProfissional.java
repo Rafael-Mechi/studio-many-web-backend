@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class ServicoProfissional {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "servicos_id")
@@ -20,14 +20,14 @@ public class ServicoProfissional {
 
     public ServicoProfissional() {}
 
-    public ServicoProfissional(Integer id, Servico servico, Profissional profissional) {
+    public ServicoProfissional(Long id, Servico servico, Profissional profissional) {
         this.id = id;
         this.servico = servico;
         this.profissional = profissional;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public Servico getServico() { return servico; }
     public void setServico(Servico servico) { this.servico = servico; }
     public Profissional getProfissional() { return profissional; }

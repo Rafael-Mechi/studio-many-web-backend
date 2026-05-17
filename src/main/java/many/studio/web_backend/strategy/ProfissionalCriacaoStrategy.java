@@ -17,8 +17,8 @@ public class ProfissionalCriacaoStrategy implements UsuarioCriacaoStrategy {
     }
 
     @Override
-    public boolean suporta(Integer perfilId) {
-        return perfilId == 1 || perfilId == 2;
+    public boolean suporta(Long perfilId) {
+        return perfilId == 1L || perfilId == 2L;
     }
 
     @Override
