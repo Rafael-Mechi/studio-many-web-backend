@@ -7,20 +7,20 @@ import jakarta.persistence.*;
 public class Perfil {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "perfil", nullable = false)
     private String perfil;
 
     public Perfil() {}
 
-    public Perfil(Integer id, String perfil) {
+    public Perfil(Long id, String perfil) {
         this.id = id;
         this.perfil = perfil;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getPerfil() { return perfil; }
     public void setPerfil(String perfil) { this.perfil = perfil; }
 }

@@ -4,7 +4,7 @@ import many.studio.web_backend.dto.usuario.UsuarioCriacaoDto;
 import many.studio.web_backend.entity.Usuario;
 
 public interface UsuarioCriacaoStrategy {
-    boolean suporta(Integer perfilId);
+    boolean suporta(Long perfilId);
 
     void criarDadosComplementares(Usuario usuario, UsuarioCriacaoDto dto);
 }

@@ -109,7 +109,7 @@ public class UsuarioService {
                 .toList();
     }
 
-    public void atualizar(Integer id, UsuarioAtualizarDto dto) {
+    public void atualizar(Long id, UsuarioAtualizarDto dto) {
 
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
@@ -128,7 +128,7 @@ public class UsuarioService {
         usuarioRepository.save(usuarioExistente);
     }
 
-    public void removerPorId(Integer id) {
+    public void removerPorId(Long id) {
         if (!usuarioRepository.existsById(id)) {
             throw new EntityNotFoundException("Usuário não encontrado");
         }

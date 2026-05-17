@@ -220,7 +220,7 @@ public class UsuarioController {
     )
     @PutMapping("/{id}")
     public ResponseEntity<Void> atualizarUsuario(
-            @PathVariable Integer id,
+            @PathVariable Long id,
             @Valid @RequestBody UsuarioAtualizarDto dto) {
 
         usuarioService.atualizar(id, dto);
@@ -273,7 +273,7 @@ public class UsuarioController {
     )
     @SecurityRequirement(name = "Bearer")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removerUsuario(@PathVariable Integer id) {
+    public ResponseEntity<Void> removerUsuario(@PathVariable Long id) {
         usuarioService.removerPorId(id);
 
 

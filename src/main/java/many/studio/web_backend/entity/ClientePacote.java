@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class ClientePacote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "sessoes_restantes")
     private Integer sessoesRestantes;
@@ -37,7 +37,7 @@ public class ClientePacote {
 
     public ClientePacote() {}
 
-    public ClientePacote(Integer id, Integer sessoesRestantes, LocalDateTime validoAte, LocalDateTime criadoEm, Cliente cliente, Pacote pacote, Pagamento pagamento, StatusClientePacote statusClientePacote) {
+    public ClientePacote(Long id, Integer sessoesRestantes, LocalDateTime validoAte, LocalDateTime criadoEm, Cliente cliente, Pacote pacote, Pagamento pagamento, StatusClientePacote statusClientePacote) {
         this.id = id;
         this.sessoesRestantes = sessoesRestantes;
         this.validoAte = validoAte;
@@ -48,8 +48,8 @@ public class ClientePacote {
         this.statusClientePacote = statusClientePacote;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public Integer getSessoesRestantes() { return sessoesRestantes; }
     public void setSessoesRestantes(Integer sessoesRestantes) { this.sessoesRestantes = sessoesRestantes; }
     public LocalDateTime getValidoAte() { return validoAte; }
