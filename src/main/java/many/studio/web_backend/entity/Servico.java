@@ -1,6 +1,8 @@
 package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
+import many.studio.web_backend.entity.enums.TipoSinal;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,9 +36,8 @@ public class Servico {
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
 
-    @ManyToOne
-    @JoinColumn(name = "tipos_sinais_id")
-    private TipoSinal tipoSinal;
+    @Column(name = "sinal_tipo")
+    private  TipoSinal tipoSinal;
 
     public Servico() {}
 
