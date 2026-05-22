@@ -1,6 +1,7 @@
 package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,22 +28,6 @@ public class Pagamento {
     @JoinColumn(name = "status_pagamento_id")
     private StatusPagamento statusPagamento;
 
-    @ManyToOne
-    @JoinColumn(name = "tipo_pagamentos_id")
-    private TipoPagamento tipoPagamento;
-
-    public Pagamento() {}
-
-    public Pagamento(Long id, Double valor, LocalDateTime pagoEm, String comprovanteUrl, Agendamento agendamento, StatusPagamento statusPagamento, TipoPagamento tipoPagamento) {
-        this.id = id;
-        this.valor = valor;
-        this.pagoEm = pagoEm;
-        this.comprovanteUrl = comprovanteUrl;
-        this.agendamento = agendamento;
-        this.statusPagamento = statusPagamento;
-        this.tipoPagamento = tipoPagamento;
-    }
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Double getValor() { return valor; }
@@ -55,6 +40,4 @@ public class Pagamento {
     public void setAgendamento(Agendamento agendamento) { this.agendamento = agendamento; }
     public StatusPagamento getStatusPagamento() { return statusPagamento; }
     public void setStatusPagamento(StatusPagamento statusPagamento) { this.statusPagamento = statusPagamento; }
-    public TipoPagamento getTipoPagamento() { return tipoPagamento; }
-    public void setTipoPagamento(TipoPagamento tipoPagamento) { this.tipoPagamento = tipoPagamento; }
 }
