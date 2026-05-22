@@ -1,8 +1,6 @@
 package many.studio.web_backend.dto.servico;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
-import many.studio.web_backend.entity.enums.TipoSinal;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +24,6 @@ public class ServicoListarDto {
     @Schema(description = "Custo do serviço", example = "120,00")
     private Double preco;
 
-
     @Schema(description = "Custo do sinal para aquele serviço", example = "50,00")
     private Double sinalValor;
 
@@ -35,9 +32,6 @@ public class ServicoListarDto {
 
     @Schema(description = "Data de criação do serviço", example = "15/09/2026")
     private LocalDateTime criadoEm;
-
-    @Schema(description = "tipo de sinal que esse serviço possui",example = "FIXO")
-    private TipoSinal tipoSinal;
 
     public Boolean getAtivo() {
         return ativo;

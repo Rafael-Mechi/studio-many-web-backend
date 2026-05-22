@@ -25,7 +25,7 @@ public class AgendamentoController {
 
     @PostMapping
     public ResponseEntity<AgendamentoCriacaoResponse> criar(@Valid @RequestBody AgendamentoCriacaoRequest request) {
-        return ResponseEntity.status(201).body(service.criar(AgendamentoMapper.toEntity(request), request.getHorarios()));
+        return ResponseEntity.status(201).body(service.criar(request));
     }
 
 

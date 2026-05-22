@@ -1,7 +1,6 @@
 package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
-import many.studio.web_backend.entity.enums.TipoSinal;
 
 import java.time.LocalDateTime;
 
@@ -36,24 +35,6 @@ public class Servico {
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
 
-    @Column(name = "sinal_tipo")
-    private  TipoSinal tipoSinal;
-
-    public Servico() {}
-
-    public Servico(Long id, String nome, String descricao, String fotoUrl, Integer duracaoMinutos, Double preco, Double sinalValor, Boolean ativo, LocalDateTime criadoEm, TipoSinal tipoSinal) {
-        this.id = id;
-        this.nome = nome;
-        this.descricao = descricao;
-        this.fotoUrl = fotoUrl;
-        this.duracaoMinutos = duracaoMinutos;
-        this.preco = preco;
-        this.sinalValor = sinalValor;
-        this.ativo = ativo;
-        this.criadoEm = criadoEm;
-        this.tipoSinal = tipoSinal;
-    }
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
@@ -72,6 +53,4 @@ public class Servico {
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public LocalDateTime getCriadoEm() { return criadoEm; }
     public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
-    public TipoSinal getTipoSinal() { return tipoSinal; }
-    public void setTipoSinal(TipoSinal tipoSinal) { this.tipoSinal = tipoSinal; }
 }
