@@ -1,8 +1,10 @@
 package many.studio.web_backend.service;
 
-import many.studio.web_backend.dto.profissional.ClientePorProfissionalDto;
+import jakarta.transaction.Transactional;
+import many.studio.web_backend.dto.profissional.*;
 import many.studio.web_backend.entity.Cliente;
 import many.studio.web_backend.entity.Profissional;
+import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.ProfissionalMapper;
 import many.studio.web_backend.repository.AgendamentoRepository;
@@ -12,9 +14,7 @@ import many.studio.web_backend.repository.ProfissionalRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProfissionalService {
@@ -51,5 +51,63 @@ public class ProfissionalService {
                     totalGasto,
                     preferido);
         }).toList();
+    }
+
+    public ClienteDetalheDto detalharClientePorProfissional(Long profissionalId, Long clienteId) {
+        if (!profissionalRepository.existsById(profissionalId)) {
+            throw new EntityNotFoundException("Profissional não existe");
+        }
+
+        ClienteAgregado agregado = clienteRepository.findClienteByProfissionalIdEClienteId(profissionalId, clienteId)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado para este profissional"));
+
+        Cliente cliente = agregado.getCliente();
+        LocalDate ultimaVisita = agregado.getUltimaVisita();
+        Double totalGasto = (agregado.getTotalGasto() != null) ? agregado.getTotalGasto() : 0.0;
+
+        List<AgendamentoHistoricoDto> historico = agendamentoRepository.findHistoricoRecenteByClienteId(clienteId);
+
+        return new ClienteDetalheDto(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getTelefone(),
+                cliente.getDocumento(),
+                cliente.getUsuario().getEmail(),
+                cliente.getTotalNoShows(),
+                ultimaVisita,
+                totalGasto,
+                historico
+        );
+    }
+
+    @Transactional
+    public ProfissionalResponseDto atualizarProfissional(Long profissionalId, ProfissionalUpdateDto dto) {
+        Profissional profissional = profissionalRepository.findById(profissionalId)
+                .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+
+        profissional.setNome(dto.nome());
+
+        Usuario usuario = profissional.getUsuario();
+        usuario.setEmail(dto.email());
+        usuario.setSenha(dto.senha());
+
+        profissionalRepository.save(profissional);
+
+        return new ProfissionalResponseDto(
+                profissional.getId(),
+                profissional.getNome(),
+                usuario.getEmail()
+        );
+    }
+
+    @Transactional
+    public void deletarProfissional(Long profissionalId) {
+        Profissional profissional = profissionalRepository.findById(profissionalId)
+                .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+
+        Usuario usuario = profissional.getUsuario();
+        usuario.setAtivo(false);
+
+        profissionalRepository.save(profissional);
     }
 }
