@@ -30,11 +30,9 @@ public class ClientePorProfissionalDto {
     @Schema(description = "Telefone do cliente", example = "(11) 91234-1234")
     private String telefone;
 
-    @NotBlank
     @Schema(description = "Serviço preferido do cliente", example = "Depilação a laser")
     private String servicoPreferido;
 
-    @NotNull
     @Past
     @Schema(description = "Data do último agendamento do cliente", example = "2026-05-10")
     private LocalDate ultimaVisita;

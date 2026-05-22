@@ -8,18 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
-    @Query("SELECT MAX(FUNCTION('DATE', a.criadoEm)) " +
-            "FROM Agendamento a " +
-            "WHERE a.cliente.id = :clienteId")
-    LocalDate findUltimaVisitaByClienteId(@Param("clienteId") Long clienteId);
-
-    @Query("SELECT SUM(ai.precoFinal) FROM AgendamentoItem ai " +
-            "JOIN ai.agendamento a " +
-            "JOIN a.statusAgendamento sa " +
-            "WHERE a.cliente.id = :clienteId " +
-            "AND sa.estado = 'PAGO'")
-    Double findTotalGastoByClienteId(@Param("clienteId") Long clienteId);
-
     @Query("SELECT s.nome FROM AgendamentoItem ai " +
             "JOIN ai.agendamento a " +
             "JOIN ai.servico s " +

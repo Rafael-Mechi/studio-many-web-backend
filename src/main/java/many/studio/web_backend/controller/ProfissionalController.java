@@ -1,14 +1,10 @@
 package many.studio.web_backend.controller;
 
-import jakarta.websocket.server.PathParam;
 import many.studio.web_backend.dto.profissional.ClientePorProfissionalDto;
 import many.studio.web_backend.entity.Cliente;
 import many.studio.web_backend.service.ProfissionalService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,11 +17,11 @@ public class ProfissionalController {
         this.profissionalService = profissionalService;
     }
 
-    @GetMapping("/{funcionarioId}/clientes")
+    @GetMapping("/{profissionalId}/clientes")
     public ResponseEntity<List<ClientePorProfissionalDto>> listarClientesPorProfissional(
-            @PathVariable Long funcionarioId
+            @PathVariable Long profissionalId
     ){
-        List<ClientePorProfissionalDto> response = profissionalService.listarClientesPorFuncionarioId(funcionarioId);
+        List<ClientePorProfissionalDto> response = profissionalService.listarClientesPorProfissionalId(profissionalId);
         return ResponseEntity.ok(response);
     }
 }

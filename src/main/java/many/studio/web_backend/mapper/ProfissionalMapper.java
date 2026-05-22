@@ -2,12 +2,12 @@ package many.studio.web_backend.mapper;
 
 import many.studio.web_backend.dto.profissional.ClientePorProfissionalDto;
 import many.studio.web_backend.entity.Cliente;
+import many.studio.web_backend.repository.ClienteAgregado;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ProfissionalMapper {
-
-    // Método estático que recebe a entidade e os dados calculados de fora
     public static ClientePorProfissionalDto toResponse(
             Cliente cliente,
             String nomeFuncionario,
@@ -23,9 +23,7 @@ public class ProfissionalMapper {
         response.setTelefone(cliente.getTelefone());
         response.setNoShow(cliente.getTotalNoShows());
         response.setNomeFuncionario(nomeFuncionario);
-
         response.setEmail(cliente.getUsuario().getEmail());
-
         response.setUltimaVisita(ultimaVisita);
         response.setTotalGasto(totalGasto);
         response.setServicoPreferido(servicoPreferido);

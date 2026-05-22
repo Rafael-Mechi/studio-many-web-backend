@@ -1,6 +1,5 @@
 package many.studio.web_backend.repository;
 
-import jakarta.websocket.server.PathParam;
 import many.studio.web_backend.entity.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,10 +11,16 @@ import java.util.Optional;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     Optional<Cliente> findByUsuario_Id(Long usuarioId);
 
-    @Query("SELECT DISTINCT c " +
+    @Query("SELECT c as cliente, " +
+            "MAX(a.criadoEm) as ultimaVisita, " +
+            "SUM(CASE WHEN sa.estado = 'PAGO' " +
+            "   THEN ai.precoFinal ELSE 0.0 END) " +
+            "   as totalGasto " +
             "FROM Cliente c " +
             "JOIN Agendamento a ON a.cliente.id = c.id " +
             "JOIN AgendamentoItem ai ON ai.agendamento.id = a.id " +
-            "WHERE ai.profissional.id = :profissionalId")
-    List<Cliente> findClientesByProfissionalId(@Param("profissionalId") Long profissionalId);
+            "JOIN ai.statusAgendamento sa " +
+            "WHERE ai.profissional.id = :profissionalId " +
+            "GROUP BY c.id, c.nome")
+    List<ClienteAgregado> findClientesByProfissionalId(@Param("profissionalId") Long profissionalId);
 }
