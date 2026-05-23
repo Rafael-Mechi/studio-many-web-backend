@@ -1,16 +1,17 @@
 package many.studio.web_backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
+import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequestDto;
+import many.studio.web_backend.dto.agendamento.CancelarAgendamentoResponseDto;
 import many.studio.web_backend.mapper.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/agendamentos")
@@ -28,5 +29,11 @@ public class AgendamentoController {
         return ResponseEntity.status(201).body(service.criar(request));
     }
 
+    @PatchMapping("/{idAgendamento}/cancelar")
+    @Operation(summary = "Cancelar agendamento")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<CancelarAgendamentoResponseDto> cancelarAgendamento(@Valid @PathVariable Long idAgendamento, CancelarAgendamentoRequestDto requestDto){
+        return ResponseEntity.status(200).body(null);
+    }
 
 }
