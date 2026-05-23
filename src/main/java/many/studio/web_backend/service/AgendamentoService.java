@@ -92,9 +92,12 @@ public class AgendamentoService {
         Optional<Agendamento> agendamento = agendamentoRepository.findById(idAgendamento);
         LocalDateTime inicioAgendamento = agendamento.get().getInicio();
 
-        Long perfilUsuario = perfilRepository.findByUsuarioId(idUsuario).getId();
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        if(inicioAgendamento.isBefore(LocalDateTime.now().plusHours(24)) && perfilUsuario != 1){
+        Long perfilUsuario = usuario.getPerfil().getId();
+
+        if(inicioAgendamento.isBefore(LocalDateTime.now().plusHours(24)) && perfilUsuario != 1L){
             throw new NonAuthorizedException("Não é possível cancelar agendamento com menos de 24 horas");
         }
 

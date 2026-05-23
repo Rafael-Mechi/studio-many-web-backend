@@ -3,10 +3,12 @@ package many.studio.web_backend.service.helper;
 import many.studio.web_backend.entity.Agendamento;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.repository.*;
+import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Optional;
 
+@Component
 public class AgendamentoHelper {
     private final AgendamentoRepository agendamentoRepository;
     private final AgendamentoItemRepository agendamentoItemRepository;
