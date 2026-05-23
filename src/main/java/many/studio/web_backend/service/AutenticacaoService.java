@@ -30,6 +30,6 @@ public class AutenticacaoService implements UserDetailsService {
         Usuario usuario = usuarioOpt.get();
 
         // Passa o campo 'ativo' do banco para que isEnabled() bloqueie usuários inativos
-        return new UsuarioDetalhesDto(usuario, usuario.getAtivo());
+        return new UsuarioDetalhesDto(usuario.getId(), usuario, usuario.getAtivo());
     }
 }
