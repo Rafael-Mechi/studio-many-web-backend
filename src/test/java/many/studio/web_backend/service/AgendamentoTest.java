@@ -4,13 +4,11 @@ import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
 import many.studio.web_backend.entity.Agendamento;
 import many.studio.web_backend.entity.Perfil;
 import many.studio.web_backend.exception.NonAuthorizedException;
-import many.studio.web_backend.repository.AgendamentoItemRepository;
-import many.studio.web_backend.repository.AgendamentoRepository;
-import many.studio.web_backend.repository.PerfilRepository;
+import many.studio.web_backend.repository.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
-import many.studio.web_backend.repository.StatusAgendamentoRepository;
 import many.studio.web_backend.service.helper.AgendamentoHelper;
 import many.studio.web_backend.entity.StatusAgendamento;
+import many.studio.web_backend.entity.Usuario;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,9 +25,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AgendamentoTest {
-    @InjectMocks
-    private AgendamentoService service;
-
     @Mock
     private AgendamentoRepository agendamentoRepository;
 
@@ -45,166 +40,36 @@ public class AgendamentoTest {
     @Mock
     private AgendamentoHelper agendamentoHelper;
 
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
+    @InjectMocks
+    private AgendamentoService service;
+
     @Nested
     class CancelarAgendamento{
         @Test
-        void deveLancarExcecaoQuandoUsuarioNaoAutorizado() {
+        void deveCancelarQuandoUsuarioForDonoDoAgendamentoEFaltarMaisDe24Horas() {
 
             Long idAgendamento = 1L;
             Long idUsuario = 2L;
 
             CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
+            request.setMotivo("Cliente cancelou");
 
-            when(agendamentoHelper
-                    .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
-                    .thenReturn(false);
+            Perfil perfilCliente = new Perfil();
+            perfilCliente.setId(3L);
 
-            assertThrows(
-                    NonAuthorizedException.class,
-                    () -> service.cancelarAgendamento(idAgendamento, request, idUsuario)
-            );
-
-            verify(agendamentoRepository, never()).findById(any());
-            verify(agendamentoItemRepository, never()).deleteByAgendamentoId(any());
-            verify(statusAgendamentoRepository, never()).findByEstado(any());
-            verify(agendamentoRepository, never()).save(any());
-        }
-
-        @Test
-        void deveLancarExcecaoQuandoAgendamentoNaoExiste() {
-
-            Long idAgendamento = 1L;
-            Long idUsuario = 2L;
-
-            CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
-
-            when(agendamentoHelper
-                    .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
-                    .thenReturn(true);
-
-            when(agendamentoRepository.existsById(idAgendamento))
-                    .thenReturn(false);
-
-            assertThrows(
-                    EntityNotFoundException.class,
-                    () -> service.cancelarAgendamento(idAgendamento, request, idUsuario)
-            );
-
-            verify(agendamentoRepository).existsById(idAgendamento);
-            verify(agendamentoRepository, never()).findById(any());
-            verify(agendamentoItemRepository, never()).deleteByAgendamentoId(any());
-            verify(statusAgendamentoRepository, never()).findByEstado(any());
-            verify(agendamentoRepository, never()).save(any());
-        }
-
-        @Test
-        void deveLancarExcecaoQuandoFaltarMenosDe24HorasEUsuarioNaoForAdmin() {
-
-            Long idAgendamento = 1L;
-            Long idUsuario = 2L;
-
-            CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
-
-            Perfil perfil = new Perfil();
-            perfil.setId(2L);
-
-            Agendamento agendamento = new Agendamento();
-            agendamento.setId(idAgendamento);
-            agendamento.setInicio(LocalDateTime.now().plusHours(10));
-
-            when(agendamentoHelper
-                    .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
-                    .thenReturn(true);
-
-            when(agendamentoRepository.existsById(idAgendamento))
-                    .thenReturn(true);
-
-            when(agendamentoRepository.findById(idAgendamento))
-                    .thenReturn(Optional.of(agendamento));
-
-            when(perfilRepository.findByUsuarioId(idUsuario))
-                    .thenReturn(perfil);
-
-            assertThrows(
-                    NonAuthorizedException.class,
-                    () -> service.cancelarAgendamento(idAgendamento, request, idUsuario)
-            );
-
-            verify(agendamentoRepository).existsById(idAgendamento);
-            verify(agendamentoRepository).findById(idAgendamento);
-            verify(perfilRepository).findByUsuarioId(idUsuario);
-            verify(agendamentoItemRepository, never()).deleteByAgendamentoId(any());
-            verify(statusAgendamentoRepository, never()).findByEstado(any());
-            verify(agendamentoRepository, never()).save(any());
-        }
-
-        @Test
-        void devePermitirCancelamentoQuandoFaltarMenosDe24HorasMasUsuarioForAdmin() {
-
-            Long idAgendamento = 1L;
-            Long idUsuario = 2L;
-
-            CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
-            request.setMotivo("Cancelamento solicitado pelo admin");
-
-            Perfil perfil = new Perfil();
-            perfil.setId(1L);
-
-            Agendamento agendamento = new Agendamento();
-            agendamento.setId(idAgendamento);
-            agendamento.setInicio(LocalDateTime.now().plusHours(10));
-
-            StatusAgendamento statusCancelado = new StatusAgendamento();
-            statusCancelado.setId(1L);
-            statusCancelado.setEstado("cancelado");
-
-            when(agendamentoHelper
-                    .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
-                    .thenReturn(true);
-
-            when(agendamentoRepository.existsById(idAgendamento))
-                    .thenReturn(true);
-
-            when(agendamentoRepository.findById(idAgendamento))
-                    .thenReturn(Optional.of(agendamento));
-
-            when(perfilRepository.findByUsuarioId(idUsuario))
-                    .thenReturn(perfil);
-
-            when(statusAgendamentoRepository.findByEstado("cancelado"))
-                    .thenReturn(Optional.of(statusCancelado));
-
-            doNothing().when(agendamentoItemRepository).deleteByAgendamentoId(idAgendamento);
-
-            service.cancelarAgendamento(idAgendamento, request, idUsuario);
-
-            verify(agendamentoItemRepository).deleteByAgendamentoId(idAgendamento);
-            verify(statusAgendamentoRepository).findByEstado("cancelado");
-            verify(agendamentoRepository).save(agendamento);
-
-            assertNotNull(agendamento.getCanceladoEm());
-            assertEquals("cancelado", agendamento.getStatusAgendamento().getEstado());
-            assertEquals("Cancelamento solicitado pelo admin", agendamento.getCancelamentoMotivo());
-        }
-
-        @Test
-        void devePermitirCancelamentoQuandoFaltarMaisDe24Horas() {
-
-            Long idAgendamento = 1L;
-            Long idUsuario = 2L;
-
-            CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
-            request.setMotivo("Cliente mudou de ideia");
-
-            Perfil perfil = new Perfil();
-            perfil.setId(2L);
+            Usuario usuario = new Usuario();
+            usuario.setId(idUsuario);
+            usuario.setPerfil(perfilCliente);
 
             Agendamento agendamento = new Agendamento();
             agendamento.setId(idAgendamento);
             agendamento.setInicio(LocalDateTime.now().plusHours(48));
 
             StatusAgendamento statusCancelado = new StatusAgendamento();
-            statusCancelado.setId(1L);
+            statusCancelado.setId(5L);
             statusCancelado.setEstado("cancelado");
 
             when(agendamentoHelper
@@ -217,40 +82,57 @@ public class AgendamentoTest {
             when(agendamentoRepository.findById(idAgendamento))
                     .thenReturn(Optional.of(agendamento));
 
-            when(perfilRepository.findByUsuarioId(idUsuario))
-                    .thenReturn(perfil);
+            when(usuarioRepository.findById(idUsuario))
+                    .thenReturn(Optional.of(usuario));
 
             when(statusAgendamentoRepository.findByEstado("cancelado"))
                     .thenReturn(Optional.of(statusCancelado));
 
-            doNothing().when(agendamentoItemRepository).deleteByAgendamentoId(idAgendamento);
+            doNothing().when(agendamentoItemRepository)
+                    .deleteByAgendamentoId(idAgendamento);
 
             service.cancelarAgendamento(idAgendamento, request, idUsuario);
 
-            verify(agendamentoItemRepository).deleteByAgendamentoId(idAgendamento);
-            verify(statusAgendamentoRepository).findByEstado("cancelado");
-            verify(agendamentoRepository).save(agendamento);
+            verify(agendamentoItemRepository)
+                    .deleteByAgendamentoId(idAgendamento);
+
+            verify(statusAgendamentoRepository)
+                    .findByEstado("cancelado");
+
+            verify(agendamentoRepository)
+                    .save(agendamento);
+
+            assertEquals("cancelado",
+                    agendamento.getStatusAgendamento().getEstado());
+
+            assertEquals("Cliente cancelou",
+                    agendamento.getCancelamentoMotivo());
 
             assertNotNull(agendamento.getCanceladoEm());
-            assertEquals("cancelado", agendamento.getStatusAgendamento().getEstado());
-            assertEquals("Cliente mudou de ideia", agendamento.getCancelamentoMotivo());
         }
 
         @Test
-        void deveLancarRuntimeExceptionQuandoStatusCanceladoNaoEncontrado() {
+        void deveCancelarQuandoUsuarioForAdminMesmoFaltandoMenosDe24Horas() {
 
             Long idAgendamento = 1L;
-            Long idUsuario = 2L;
+            Long idUsuario = 1L;
 
             CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
-            request.setMotivo("Cancelamento");
+            request.setMotivo("Admin cancelou");
 
-            Perfil perfil = new Perfil();
-            perfil.setId(1L);
+            Perfil perfilAdmin = new Perfil();
+            perfilAdmin.setId(1L);
+
+            Usuario admin = new Usuario();
+            admin.setId(idUsuario);
+            admin.setPerfil(perfilAdmin);
 
             Agendamento agendamento = new Agendamento();
             agendamento.setId(idAgendamento);
-            agendamento.setInicio(LocalDateTime.now().plusHours(10));
+            agendamento.setInicio(LocalDateTime.now().plusHours(5));
+
+            StatusAgendamento statusCancelado = new StatusAgendamento();
+            statusCancelado.setEstado("cancelado");
 
             when(agendamentoHelper
                     .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
@@ -262,20 +144,160 @@ public class AgendamentoTest {
             when(agendamentoRepository.findById(idAgendamento))
                     .thenReturn(Optional.of(agendamento));
 
-            when(perfilRepository.findByUsuarioId(idUsuario))
-                    .thenReturn(perfil);
+            when(usuarioRepository.findById(idUsuario))
+                    .thenReturn(Optional.of(admin));
 
             when(statusAgendamentoRepository.findByEstado("cancelado"))
-                    .thenReturn(Optional.empty());
+                    .thenReturn(Optional.of(statusCancelado));
+
+            service.cancelarAgendamento(idAgendamento, request, idUsuario);
+
+            verify(agendamentoItemRepository)
+                    .deleteByAgendamentoId(idAgendamento);
+
+            verify(agendamentoRepository)
+                    .save(agendamento);
+
+            assertEquals("cancelado",
+                    agendamento.getStatusAgendamento().getEstado());
+
+            assertEquals("Admin cancelou",
+                    agendamento.getCancelamentoMotivo());
+        }
+
+        @Test
+        void deveCancelarQuandoUsuarioForAdminMesmoDepoisDas24Horas() {
+
+            Long idAgendamento = 1L;
+            Long idUsuario = 1L;
+
+            CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
+            request.setMotivo("Admin cancelou atrasado");
+
+            Perfil perfilAdmin = new Perfil();
+            perfilAdmin.setId(1L);
+
+            Usuario admin = new Usuario();
+            admin.setId(idUsuario);
+            admin.setPerfil(perfilAdmin);
+
+            Agendamento agendamento = new Agendamento();
+            agendamento.setId(idAgendamento);
+
+            // já passou
+            agendamento.setInicio(LocalDateTime.now().minusHours(2));
+
+            StatusAgendamento statusCancelado = new StatusAgendamento();
+            statusCancelado.setEstado("cancelado");
+
+            when(agendamentoHelper
+                    .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
+                    .thenReturn(true);
+
+            when(agendamentoRepository.existsById(idAgendamento))
+                    .thenReturn(true);
+
+            when(agendamentoRepository.findById(idAgendamento))
+                    .thenReturn(Optional.of(agendamento));
+
+            when(usuarioRepository.findById(idUsuario))
+                    .thenReturn(Optional.of(admin));
+
+            when(statusAgendamentoRepository.findByEstado("cancelado"))
+                    .thenReturn(Optional.of(statusCancelado));
+
+            service.cancelarAgendamento(idAgendamento, request, idUsuario);
+
+            verify(agendamentoItemRepository)
+                    .deleteByAgendamentoId(idAgendamento);
+
+            verify(agendamentoRepository)
+                    .save(agendamento);
+
+            assertEquals("cancelado",
+                    agendamento.getStatusAgendamento().getEstado());
+        }
+
+        @Test
+        void naoDeveCancelarQuandoFaltarMenosDe24HorasEUsuarioNaoForAdmin() {
+
+            Long idAgendamento = 1L;
+            Long idUsuario = 2L;
+
+            CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
+
+            Perfil perfilCliente = new Perfil();
+            perfilCliente.setId(3L);
+
+            Usuario usuario = new Usuario();
+            usuario.setId(idUsuario);
+            usuario.setPerfil(perfilCliente);
+
+            Agendamento agendamento = new Agendamento();
+            agendamento.setId(idAgendamento);
+
+            // menos de 24h
+            agendamento.setInicio(LocalDateTime.now().plusHours(5));
+
+            when(agendamentoHelper
+                    .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
+                    .thenReturn(true);
+
+            when(agendamentoRepository.existsById(idAgendamento))
+                    .thenReturn(true);
+
+            when(agendamentoRepository.findById(idAgendamento))
+                    .thenReturn(Optional.of(agendamento));
+
+            when(usuarioRepository.findById(idUsuario))
+                    .thenReturn(Optional.of(usuario));
 
             assertThrows(
-                    RuntimeException.class,
+                    NonAuthorizedException.class,
                     () -> service.cancelarAgendamento(idAgendamento, request, idUsuario)
             );
 
-            verify(agendamentoItemRepository).deleteByAgendamentoId(idAgendamento);
-            verify(statusAgendamentoRepository).findByEstado("cancelado");
-            verify(agendamentoRepository, never()).save(any());
+            verify(agendamentoItemRepository, never())
+                    .deleteByAgendamentoId(any());
+
+            verify(statusAgendamentoRepository, never())
+                    .findByEstado(any());
+
+            verify(agendamentoRepository, never())
+                    .save(any());
+        }
+
+        @Test
+        void naoDeveCancelarQuandoAgendamentoForDeOutroUsuario() {
+
+            Long idAgendamento = 1L;
+            Long idUsuario = 2L;
+
+            CancelarAgendamentoRequest request = new CancelarAgendamentoRequest();
+
+            when(agendamentoHelper
+                    .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
+                    .thenReturn(false);
+
+            assertThrows(
+                    NonAuthorizedException.class,
+                    () -> service.cancelarAgendamento(idAgendamento, request, idUsuario)
+            );
+
+            verify(agendamentoRepository, never())
+                    .existsById(any());
+
+            verify(agendamentoRepository, never())
+                    .findById(any());
+
+            verify(agendamentoItemRepository, never())
+                    .deleteByAgendamentoId(any());
+
+            verify(statusAgendamentoRepository, never())
+                    .findByEstado(any());
+
+            verify(agendamentoRepository, never())
+                    .save(any());
         }
     }
 }

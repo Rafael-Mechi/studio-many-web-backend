@@ -30,8 +30,6 @@ public class AgendamentoController {
 
     @PatchMapping("/{idAgendamento}/cancelar")
     public ResponseEntity<Void> cancelarAgendamento(@PathVariable Long idAgendamento, @RequestBody CancelarAgendamentoRequest requestDto, @AuthenticationPrincipal UsuarioDetalhesDto usuario){
-        System.out.println(usuario.getId());
-        System.out.println(usuario.getUsername());
         service.cancelarAgendamento(idAgendamento, requestDto, usuario.getId());
         return ResponseEntity.status(200).build();
     }
