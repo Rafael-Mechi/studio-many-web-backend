@@ -6,6 +6,11 @@ CREATE TABLE IF NOT EXISTS status_pagamentos (
                                                  estado VARCHAR(45)
 );
 
+CREATE TABLE IF NOT EXISTS tipo_pagamentos(
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    tipo VARCHAR(45)
+);
+
 CREATE TABLE IF NOT EXISTS status_clientes_pacotes (
                                                        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                                                        estado VARCHAR(45)
