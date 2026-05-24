@@ -1,4 +1,4 @@
-package many.studio.web_backend.mapper;
+package many.studio.web_backend.mapper.agendamento;
 
 import many.studio.web_backend.dto.agendamento.AgendamentoItemResponse;
 import many.studio.web_backend.entity.AgendamentoItem;

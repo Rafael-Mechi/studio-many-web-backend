@@ -8,38 +8,234 @@ import java.util.List;
 public class AgendamentoCriacaoResponse {
 
     private Long id;
-    private LocalDateTime inicio;
-    private LocalDateTime fim;
     private LocalDateTime criadoEm;
-    private StatusAgendamento status;
-    private Long criadoPorUsuarioId;
-    private ClienteResponse cliente;
+    private Double preco;
+    private Double descontoPorcentagem;
+    private Double precoFinal;
+    private String status;
     private List<AgendamentoItemResponse> itens;
+    private ClienteDto cliente;
+    private ProfissionalDto profissional;
+    private UsuarioDto criadoPor;
+    private PacoteDto pacote;
 
-    public static class ClienteResponse {
+    public static class ClienteDto {
         private Long id;
         private String nome;
 
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
-        public String getNome() { return nome; }
-        public void setNome(String nome) { this.nome = nome; }
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public LocalDateTime getInicio() { return inicio; }
-    public void setInicio(LocalDateTime inicio) { this.inicio = inicio; }
-    public LocalDateTime getFim() { return fim; }
-    public void setFim(LocalDateTime fim) { this.fim = fim; }
-    public LocalDateTime getCriadoEm() { return criadoEm; }
-    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
-    public StatusAgendamento getStatus() { return status; }
-    public void setStatus(StatusAgendamento status) { this.status = status; }
-    public Long getCriadoPorUsuarioId() { return criadoPorUsuarioId; }
-    public void setCriadoPorUsuarioId(Long criadoPorUsuarioId) { this.criadoPorUsuarioId = criadoPorUsuarioId; }
-    public ClienteResponse getCliente() { return cliente; }
-    public void setCliente(ClienteResponse cliente) { this.cliente = cliente; }
-    public List<AgendamentoItemResponse> getItens() { return itens; }
-    public void setItens(List<AgendamentoItemResponse> itens) { this.itens = itens; }
+    public static class ProfissionalDto {
+        private Long id;
+        private String nome;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+    }
+
+    public static class UsuarioDto {
+        private Long id;
+        private String nome;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+    }
+
+    public static class PacoteDto {
+        private Long id;
+        private String nome;
+        private Integer totalSessoes;
+        private Integer validadeDias;
+        private PacoteDto pacote;
+
+        public static class ServicoDto {
+            private Long id;
+            private String nome;
+
+            public Long getId() {
+                return id;
+            }
+
+            public void setId(Long id) {
+                this.id = id;
+            }
+
+            public String getNome() {
+                return nome;
+            }
+
+            public void setNome(String nome) {
+                this.nome = nome;
+            }
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public Integer getTotalSessoes() {
+            return totalSessoes;
+        }
+
+        public void setTotalSessoes(Integer totalSessoes) {
+            this.totalSessoes = totalSessoes;
+        }
+
+        public Integer getValidadeDias() {
+            return validadeDias;
+        }
+
+        public void setValidadeDias(Integer validadeDias) {
+            this.validadeDias = validadeDias;
+        }
+
+        public PacoteDto getPacote() {
+            return pacote;
+        }
+
+        public void setPacote(PacoteDto pacote) {
+            this.pacote = pacote;
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public void setCriadoEm(LocalDateTime criadoEm) {
+        this.criadoEm = criadoEm;
+    }
+
+    public Double getPreco() {
+        return preco;
+    }
+
+    public void setPreco(Double preco) {
+        this.preco = preco;
+    }
+
+    public Double getDescontoPorcentagem() {
+        return descontoPorcentagem;
+    }
+
+    public void setDescontoPorcentagem(Double descontoPorcentagem) {
+        this.descontoPorcentagem = descontoPorcentagem;
+    }
+
+    public Double getPrecoFinal() {
+        return precoFinal;
+    }
+
+    public void setPrecoFinal(Double precoFinal) {
+        this.precoFinal = precoFinal;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public List<AgendamentoItemResponse> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<AgendamentoItemResponse> itens) {
+        this.itens = itens;
+    }
+
+    public ClienteDto getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(ClienteDto cliente) {
+        this.cliente = cliente;
+    }
+
+    public ProfissionalDto getProfissional() {
+        return profissional;
+    }
+
+    public void setProfissional(ProfissionalDto profissional) {
+        this.profissional = profissional;
+    }
+
+    public UsuarioDto getCriadoPor() {
+        return criadoPor;
+    }
+
+    public void setCriadoPor(UsuarioDto criadoPor) {
+        this.criadoPor = criadoPor;
+    }
+
+    public PacoteDto getPacote() {
+        return pacote;
+    }
+
+    public void setPacote(PacoteDto pacote) {
+        this.pacote = pacote;
+    }
 }

@@ -5,12 +5,14 @@ import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
 import many.studio.web_backend.dto.agendamento.AgendamentoItemCriacaoRequest;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
-import many.studio.web_backend.mapper.AgendamentoMapper;
+import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.repository.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 public class AgendamentoService {
@@ -19,6 +21,7 @@ public class AgendamentoService {
     private final AgendamentoItemRepository agendamentoItemRepository;
     private final ClienteRepository clienteRepository;
     private final StatusAgendamentoRepository statusAgendamentoRepository;
+    private final PacoteRepository pacoteRepository;
     private final ServicoRepository servicoRepository;
     private final ProfissionalRepository profissionalRepository;
     private final UsuarioRepository usuarioRepository;
@@ -27,7 +30,7 @@ public class AgendamentoService {
             AgendamentoRepository agendamentoRepository,
             AgendamentoItemRepository agendamentoItemRepository,
             ClienteRepository clienteRepository,
-            StatusAgendamentoRepository statusAgendamentoRepository,
+            StatusAgendamentoRepository statusAgendamentoRepository, PacoteRepository pacoteRepository,
             ServicoRepository servicoRepository,
             ProfissionalRepository profissionalRepository,
             UsuarioRepository usuarioRepository
@@ -36,57 +39,53 @@ public class AgendamentoService {
         this.agendamentoItemRepository = agendamentoItemRepository;
         this.clienteRepository = clienteRepository;
         this.statusAgendamentoRepository = statusAgendamentoRepository;
+        this.pacoteRepository = pacoteRepository;
         this.servicoRepository = servicoRepository;
         this.profissionalRepository = profissionalRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
-    public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request) {
+    public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
-        StatusAgendamento status = statusAgendamentoRepository.findById(request.getStatusAgendamentoId())
-                .orElseThrow(() -> new EntityNotFoundException("Status de agendamento não encontrado"));
+        Pacote pacote = pacoteRepository.findById(request.getPacoteId())
+                .orElseThrow(() -> new EntityNotFoundException("Pacote não encontrado"));
+
+        Profissional profissional = profissionalRepository.findById(request.getProfissionalId())
+                .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+
+        Usuario usuario = usuarioRepository.findById(request.getUsuarioCriadorId())
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
         Agendamento agendamento = new Agendamento();
         agendamento.setCliente(cliente);
-        agendamento.setStatusAgendamento(status);
-        agendamento.setInicio(request.getInicio());
-        agendamento.setFim(request.getFim());
-
-        if (request.getCriadoPorUsuarioId() != null) {
-            Usuario criadoPor = usuarioRepository.findById(request.getCriadoPorUsuarioId())
-                    .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-            agendamento.setCriadoPorUsuario(criadoPor);
-        }
+        agendamento.setPacote(pacote);
+        agendamento.setProfissional(profissional);
+        agendamento.setCriadoPorUsuario(usuario);
+        agendamento.setPreco(pacote.getPrecoTotal());
+        agendamento.setPrecoFinal(pacote.getPrecoTotal());
 
         Agendamento saved = agendamentoRepository.save(agendamento);
-        List<AgendamentoItem> itens = criarItens(saved, request.getItens());
-        List<AgendamentoItem> savedItens = agendamentoItemRepository.saveAll(itens);
+        List<AgendamentoItem> itens = criarItens(saved, horarioAgendado);
+        List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
 
-        return AgendamentoMapper.toResponse(saved, savedItens);
+        return AgendamentoMapper.toResponse(agendamento);
     }
 
-    private List<AgendamentoItem> criarItens(Agendamento agendamento, List<AgendamentoItemCriacaoRequest> itensRequest) {
-        List<AgendamentoItem> itens = new ArrayList<>();
-        for (AgendamentoItemCriacaoRequest itemReq : itensRequest) {
-            Servico servico = servicoRepository.findById(itemReq.getServicoId())
-                    .orElseThrow(() -> new EntityNotFoundException("Serviço não encontrado"));
+    private List<AgendamentoItem> criarItens(Agendamento agendamento, LocalDateTime horaraioAgendado) {
+        return IntStream
+                .rangeClosed(0, agendamento.getPacote().getTotalSessoes())
+                .mapToObj(sessao -> {
 
-            Profissional profissional = profissionalRepository.findById(itemReq.getProfissionalId())
-                    .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+                    AgendamentoItem item = new AgendamentoItem();
+                    item.setInicioAtendimento(horaraioAgendado.plusDays(sessao * 7L));
+                    item.setFimAtendimento(item.getInicioAtendimento().plusMinutes(agendamento.getPacote().getServico().getDuracaoMinutos()));
+                    item.setAgendamento(agendamento);
 
-            AgendamentoItem item = new AgendamentoItem();
-            item.setAgendamento(agendamento);
-            item.setServico(servico);
-            item.setProfissional(profissional);
-            item.setInicioAtendimento(itemReq.getInicioAtendimento());
-            item.setFimAtendimento(itemReq.getFimAtendimento());
-            item.setPreco(itemReq.getPreco());
-            item.setDescontoPorcentagem(itemReq.getDescontoPorcentagem());
-            item.setPrecoFinal(itemReq.getPrecoFinal());
-            itens.add(item);
-        }
-        return itens;
+                    return item;
+                })
+                .toList();
+
     }
 }
