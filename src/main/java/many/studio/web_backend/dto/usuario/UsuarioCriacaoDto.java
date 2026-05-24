@@ -27,7 +27,7 @@ public class UsuarioCriacaoDto {
     @Schema(description = "cpf do usuário", example = "54345743331")
     private String documento;
 
-    @Schema(description = "Lista de serviços que o usuário faz", example = "[Limpeza de pele, Unha]")
+    @Schema(description = "Lista de serviços que o usuário faz", example = "[\"Limpeza de pele\", \"Unha\"]")
     private List<String> servicos;
 
     @NotNull

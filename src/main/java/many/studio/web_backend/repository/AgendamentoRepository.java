@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
     @Query("""
-    SELECT new many.studio.web_backend.util.horarioDisponivel.HorarioIndisponivelDto(
+    SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
         a.inicio,
         a.fim,
         p.nome,
@@ -26,7 +26,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     List<HorarioIndisponivelDto> buscarAgendamentosIndisponiveis(String nomeServico);
 
     @Query("""
-    SELECT new many.studio.web_backend.util.horarioDisponivel.HorarioIndisponivelDto(
+    SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
         b.inicio,
         b.fim,
         p.nome,
