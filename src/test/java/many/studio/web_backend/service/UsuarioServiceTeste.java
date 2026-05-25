@@ -177,7 +177,7 @@ class UsuarioServiceTeste {
                 .thenReturn(true);
 
         // Configure a lista de strategies
-        when(strategies.stream()).thenReturn(Stream.of(usuarioCriacaoStrategy));asss
+        when(strategies.stream()).thenReturn(Stream.of(usuarioCriacaoStrategy));
 
         // when
         usuarioService.criar(dto);
