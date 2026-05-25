@@ -31,30 +31,25 @@ import java.util.List;
 @Service
 public class UsuarioService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final UsuarioRepository usuarioRepository;
+    private final PerfilRepository perfilRepository;
+    private final GerenciadorTokenJwt gerenciadorTokenJwt;
+    private final AuthenticationManager authenticationManager;
+    private final List<UsuarioCriacaoStrategy> strategies;
+    private final ClienteRepository clienteRepository;
+    private final ProfissionalRepository profissionalRepository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private PerfilRepository perfilRepository;
-
-    @Autowired
-    private GerenciadorTokenJwt gerenciadorTokenJwt;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private List<UsuarioCriacaoStrategy> strategies;
-
-    @Autowired
-    private ClienteRepository clienteRepository;
-
-    @Autowired
-    private ProfissionalRepository profissionalRepository;
-
+    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository) {
+        this.passwordEncoder = passwordEncoder;
+        this.usuarioRepository = usuarioRepository;
+        this.perfilRepository = perfilRepository;
+        this.gerenciadorTokenJwt = gerenciadorTokenJwt;
+        this.authenticationManager = authenticationManager;
+        this.strategies = strategies;
+        this.clienteRepository = clienteRepository;
+        this.profissionalRepository = profissionalRepository;
+    }
 
     public void criar(UsuarioCriacaoDto dto) {
 

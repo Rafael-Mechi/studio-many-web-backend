@@ -1,25 +1,25 @@
 INSERT INTO perfis (perfil) VALUES
-                                ('ROLE_ADMIN'),
-                                ('ROLE_PROFISSIONAL'),
-                                ('ROLE_CLIENTE');
+    ('ROLE_ADMIN'),
+    ('ROLE_PROFISSIONAL'),
+    ('ROLE_CLIENTE');
 
 INSERT INTO status_agendamentos (estado) VALUES
-                                             ('solicitar confirmacao agendamento'),
-                                             ('agendado'),
-                                             ('confirmado'),
-                                             ('solicitar cancelamento'),
-                                             ('cancelado'),
-                                             ('solicitar reagendamento'),
-                                             ('reagendado'),
-                                             ('recusado'),
-                                             ('concluido'),
-                                             ('faltou'),
-                                             ('em atendimento');
+    ('solicitar confirmacao agendamento'),
+    ('agendado'),
+    ('confirmado'),
+    ('solicitar cancelamento'),
+    ('cancelado'),
+    ('solicitar reagendamento'),
+    ('reagendado'),
+    ('recusado'),
+    ('concluido'),
+    ('faltou'),
+    ('em atendimento');
 
 INSERT INTO status_pagamentos (estado) VALUES
-                                           ('Cancelado'),
-                                           ('Pendente'),
-                                           ('Pago');
+    ('Cancelado'),
+    ('Pendente'),
+    ('Pago');
 
 --INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('ana.estetica@email.com', 'hash123', 2, NOW());
 --INSERT INTO profissionais (nome, usuario_id) VALUES ('Ana Silva', 1);

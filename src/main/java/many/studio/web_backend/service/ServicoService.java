@@ -14,17 +14,13 @@ import java.util.List;
 @Service
 public class ServicoService {
 
-
-
     private final ServicoRepository servicoRepository;
     private final PacoteRepository pacoteRepository;
-
 
     public ServicoService(PacoteRepository pacoteRepository, ServicoRepository servicoRepository) {
         this.pacoteRepository = pacoteRepository;
         this.servicoRepository = servicoRepository;
     }
-
 
     public List<ServicoListarDto> listar(){
         return  ServicoMapper.toResponse(servicoRepository.findAll());
