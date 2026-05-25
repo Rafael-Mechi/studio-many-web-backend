@@ -1,7 +1,7 @@
 package many.studio.web_backend.dto.profissional;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record ClienteDetalheDto(
@@ -18,7 +18,7 @@ public record ClienteDetalheDto(
         @Schema(description = "Total de faltas acumuladas", example = "0")
         Integer totalNoShows,
         @Schema(description = "Data da última visita", example = "2026-02-16")
-        LocalDate ultimaVisita,
+        LocalDateTime ultimaVisita,
         @Schema(description = "Total financeiro investido", example = "250.00")
         Double totalGasto,
         @Schema(description = "Lista com o histórico recente de agendamentos")

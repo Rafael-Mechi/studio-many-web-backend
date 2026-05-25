@@ -2,16 +2,14 @@ package many.studio.web_backend.mapper;
 
 import many.studio.web_backend.dto.profissional.ClientePorProfissionalDto;
 import many.studio.web_backend.entity.Cliente;
-import many.studio.web_backend.repository.ClienteAgregado;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 public class ProfissionalMapper {
     public static ClientePorProfissionalDto toResponse(
             Cliente cliente,
             String nomeFuncionario,
-            LocalDate ultimaVisita,
+            LocalDateTime ultimaVisita,
             Double totalGasto,
             String servicoPreferido
     ) {

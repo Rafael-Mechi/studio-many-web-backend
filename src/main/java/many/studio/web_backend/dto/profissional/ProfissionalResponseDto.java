@@ -9,12 +9,12 @@ public record ProfissionalResponseDto(
         Long id,
 
         @NotBlank
-        @Schema(description = "Nome atualizado do profissional", example = "Carlos Souza")
+        @Schema(description = "Nome do profissional", example = "Carlos Souza")
         String nome,
 
         @NotBlank
         @Email
-        @Schema(description = "E-mail atualizado de acesso", example = "carlos.souza@email.com")
+        @Schema(description = "E-mail de acesso", example = "carlos.souza@email.com")
         String email
 ) {
 }

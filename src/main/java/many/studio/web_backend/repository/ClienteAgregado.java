@@ -2,10 +2,10 @@ package many.studio.web_backend.repository;
 
 import many.studio.web_backend.entity.Cliente;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface ClienteAgregado {
     Cliente getCliente();
-    LocalDate getUltimaVisita();
+    LocalDateTime getUltimaVisita();
     Double getTotalGasto();
 }

@@ -19,7 +19,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
             "FROM Cliente c " +
             "JOIN Agendamento a ON a.cliente.id = c.id " +
             "JOIN AgendamentoItem ai ON ai.agendamento.id = a.id " +
-            "JOIN ai.statusAgendamento sa " +
+            "JOIN a.statusAgendamento sa " +
             "WHERE ai.profissional.id = :profissionalId " +
             "GROUP BY c.id, c.nome")
     List<ClienteAgregado> findClientesByProfissionalId(@Param("profissionalId") Long profissionalId);

@@ -5,15 +5,14 @@ import many.studio.web_backend.dto.profissional.*;
 import many.studio.web_backend.entity.Cliente;
 import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.Usuario;
+import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.ProfissionalMapper;
-import many.studio.web_backend.repository.AgendamentoRepository;
-import many.studio.web_backend.repository.ClienteAgregado;
-import many.studio.web_backend.repository.ClienteRepository;
-import many.studio.web_backend.repository.ProfissionalRepository;
+import many.studio.web_backend.repository.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,11 +20,15 @@ public class ProfissionalService {
     private final ClienteRepository clienteRepository;
     private final AgendamentoRepository agendamentoRepository;
     private final ProfissionalRepository profissionalRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UsuarioRepository usuarioRepository;
 
-    public ProfissionalService(ClienteRepository clienteRepository, AgendamentoRepository agendamentoRepository, ProfissionalRepository profissionalRepository) {
+    public ProfissionalService(ClienteRepository clienteRepository, AgendamentoRepository agendamentoRepository, ProfissionalRepository profissionalRepository, PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository) {
         this.clienteRepository = clienteRepository;
         this.agendamentoRepository = agendamentoRepository;
         this.profissionalRepository = profissionalRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<ClientePorProfissionalDto> listarClientesPorProfissionalId(Long profissionalId){
@@ -39,7 +42,7 @@ public class ProfissionalService {
 
         return agregados.stream().map(item -> {
             Cliente cliente = item.getCliente();
-            LocalDate ultimaVisita = item.getUltimaVisita();
+            LocalDateTime ultimaVisita = item.getUltimaVisita();
             Double totalGasto = (item.getTotalGasto() != null) ? item.getTotalGasto() : 0.0;
             List<String> servicos = agendamentoRepository.findServicoPreferidoByClienteId(cliente.getId());
             String preferido = (!servicos.isEmpty()) ? servicos.get(0) : "Nenhum serviço";
@@ -62,7 +65,7 @@ public class ProfissionalService {
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado para este profissional"));
 
         Cliente cliente = agregado.getCliente();
-        LocalDate ultimaVisita = agregado.getUltimaVisita();
+        LocalDateTime ultimaVisita = agregado.getUltimaVisita();
         Double totalGasto = (agregado.getTotalGasto() != null) ? agregado.getTotalGasto() : 0.0;
 
         List<AgendamentoHistoricoDto> historico = agendamentoRepository.findHistoricoRecenteByClienteId(clienteId);
@@ -88,8 +91,15 @@ public class ProfissionalService {
         profissional.setNome(dto.nome());
 
         Usuario usuario = profissional.getUsuario();
-        usuario.setEmail(dto.email());
-        usuario.setSenha(dto.senha());
+
+        if (dto.email() != null && !dto.email().equals(usuario.getEmail())) {
+            if (usuarioRepository.existsByEmail(dto.email())) {
+                throw new EntityConflictException("Email já cadastrado");
+            }
+            usuario.setEmail(dto.email());
+        }
+
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
 
         profissionalRepository.save(profissional);
 

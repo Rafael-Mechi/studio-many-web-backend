@@ -3,7 +3,7 @@ package many.studio.web_backend.dto.profissional;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ClientePorProfissionalDto {
     @Schema(description = "ID do profissional", example = "1")
@@ -35,7 +35,7 @@ public class ClientePorProfissionalDto {
 
     @Past
     @Schema(description = "Data do último agendamento do cliente", example = "2026-05-10")
-    private LocalDate ultimaVisita;
+    private LocalDateTime ultimaVisita;
 
     @NotNull
     @PositiveOrZero
@@ -50,7 +50,7 @@ public class ClientePorProfissionalDto {
     public ClientePorProfissionalDto() {
     }
 
-    public ClientePorProfissionalDto(Long id, String nomeFuncionario, Long clienteId, String nomeCliente, String email, String telefone, String servicoPreferido, LocalDate ultimaVisita, Integer noShow, Double totalGasto) {
+    public ClientePorProfissionalDto(Long id, String nomeFuncionario, Long clienteId, String nomeCliente, String email, String telefone, String servicoPreferido, LocalDateTime ultimaVisita, Integer noShow, Double totalGasto) {
         this.id = id;
         this.nomeFuncionario = nomeFuncionario;
         this.clienteId = clienteId;
@@ -119,11 +119,11 @@ public class ClientePorProfissionalDto {
         this.servicoPreferido = servicoPreferido;
     }
 
-    public LocalDate getUltimaVisita() {
+    public LocalDateTime getUltimaVisita() {
         return ultimaVisita;
     }
 
-    public void setUltimaVisita(LocalDate ultimaVisita) {
+    public void setUltimaVisita(LocalDateTime ultimaVisita) {
         this.ultimaVisita = ultimaVisita;
     }
 
