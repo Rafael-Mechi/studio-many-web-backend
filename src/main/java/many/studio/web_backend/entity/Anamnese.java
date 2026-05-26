@@ -1,7 +1,6 @@
 package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "anamneses")
