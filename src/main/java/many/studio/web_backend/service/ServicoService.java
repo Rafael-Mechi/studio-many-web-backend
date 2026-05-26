@@ -25,7 +25,7 @@ public class ServicoService {
         this.pacoteRepository = pacoteRepository;
         this.servicoRepository = servicoRepository;
     }
-    
+
     public List<ServicoListarDto> listar(){
         return  ServicoMapper.toResponse(servicoRepository.findAll());
     }
@@ -33,6 +33,15 @@ public class ServicoService {
     public List<PacoteListarDto> listarPacotesPorServico(Long id){
         return PacoteMapper.toResponse(pacoteRepository.findByServicoId(id));
     }
+
+    public List<ServicoListarDto> listarServicoPorHorarioDisponivel(Long id){
+        return ServicoMapper.toResponse(servicoRepository.findAll());
+    }
+
+    public List<ServicoListarDto> listarServicosPorProfissional(Long id){
+        return ServicoMapper.toResponse(servicoRepository.findAllByProfissionalId(id));
+    }
+
 
     public ServicoListarDto criar(ServicoCadastroDto cadastroDto){
         Servico entity = ServicoMapper.toEntity(cadastroDto);
