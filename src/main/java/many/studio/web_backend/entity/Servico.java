@@ -35,22 +35,6 @@ public class Servico {
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
 
-
-    public Servico() {}
-
-    public Servico(Long id, String nome, String descricao, String fotoUrl, Integer duracaoMinutos, Double preco, Double sinalValor, Boolean ativo, LocalDateTime criadoEm) {
-        this.id = id;
-        this.nome = nome;
-        this.descricao = descricao;
-        this.fotoUrl = fotoUrl;
-        this.duracaoMinutos = duracaoMinutos;
-        this.preco = preco;
-        this.sinalValor = sinalValor;
-        this.ativo = ativo;
-        this.criadoEm = criadoEm;
-
-    }
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
@@ -68,5 +52,4 @@ public class Servico {
     public Boolean getAtivo() { return ativo; }
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public LocalDateTime getCriadoEm() { return criadoEm; }
-    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
- }
+    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }}

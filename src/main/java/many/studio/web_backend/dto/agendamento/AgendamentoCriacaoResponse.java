@@ -1,7 +1,6 @@
 package many.studio.web_backend.dto.agendamento;
 
 import many.studio.web_backend.entity.StatusAgendamento;
-import many.studio.web_backend.entity.enums.StatusAgendamentoItem;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,15 +9,17 @@ public class AgendamentoCriacaoResponse {
 
     private Long id;
     private LocalDateTime criadoEm;
-    private StatusAgendamento status;
-    private Long criadoPorId;
-    private ClienteResponse cliente;
-    private ProfissionalResponse profissional;
-    private PacoteResponse pacote;
+    private Double preco;
+    private Double descontoPorcentagem;
+    private Double precoFinal;
+    private String status;
     private List<AgendamentoItemResponse> itens;
+    private ClienteDto cliente;
+    private ProfissionalDto profissional;
+    private UsuarioDto criadoPor;
+    private PacoteDto pacote;
 
-    public static class ClienteResponse {
-
+    public static class ClienteDto {
         private Long id;
         private String nome;
 
@@ -39,8 +40,7 @@ public class AgendamentoCriacaoResponse {
         }
     }
 
-    public static class ProfissionalResponse {
-
+    public static class ProfissionalDto {
         private Long id;
         private String nome;
 
@@ -61,14 +61,54 @@ public class AgendamentoCriacaoResponse {
         }
     }
 
-    public static class PacoteResponse {
+    public static class UsuarioDto {
+        private Long id;
+        private String email;
 
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+    }
+
+    public static class PacoteDto {
         private Long id;
         private String nome;
         private Integer totalSessoes;
-        private Double precoTotal;
         private Integer validadeDias;
-        private Boolean ativo;
+        private ServicoDto servico;
+
+        public static class ServicoDto {
+            private Long id;
+            private String nome;
+
+            public Long getId() {
+                return id;
+            }
+
+            public void setId(Long id) {
+                this.id = id;
+            }
+
+            public String getNome() {
+                return nome;
+            }
+
+            public void setNome(String nome) {
+                this.nome = nome;
+            }
+        }
 
         public Long getId() {
             return id;
@@ -94,14 +134,6 @@ public class AgendamentoCriacaoResponse {
             this.totalSessoes = totalSessoes;
         }
 
-        public Double getPrecoTotal() {
-            return precoTotal;
-        }
-
-        public void setPrecoTotal(Double precoTotal) {
-            this.precoTotal = precoTotal;
-        }
-
         public Integer getValidadeDias() {
             return validadeDias;
         }
@@ -110,12 +142,12 @@ public class AgendamentoCriacaoResponse {
             this.validadeDias = validadeDias;
         }
 
-        public Boolean getAtivo() {
-            return ativo;
+        public ServicoDto getServico() {
+            return servico;
         }
 
-        public void setAtivo(Boolean ativo) {
-            this.ativo = ativo;
+        public void setServico(ServicoDto servico) {
+            this.servico = servico;
         }
     }
 
@@ -135,44 +167,36 @@ public class AgendamentoCriacaoResponse {
         this.criadoEm = criadoEm;
     }
 
-    public StatusAgendamento getStatus() {
+    public Double getPreco() {
+        return preco;
+    }
+
+    public void setPreco(Double preco) {
+        this.preco = preco;
+    }
+
+    public Double getDescontoPorcentagem() {
+        return descontoPorcentagem;
+    }
+
+    public void setDescontoPorcentagem(Double descontoPorcentagem) {
+        this.descontoPorcentagem = descontoPorcentagem;
+    }
+
+    public Double getPrecoFinal() {
+        return precoFinal;
+    }
+
+    public void setPrecoFinal(Double precoFinal) {
+        this.precoFinal = precoFinal;
+    }
+
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(StatusAgendamento status) {
+    public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Long getCriadoPorId() {
-        return criadoPorId;
-    }
-
-    public void setCriadoPorId(Long criadoPorId) {
-        this.criadoPorId = criadoPorId;
-    }
-
-    public ClienteResponse getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(ClienteResponse cliente) {
-        this.cliente = cliente;
-    }
-
-    public ProfissionalResponse getProfissional() {
-        return profissional;
-    }
-
-    public void setProfissional(ProfissionalResponse profissional) {
-        this.profissional = profissional;
-    }
-
-    public PacoteResponse getPacote() {
-        return pacote;
-    }
-
-    public void setPacote(PacoteResponse pacote) {
-        this.pacote = pacote;
     }
 
     public List<AgendamentoItemResponse> getItens() {
@@ -181,5 +205,37 @@ public class AgendamentoCriacaoResponse {
 
     public void setItens(List<AgendamentoItemResponse> itens) {
         this.itens = itens;
+    }
+
+    public ClienteDto getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(ClienteDto cliente) {
+        this.cliente = cliente;
+    }
+
+    public ProfissionalDto getProfissional() {
+        return profissional;
+    }
+
+    public void setProfissional(ProfissionalDto profissional) {
+        this.profissional = profissional;
+    }
+
+    public UsuarioDto getCriadoPor() {
+        return criadoPor;
+    }
+
+    public void setCriadoPor(UsuarioDto criadoPor) {
+        this.criadoPor = criadoPor;
+    }
+
+    public PacoteDto getPacote() {
+        return pacote;
+    }
+
+    public void setPacote(PacoteDto pacote) {
+        this.pacote = pacote;
     }
 }

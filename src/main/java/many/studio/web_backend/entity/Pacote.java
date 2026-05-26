@@ -1,6 +1,7 @@
 package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,21 +26,12 @@ public class Pacote {
     @Column(name = "ativo")
     private Boolean ativo;
 
+    @Column(name = "criado_em")
+    private LocalDateTime criadoEm;
+
     @ManyToOne
     @JoinColumn(name = "servicos_id")
     private Servico servico;
-
-    public Pacote() {}
-
-    public Pacote(Long id, String nome, Integer totalSessoes, Double precoTotal, Integer validadeDias, Boolean ativo, Servico servico) {
-        this.id = id;
-        this.nome = nome;
-        this.totalSessoes = totalSessoes;
-        this.precoTotal = precoTotal;
-        this.validadeDias = validadeDias;
-        this.ativo = ativo;
-        this.servico = servico;
-    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -53,6 +45,8 @@ public class Pacote {
     public void setValidadeDias(Integer validadeDias) { this.validadeDias = validadeDias; }
     public Boolean getAtivo() { return ativo; }
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+    public LocalDateTime getCriadoEm() { return criadoEm; }
+    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
     public Servico getServico() { return servico; }
     public void setServico(Servico servico) { this.servico = servico; }
 }

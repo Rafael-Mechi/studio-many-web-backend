@@ -11,6 +11,7 @@ import java.util.List;
 
 public class UsuarioDetalhesDto implements UserDetails {
 
+    private final Long id;
     private final String email;
     private final String senha;
     private final Perfil perfil;
@@ -18,17 +19,19 @@ public class UsuarioDetalhesDto implements UserDetails {
 
 
     public UsuarioDetalhesDto(
-            String email,
+            Long id, String email,
             String senha,
             Perfil perfil, Boolean ativo
     ) {
+        this.id = id;
         this.email = email;
         this.senha = senha;
         this.perfil = perfil;
         this.ativo = ativo;
     }
 
-    public UsuarioDetalhesDto(Usuario usuario, Boolean ativo) {
+    public UsuarioDetalhesDto(Long id, Usuario usuario, Boolean ativo) {
+        this.id = id;
         this.email = usuario.getEmail();
         this.senha = usuario.getSenha();
         this.perfil = usuario.getPerfil();
@@ -42,6 +45,10 @@ public class UsuarioDetalhesDto implements UserDetails {
         return List.of(
                 new SimpleGrantedAuthority(perfil.getPerfil()));
 
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override

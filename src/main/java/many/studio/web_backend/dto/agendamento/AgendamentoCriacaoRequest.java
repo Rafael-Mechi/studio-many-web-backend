@@ -1,10 +1,8 @@
 package many.studio.web_backend.dto.agendamento;
 
 import jakarta.validation.constraints.*;
-import many.studio.web_backend.entity.Agendamento;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class AgendamentoCriacaoRequest {
 
@@ -12,10 +10,13 @@ public class AgendamentoCriacaoRequest {
     private Long clienteId;
 
     @NotNull
+    private Long profissionalId;
+
+    @NotNull
     private Long pacoteId;
 
     @NotNull
-    List<@Future LocalDateTime> horarios;
+    private Long usuarioCriadorId;
 
     public Long getClienteId() {
         return clienteId;
@@ -23,6 +24,14 @@ public class AgendamentoCriacaoRequest {
 
     public void setClienteId(Long clienteId) {
         this.clienteId = clienteId;
+    }
+
+    public Long getProfissionalId() {
+        return profissionalId;
+    }
+
+    public void setProfissionalId(Long profissionalId) {
+        this.profissionalId = profissionalId;
     }
 
     public Long getPacoteId() {
@@ -33,11 +42,11 @@ public class AgendamentoCriacaoRequest {
         this.pacoteId = pacoteId;
     }
 
-    public List<LocalDateTime> getHorarios() {
-        return horarios;
+    public Long getUsuarioCriadorId() {
+        return usuarioCriadorId;
     }
 
-    public void setHorarios(List<LocalDateTime> horarios) {
-        this.horarios = horarios;
+    public void setUsuarioCriadorId(Long usuarioCriadorId) {
+        this.usuarioCriadorId = usuarioCriadorId;
     }
 }

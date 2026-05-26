@@ -1,15 +1,12 @@
 package many.studio.web_backend.dto.agendamento;
 
-import many.studio.web_backend.entity.enums.StatusAgendamentoItem;
-
 import java.time.LocalDateTime;
 
 public class AgendamentoItemResponse {
 
     private Long id;
-    private LocalDateTime dataHora;
-    private Double precoUnitario;
-    private StatusAgendamentoItem status;
+    private LocalDateTime inicioAtendimento;
+    private LocalDateTime fimAtendimento;
 
     public Long getId() {
         return id;
@@ -19,27 +16,19 @@ public class AgendamentoItemResponse {
         this.id = id;
     }
 
-    public LocalDateTime getDataHora() {
-        return dataHora;
+    public LocalDateTime getInicioAtendimento() {
+        return inicioAtendimento;
     }
 
-    public void setDataHora(LocalDateTime dataHora) {
-        this.dataHora = dataHora;
+    public void setInicioAtendimento(LocalDateTime inicioAtendimento) {
+        this.inicioAtendimento = inicioAtendimento;
     }
 
-    public Double getPrecoUnitario() {
-        return precoUnitario;
+    public LocalDateTime getFimAtendimento() {
+        return fimAtendimento;
     }
 
-    public void setPrecoUnitario(Double precoUnitario) {
-        this.precoUnitario = precoUnitario;
-    }
-
-    public StatusAgendamentoItem getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusAgendamentoItem status) {
-        this.status = status;
+    public void setFimAtendimento(LocalDateTime fimAtendimento) {
+        this.fimAtendimento = fimAtendimento;
     }
 }

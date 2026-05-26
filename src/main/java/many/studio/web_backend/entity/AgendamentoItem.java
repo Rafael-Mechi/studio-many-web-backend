@@ -1,7 +1,6 @@
 package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
-import many.studio.web_backend.entity.enums.StatusAgendamentoItem;
 
 import java.time.LocalDateTime;
 
@@ -12,14 +11,14 @@ public class AgendamentoItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "data_hora")
-    private LocalDateTime dataHora;
+    @Column(name = "inicio_atendimento")
+    private LocalDateTime inicioAtendimento;
 
-    @Column(name = "preco_unitario")
-    private Double precoUnitario;
+    @Column(name = "fim_atendimento")
+    private LocalDateTime fimAtendimento;
 
-    @Enumerated(EnumType.STRING)
-    private StatusAgendamentoItem status;
+    @Column(name = "checkin_em")
+    private LocalDateTime checkinEm;
 
     @ManyToOne
     @JoinColumn(name = "agendamento_id")
@@ -33,28 +32,28 @@ public class AgendamentoItem {
         this.id = id;
     }
 
-    public LocalDateTime getDataHora() {
-        return dataHora;
+    public LocalDateTime getInicioAtendimento() {
+        return inicioAtendimento;
     }
 
-    public void setDataHora(LocalDateTime dataHora) {
-        this.dataHora = dataHora;
+    public void setInicioAtendimento(LocalDateTime inicioAtendimento) {
+        this.inicioAtendimento = inicioAtendimento;
     }
 
-    public Double getPrecoUnitario() {
-        return precoUnitario;
+    public LocalDateTime getFimAtendimento() {
+        return fimAtendimento;
     }
 
-    public void setPrecoUnitario(Double precoUnitario) {
-        this.precoUnitario = precoUnitario;
+    public void setFimAtendimento(LocalDateTime fimAtendimento) {
+        this.fimAtendimento = fimAtendimento;
     }
 
-    public StatusAgendamentoItem getStatus() {
-        return status;
+    public LocalDateTime getCheckinEm() {
+        return checkinEm;
     }
 
-    public void setStatus(StatusAgendamentoItem status) {
-        this.status = status;
+    public void setCheckinEm(LocalDateTime checkinEm) {
+        this.checkinEm = checkinEm;
     }
 
     public Agendamento getAgendamento() {

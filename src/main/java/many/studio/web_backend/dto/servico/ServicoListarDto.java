@@ -1,6 +1,8 @@
 package many.studio.web_backend.dto.servico;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
+import many.studio.web_backend.entity.enums.TipoSinal;
 
 import java.time.LocalDateTime;
 
@@ -33,8 +35,6 @@ public class ServicoListarDto {
 
     @Schema(description = "Data de criação do serviço", example = "15/09/2026")
     private LocalDateTime criadoEm;
-
-
 
     public Boolean getAtivo() {
         return ativo;
