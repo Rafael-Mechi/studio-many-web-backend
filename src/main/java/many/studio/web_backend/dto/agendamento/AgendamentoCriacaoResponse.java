@@ -63,7 +63,7 @@ public class AgendamentoCriacaoResponse {
 
     public static class UsuarioDto {
         private Long id;
-        private String nome;
+        private String email;
 
         public Long getId() {
             return id;
@@ -73,12 +73,12 @@ public class AgendamentoCriacaoResponse {
             this.id = id;
         }
 
-        public String getNome() {
-            return nome;
+        public String getEmail() {
+            return email;
         }
 
-        public void setNome(String nome) {
-            this.nome = nome;
+        public void setEmail(String email) {
+            this.email = email;
         }
     }
 
@@ -87,7 +87,7 @@ public class AgendamentoCriacaoResponse {
         private String nome;
         private Integer totalSessoes;
         private Integer validadeDias;
-        private PacoteDto pacote;
+        private ServicoDto servico;
 
         public static class ServicoDto {
             private Long id;
@@ -142,12 +142,12 @@ public class AgendamentoCriacaoResponse {
             this.validadeDias = validadeDias;
         }
 
-        public PacoteDto getPacote() {
-            return pacote;
+        public ServicoDto getServico() {
+            return servico;
         }
 
-        public void setPacote(PacoteDto pacote) {
-            this.pacote = pacote;
+        public void setServico(ServicoDto servico) {
+            this.servico = servico;
         }
     }
 

@@ -58,9 +58,13 @@ public class AgendamentoService {
         Usuario usuario = usuarioRepository.findById(request.getUsuarioCriadorId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
+        StatusAgendamento status = statusAgendamentoRepository.findStatusAgendamentoByEstado("solicitar confirmacao agendamento")
+                .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
+
         Agendamento agendamento = new Agendamento();
         agendamento.setCliente(cliente);
         agendamento.setPacote(pacote);
+        agendamento.setStatusAgendamento(status);
         agendamento.setProfissional(profissional);
         agendamento.setCriadoPorUsuario(usuario);
         agendamento.setPreco(pacote.getPrecoTotal());
@@ -70,12 +74,12 @@ public class AgendamentoService {
         List<AgendamentoItem> itens = criarItens(saved, horarioAgendado);
         List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
 
-        return AgendamentoMapper.toResponse(agendamento);
+        return AgendamentoMapper.toResponse(agendamento, savedList);
     }
 
     private List<AgendamentoItem> criarItens(Agendamento agendamento, LocalDateTime horaraioAgendado) {
         return IntStream
-                .rangeClosed(0, agendamento.getPacote().getTotalSessoes())
+                .rangeClosed(0, agendamento.getPacote().getTotalSessoes() -1)
                 .mapToObj(sessao -> {
 
                     AgendamentoItem item = new AgendamentoItem();

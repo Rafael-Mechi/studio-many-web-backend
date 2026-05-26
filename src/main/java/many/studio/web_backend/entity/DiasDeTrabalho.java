@@ -2,6 +2,7 @@ package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -13,8 +14,9 @@ public class DiasDeTrabalho {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "dia_da_semana")
-    private String diaDaSemana;
+    private DayOfWeek diaDaSemana;
 
     @Column(name = "hora_inicio")
     private LocalTime horaInicio;
@@ -34,11 +36,11 @@ public class DiasDeTrabalho {
         this.id = id;
     }
 
-    public String getDiaDaSemana() {
+    public DayOfWeek getDiaDaSemana() {
         return diaDaSemana;
     }
 
-    public void setDiaDaSemana(String diaDaSemana) {
+    public void setDiaDaSemana(DayOfWeek diaDaSemana) {
         this.diaDaSemana = diaDaSemana;
     }
 
