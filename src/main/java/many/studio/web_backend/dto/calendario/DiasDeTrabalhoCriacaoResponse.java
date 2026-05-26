@@ -1,26 +1,23 @@
 package many.studio.web_backend.dto.calendario;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotNull;
-
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-public class DiasDeTrabalhoRequest {
+public class DiasDeTrabalhoCriacaoResponse {
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    DayOfWeek diaDaSemana;
+    private Long id;
+    private DayOfWeek diaDaSemana;
+    private LocalTime inicio;
+    private LocalTime fim;
+    private Long profissionalId;
 
-    @NotNull
-    LocalTime inicio;
+    public Long getId() {
+        return id;
+    }
 
-    @NotNull
-    LocalTime fim;
-
-    @NotNull
-    Long profissionalId;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public DayOfWeek getDiaDaSemana() {
         return diaDaSemana;

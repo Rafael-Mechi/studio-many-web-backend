@@ -25,10 +25,24 @@ public class DiasDeTrabalhoService {
         this.profissionalRepository = profissionalRepository;
     }
 
+    public DiasDeTrabalho criar(DiasDeTrabalho diasDeTrabalho) {
+
+        Profissional profissional = profissionalRepository.findById(diasDeTrabalho.getProfissional().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+
+        diasDeTrabalho.setProfissional(profissional);
+
+        return diasDeTrabalhoRepository.save(diasDeTrabalho);
+    }
+
     public List<DiasDeTrabalhoResponse> gerarDiasDisponiveisPorProfissional(Long profissionalId, YearMonth mes) {
 
         Profissional profissional = profissionalRepository.findById(profissionalId)
                 .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+
+        DiasDeTrabalhoResponse.ProfissionalDto profissionalDto = new DiasDeTrabalhoResponse.ProfissionalDto();
+        profissionalDto.setId(profissionalId);
+        profissionalDto.setNome(profissional.getNome());
 
         List<DiasDeTrabalho> diasDeTrabalho = diasDeTrabalhoRepository.findByProfissionalId(profissionalId);
 
@@ -48,7 +62,8 @@ public class DiasDeTrabalhoService {
                             new DiasDeTrabalhoResponse(
                                     data,
                                     dias.getHoraInicio(),
-                                    dias.getHoraFim()
+                                    dias.getHoraFim(),
+                                    profissionalDto
                             )
                     );
                 }

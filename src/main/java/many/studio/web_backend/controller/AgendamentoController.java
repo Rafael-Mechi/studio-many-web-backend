@@ -6,7 +6,7 @@ import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
-import many.studio.web_backend.mapper.AgendamentoMapper;
+import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

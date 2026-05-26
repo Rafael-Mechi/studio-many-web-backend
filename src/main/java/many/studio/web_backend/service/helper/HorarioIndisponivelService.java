@@ -15,14 +15,14 @@ public class HorarioIndisponivelService {
         this.agendamentoRepository = agendamentoRepository;
     }
 
-    public HorarioIndisponivelService(){}
-
-    public List<HorarioIndisponivelDto> horariosIndisponiveis(String nomeServico){
-        List<HorarioIndisponivelDto> indisponiveis = new ArrayList<>();
-
-        indisponiveis.addAll(agendamentoRepository.buscarAgendamentosIndisponiveis(nomeServico));
-        indisponiveis.addAll(agendamentoRepository.buscarBloqueios(nomeServico));
-
-        return indisponiveis;
-    }
+//    public HorarioIndisponivelService(){}
+//
+//    public List<HorarioIndisponivelDto> horariosIndisponiveis(String nomeServico){
+//        List<HorarioIndisponivelDto> indisponiveis = new ArrayList<>();
+//
+//        indisponiveis.addAll(agendamentoRepository.buscarAgendamentosIndisponiveis(nomeServico));
+//        indisponiveis.addAll(agendamentoRepository.buscarBloqueios(nomeServico));
+//
+//        return indisponiveis;
+//    }
 }

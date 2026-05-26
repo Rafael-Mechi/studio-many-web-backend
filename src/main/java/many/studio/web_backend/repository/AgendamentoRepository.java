@@ -9,62 +9,62 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
-    @Query("SELECT s.nome FROM AgendamentoItem ai " +
-        "JOIN ai.agendamento a " +
-        "JOIN ai.servico s " +
-        "WHERE a.cliente.id = :clienteId " +
-        "GROUP BY s.nome " +
-        "ORDER BY COUNT(ai.id) DESC"
-    )
-    List<String> findServicoPreferidoByClienteId(@Param("clienteId") Long clienteId);
-
-    @Query("SELECT new many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto(" +
-        "  s.nome, " +
-        "  a.inicio, " +
-        "  p.nome, " +
-        "  sa.estado" +
-        ") " +
-        "FROM AgendamentoItem ai " +
-        "JOIN ai.agendamento a " +
-        "JOIN ai.servico s " +
-        "JOIN ai.profissional p " +
-        "JOIN a.statusAgendamento sa " +
-        "WHERE a.cliente.id = :clienteId " +
-        "ORDER BY a.inicio DESC")
-    List<AgendamentoHistoricoDto> findHistoricoRecenteByClienteId(@Param("clienteId") Long clienteId);
-
-    @Query("""
-        SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
-            a.inicio,
-            a.fim,
-            p.nome,
-            s.nome
-        )
-        FROM Agendamento a
-        JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
-        JOIN ai.profissional p
-        JOIN ai.servico s
-        JOIN a.statusAgendamento sa
-        WHERE s.nome = :nomeServico
-        AND sa.estado <> 'cancelado'
-    """)
-    List<HorarioIndisponivelDto> buscarAgendamentosIndisponiveis(String nomeServico);
-
-    @Query("""
-        SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
-            b.inicio,
-            b.fim,
-            p.nome,
-            'BLOQUEIO'
-        )
-        FROM Bloqueio b
-        JOIN b.profissional p
-        WHERE EXISTS (
-            SELECT sp.id
-            FROM ServicoProfissional sp
-            WHERE sp.profissional.id = p.id
-            AND sp.servico.nome = :nomeServico
-        )
-    """)
-    List<HorarioIndisponivelDto> buscarBloqueios(String nomeServico);
+//    @Query("SELECT s.nome FROM AgendamentoItem ai " +
+//        "JOIN ai.agendamento a " +
+//        "JOIN ai.servico s " +
+//        "WHERE a.cliente.id = :clienteId " +
+//        "GROUP BY s.nome " +
+//        "ORDER BY COUNT(ai.id) DESC"
+//    )
+//    List<String> findServicoPreferidoByClienteId(@Param("clienteId") Long clienteId);
+//
+//    @Query("SELECT new many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto(" +
+//        "  s.nome, " +
+//        "  a.inicio, " +
+//        "  p.nome, " +
+//        "  sa.estado" +
+//        ") " +
+//        "FROM AgendamentoItem ai " +
+//        "JOIN ai.agendamento a " +
+//        "JOIN ai.servico s " +
+//        "JOIN ai.profissional p " +
+//        "JOIN a.statusAgendamento sa " +
+//        "WHERE a.cliente.id = :clienteId " +
+//        "ORDER BY a.inicio DESC")
+//    List<AgendamentoHistoricoDto> findHistoricoRecenteByClienteId(@Param("clienteId") Long clienteId);
+//
+//    @Query("""
+//        SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
+//            a.inicio,
+//            a.fim,
+//            p.nome,
+//            s.nome
+//        )
+//        FROM Agendamento a
+//        JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
+//        JOIN ai.profissional p
+//        JOIN ai.servico s
+//        JOIN a.statusAgendamento sa
+//        WHERE s.nome = :nomeServico
+//        AND sa.estado <> 'cancelado'
+//    """)
+//    List<HorarioIndisponivelDto> buscarAgendamentosIndisponiveis(String nomeServico);
+//
+//    @Query("""
+//        SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
+//            b.inicio,
+//            b.fim,
+//            p.nome,
+//            'BLOQUEIO'
+//        )
+//        FROM Bloqueio b
+//        JOIN b.profissional p
+//        WHERE EXISTS (
+//            SELECT sp.id
+//            FROM ServicoProfissional sp
+//            WHERE sp.profissional.id = p.id
+//            AND sp.servico.nome = :nomeServico
+//        )
+//    """)
+//    List<HorarioIndisponivelDto> buscarBloqueios(String nomeServico);
 }
