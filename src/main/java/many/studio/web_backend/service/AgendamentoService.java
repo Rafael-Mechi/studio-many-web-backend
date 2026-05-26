@@ -7,8 +7,9 @@ import many.studio.web_backend.dto.agendamento.AgendamentoItemCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
+import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.exception.NonAuthorizedException;
-import many.studio.web_backend.mapper.AgendamentoMapper;
+import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.repository.*;
 import many.studio.web_backend.service.helper.AgendamentoHelper;
 import org.apache.coyote.BadRequestException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.Optional;
 
 @Service
@@ -26,6 +28,7 @@ public class AgendamentoService {
     private final AgendamentoItemRepository agendamentoItemRepository;
     private final ClienteRepository clienteRepository;
     private final StatusAgendamentoRepository statusAgendamentoRepository;
+    private final PacoteRepository pacoteRepository;
     private final ServicoRepository servicoRepository;
     private final ProfissionalRepository profissionalRepository;
     private final UsuarioRepository usuarioRepository;
@@ -37,7 +40,7 @@ public class AgendamentoService {
             AgendamentoRepository agendamentoRepository,
             AgendamentoItemRepository agendamentoItemRepository,
             ClienteRepository clienteRepository,
-            StatusAgendamentoRepository statusAgendamentoRepository,
+            StatusAgendamentoRepository statusAgendamentoRepository, PacoteRepository pacoteRepository,
             ServicoRepository servicoRepository,
             ProfissionalRepository profissionalRepository,
             UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, AgendamentoHelper agendamentoHelper
@@ -46,6 +49,7 @@ public class AgendamentoService {
         this.agendamentoItemRepository = agendamentoItemRepository;
         this.clienteRepository = clienteRepository;
         this.statusAgendamentoRepository = statusAgendamentoRepository;
+        this.pacoteRepository = pacoteRepository;
         this.servicoRepository = servicoRepository;
         this.profissionalRepository = profissionalRepository;
         this.usuarioRepository = usuarioRepository;
@@ -53,31 +57,38 @@ public class AgendamentoService {
         this.agendamentoHelper = agendamentoHelper;
     }
 
-    public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request) {
+    public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
-        StatusAgendamento status = statusAgendamentoRepository.findById(request.getStatusAgendamentoId())
-                .orElseThrow(() -> new EntityNotFoundException("Status de agendamento não encontrado"));
+        Pacote pacote = pacoteRepository.findById(request.getPacoteId())
+                .orElseThrow(() -> new EntityNotFoundException("Pacote não encontrado"));
+
+        Profissional profissional = profissionalRepository.findById(request.getProfissionalId())
+                .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+
+        Usuario usuario = usuarioRepository.findById(request.getUsuarioCriadorId())
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        StatusAgendamento status = statusAgendamentoRepository.findByEstado("solicitar confirmacao agendamento")
+                .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
 
         Agendamento agendamento = new Agendamento();
         agendamento.setCliente(cliente);
+        agendamento.setPacote(pacote);
         agendamento.setStatusAgendamento(status);
-        agendamento.setInicio(request.getInicio());
-        agendamento.setFim(request.getFim());
-
-        if (request.getCriadoPorUsuarioId() != null) {
-            Usuario criadoPor = usuarioRepository.findById(request.getCriadoPorUsuarioId())
-                    .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-            agendamento.setCriadoPorUsuario(criadoPor);
-        }
+        agendamento.setProfissional(profissional);
+        agendamento.setCriadoPorUsuario(usuario);
+        agendamento.setPreco(pacote.getPrecoTotal());
+        agendamento.setPrecoFinal(pacote.getPrecoTotal());
 
         Agendamento saved = agendamentoRepository.save(agendamento);
-        List<AgendamentoItem> itens = criarItens(saved, request.getItens());
-        List<AgendamentoItem> savedItens = agendamentoItemRepository.saveAll(itens);
+        List<AgendamentoItem> itens = criarItens(saved, horarioAgendado);
+        List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
 
-        return AgendamentoMapper.toResponse(saved, savedItens);
+        return AgendamentoMapper.toResponse(agendamento, savedList);
     }
+
 
     @Transactional
     public void cancelarAgendamento(Long idAgendamento, CancelarAgendamentoRequest requestDto, Long idUsuario){
@@ -90,7 +101,7 @@ public class AgendamentoService {
         }
 
         Optional<Agendamento> agendamento = agendamentoRepository.findById(idAgendamento);
-        LocalDateTime inicioAgendamento = agendamento.get().getInicio();
+        LocalDateTime inicioAgendamento = agendamento.get().getCriadoEm();
 
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
@@ -115,26 +126,19 @@ public class AgendamentoService {
         agendamentoRepository.save(agendamento.get());
     }
 
-    private List<AgendamentoItem> criarItens(Agendamento agendamento, List<AgendamentoItemCriacaoRequest> itensRequest) {
-        List<AgendamentoItem> itens = new ArrayList<>();
-        for (AgendamentoItemCriacaoRequest itemReq : itensRequest) {
-            Servico servico = servicoRepository.findById(itemReq.getServicoId())
-                    .orElseThrow(() -> new EntityNotFoundException("Serviço não encontrado"));
+    private List<AgendamentoItem> criarItens(Agendamento agendamento, LocalDateTime horaraioAgendado) {
+        return IntStream
+                .rangeClosed(0, agendamento.getPacote().getTotalSessoes() -1)
+                .mapToObj(sessao -> {
 
-            Profissional profissional = profissionalRepository.findById(itemReq.getProfissionalId())
-                    .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+                    AgendamentoItem item = new AgendamentoItem();
+                    item.setInicioAtendimento(horaraioAgendado.plusDays(sessao * 7L));
+                    item.setFimAtendimento(item.getInicioAtendimento().plusMinutes(agendamento.getPacote().getServico().getDuracaoMinutos()));
+                    item.setAgendamento(agendamento);
 
-            AgendamentoItem item = new AgendamentoItem();
-            item.setAgendamento(agendamento);
-            item.setServico(servico);
-            item.setProfissional(profissional);
-            item.setInicioAtendimento(itemReq.getInicioAtendimento());
-            item.setFimAtendimento(itemReq.getFimAtendimento());
-            item.setPreco(itemReq.getPreco());
-            item.setDescontoPorcentagem(itemReq.getDescontoPorcentagem());
-            item.setPrecoFinal(itemReq.getPrecoFinal());
-            itens.add(item);
-        }
-        return itens;
+                    return item;
+                })
+                .toList();
+
     }
 }

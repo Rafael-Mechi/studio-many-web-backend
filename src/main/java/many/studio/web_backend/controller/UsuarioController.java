@@ -375,98 +375,98 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Atualizar perfil do usuário autenticado")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Dados do perfil (campos opcionais)",
-            required = true,
-            content = @Content(
-                    mediaType = "application/json",
-                    examples = @ExampleObject(value = """
-                            {
-                              "nome": "Giovana Rocha",
-                              "telefone": "11999998888",
-                              "documento": "12345678900",
-                              "email": "giovana.nova@outlook.com"
-                            }
-                            """)
-            )
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Perfil atualizado com êxito",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                            {}
-                                    """)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Nenhum campo para atualizar",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
-                                      "status": 400,
-                                      "error": "Bad Request",
-                                      "path": "/usuarios/atualizar_perfil"
-                                    }
-                                    """)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Usuário ou dados complementares não encontrados",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
-                                      "status": 404,
-                                      "error": "Not Found",
-                                      "path": "/usuarios/atualizar_perfil"
-                                    }
-                                    """)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "E-mail já cadastrado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
-                                      "status": 409,
-                                      "error": "Conflict",
-                                      "path": "/usuarios/atualizar_perfil"
-                                    }
-                                    """)
-                    )
-            )
-    })
-    @ApiResponse(
-            responseCode = "401",
-            description = "Não autorizado",
-            content = @Content(
-                    mediaType = "application/json",
-                    examples = @ExampleObject(value = """
-                                {
-                                  "timestamp": "2026-04-29T00:57:04.487+00:00",
-                                  "status": 401,
-                                  "error": "Unauthorized",
-                                  "path": "/usuarios/atualizar_perfil"
-                                }
-                            """)
-            )
-    )
-    @PutMapping("/atualizar_perfil")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<Void> atualizarPerfil(@Valid @RequestBody UsuarioAtualizarPerfilDto dto) {
-        usuarioService.atualizarPerfil(dto);
-        return ResponseEntity.noContent().build();
-    }
+//    @Operation(summary = "Atualizar perfil do usuário autenticado")
+//    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+//            description = "Dados do perfil (campos opcionais)",
+//            required = true,
+//            content = @Content(
+//                    mediaType = "application/json",
+//                    examples = @ExampleObject(value = """
+//                            {
+//                              "nome": "Giovana Rocha",
+//                              "telefone": "11999998888",
+//                              "documento": "12345678900",
+//                              "email": "giovana.nova@outlook.com"
+//                            }
+//                            """)
+//            )
+//    )
+//    @ApiResponses({
+//            @ApiResponse(
+//                    responseCode = "204",
+//                    description = "Perfil atualizado com êxito",
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            examples = @ExampleObject(value = """
+//                                            {}
+//                                    """)
+//                    )
+//            ),
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Nenhum campo para atualizar",
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            examples = @ExampleObject(value = """
+//                                    {
+//                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+//                                      "status": 400,
+//                                      "error": "Bad Request",
+//                                      "path": "/usuarios/atualizar_perfil"
+//                                    }
+//                                    """)
+//                    )
+//            ),
+//            @ApiResponse(
+//                    responseCode = "404",
+//                    description = "Usuário ou dados complementares não encontrados",
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            examples = @ExampleObject(value = """
+//                                    {
+//                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+//                                      "status": 404,
+//                                      "error": "Not Found",
+//                                      "path": "/usuarios/atualizar_perfil"
+//                                    }
+//                                    """)
+//                    )
+//            ),
+//            @ApiResponse(
+//                    responseCode = "409",
+//                    description = "E-mail já cadastrado",
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            examples = @ExampleObject(value = """
+//                                    {
+//                                      "timestamp": "2026-04-30T01:39:57.172+00:00",
+//                                      "status": 409,
+//                                      "error": "Conflict",
+//                                      "path": "/usuarios/atualizar_perfil"
+//                                    }
+//                                    """)
+//                    )
+//            )
+//    })
+//    @ApiResponse(
+//            responseCode = "401",
+//            description = "Não autorizado",
+//            content = @Content(
+//                    mediaType = "application/json",
+//                    examples = @ExampleObject(value = """
+//                                {
+//                                  "timestamp": "2026-04-29T00:57:04.487+00:00",
+//                                  "status": 401,
+//                                  "error": "Unauthorized",
+//                                  "path": "/usuarios/atualizar_perfil"
+//                                }
+//                            """)
+//            )
+//    )
+//    @PutMapping("/atualizar_perfil")
+//    @SecurityRequirement(name = "Bearer")
+//    public ResponseEntity<Void> atualizarPerfil(@Valid @RequestBody UsuarioAtualizarPerfilDto dto) {
+//        usuarioService.atualizarPerfil(dto);
+//        return ResponseEntity.noContent().build();
+//    }
 }

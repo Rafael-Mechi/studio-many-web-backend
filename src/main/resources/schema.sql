@@ -123,22 +123,25 @@ CREATE TABLE IF NOT EXISTS pacotes (
 );
 
 CREATE TABLE IF NOT EXISTS agendamentos (
-       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-       inicio TIMESTAMP,
-       fim TIMESTAMP,
-       cancelamento_motivo VARCHAR(255),
-       cancelado_em TIMESTAMP,
-       qtd_remarcacoes INT,
-       remarcacao_aprovacao_necessaria BOOLEAN,
-       criado_por_usuario_id INT,
-       criado_em TIMESTAMP,
+                                            id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                            cancelamento_motivo VARCHAR(255),
+                                            cancelado_em TIMESTAMP,
+                                            qtd_remarcacoes INT,
+                                            criado_em TIMESTAMP,
+                                            preco DECIMAL(10,2),
+                                            desconto_porcentagem DECIMAL(10,2),
+                                            preco_final DECIMAL(10,2),
+                                            criado_por_usuario_id INT,
+                                            cliente_id INT,
+                                            pacote_id INT,
+                                            profissional_id INT,
+                                            status_agendamento_id INT,
 
-       cliente_id INT,
-       status_agendamento_id INT,
-
-       FOREIGN KEY (cliente_id) REFERENCES clientes(id),
-       FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamentos(id),
-       FOREIGN KEY (criado_por_usuario_id) REFERENCES usuarios(id)
+                                            FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+                                            FOREIGN KEY (pacote_id) REFERENCES pacotes(id),
+                                            FOREIGN KEY (profissional_id) REFERENCES profissionais(id),
+                                            FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamentos(id),
+                                            FOREIGN KEY (criado_por_usuario_id) REFERENCES usuarios(id)
 );
 
 CREATE TABLE IF NOT EXISTS pagamentos (
@@ -172,21 +175,23 @@ CREATE TABLE IF NOT EXISTS cliente_pacotes (
 );
 
 CREATE TABLE IF NOT EXISTS agendamento_itens (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    inicio_atendimento TIMESTAMP,
-    fim_atendimento TIMESTAMP,
-    checkin_em TIMESTAMP,
-    preco DECIMAL(8,2),
-    desconto_porcentagem DECIMAL(5,2),
-    preco_final DECIMAL(8,2),
+                                                 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                                 inicio_atendimento TIMESTAMP,
+                                                 fim_atendimento TIMESTAMP,
+                                                 checkin_em TIMESTAMP,
+                                                 agendamento_id INT,
 
-    agendamento_id INT,
-    servico_id INT,
-    profissional_id INT,
+                                                 FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
+);
 
-    FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
-    FOREIGN KEY (servico_id) REFERENCES servicos(id),
-    FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
+CREATE TABLE IF NOT EXISTS dias_de_trabalho (
+                                                id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                                dia_da_semana VARCHAR(20),
+                                                hora_inicio TIMESTAMP,
+                                                hora_fim TIMESTAMP,
+                                                profissional_id INT,
+
+                                                FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
 );
 
 -- ------------------------------------------------------------------------------------------------------------------ --
