@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import many.studio.web_backend.dto.calendario.DiasDeTrabalhoCriacaoResponse;
 import many.studio.web_backend.dto.calendario.DiasDeTrabalhoRequest;
 import many.studio.web_backend.dto.calendario.DiasDeTrabalhoResponse;
+import many.studio.web_backend.dto.calendario.SlotsResponse;
 import many.studio.web_backend.dto.profissional.ClienteDetalheDto;
 import many.studio.web_backend.dto.profissional.ClientePorProfissionalDto;
 import many.studio.web_backend.dto.profissional.ProfissionalResponseDto;
@@ -54,8 +55,8 @@ public class ProfissionalController {
     }
 
     @GetMapping("/agenda/{profissionalId}")
-    public ResponseEntity<List<DiasDeTrabalhoResponse>> buscarDiasDeTrabalhoPorProfissional(@PathVariable Long profissionalId,
-                                                                                            @RequestParam String mes) {
+    public ResponseEntity<List<SlotsResponse>> buscarDiasDeTrabalhoPorProfissional(@PathVariable Long profissionalId,
+                                                                                   @RequestParam String mes) {
         return ResponseEntity.ok()
                 .body(diasDeTrabalhoService.gerarDiasDisponiveisPorProfissional(profissionalId, YearMonth.parse(mes)));
     }

@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
+
+    List<Agendamento> findByProfissionalId(@Param("profissionalId") Long profissionalId);
+
 //    @Query("SELECT s.nome FROM AgendamentoItem ai " +
 //        "JOIN ai.agendamento a " +
 //        "JOIN ai.servico s " +
