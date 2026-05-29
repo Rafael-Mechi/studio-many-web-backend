@@ -100,9 +100,8 @@ public class AgendamentoService {
             throw new EntityNotFoundException("Agendamento não encontrado");
         }
 
-        Optional<Agendamento> agendamento = agendamentoRepository.findById(idAgendamento);
-        LocalDateTime inicioAgendamento = agendamento.get().getCriadoEm();
-
+        List<AgendamentoItem> itens = agendamentoItemRepository.findByAgendamentoId(idAgendamento);
+        LocalDateTime inicioAgendamento = itens.get(0).getInicioAtendimento();
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
@@ -119,6 +118,7 @@ public class AgendamentoService {
                 .orElseThrow(() ->
                         new RuntimeException("Status cancelado não encontrado"));
 
+        Optional<Agendamento> agendamento = agendamentoRepository.findById(idAgendamento);
         agendamento.get().setStatusAgendamento(statusCancelado);
         agendamento.get().setCanceladoEm(LocalDateTime.now());
         agendamento.get().setCancelamentoMotivo(requestDto.getMotivo());
