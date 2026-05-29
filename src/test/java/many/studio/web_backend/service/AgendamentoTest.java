@@ -1,14 +1,11 @@
 package many.studio.web_backend.service;
 
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
-import many.studio.web_backend.entity.Agendamento;
-import many.studio.web_backend.entity.Perfil;
+import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.NonAuthorizedException;
 import many.studio.web_backend.repository.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.service.helper.AgendamentoHelper;
-import many.studio.web_backend.entity.StatusAgendamento;
-import many.studio.web_backend.entity.Usuario;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,8 +64,12 @@ public class AgendamentoTest {
 
             Agendamento agendamento = new Agendamento();
             agendamento.setId(idAgendamento);
-            agendamento.setInicio(LocalDateTime.now().plusHours(48));
 
+            AgendamentoItem item = new AgendamentoItem();
+            item.setInicioAtendimento(LocalDateTime.now().plusHours(30));
+
+            when(agendamentoItemRepository.findByAgendamentoId(idAgendamento))
+                    .thenReturn(List.of(item));
             StatusAgendamento statusCancelado = new StatusAgendamento();
             statusCancelado.setId(5L);
             statusCancelado.setEstado("cancelado");
@@ -129,7 +131,12 @@ public class AgendamentoTest {
 
             Agendamento agendamento = new Agendamento();
             agendamento.setId(idAgendamento);
-            agendamento.setInicio(LocalDateTime.now().plusHours(5));
+
+            AgendamentoItem item = new AgendamentoItem();
+            item.setInicioAtendimento(LocalDateTime.now().plusHours(2));
+
+            when(agendamentoItemRepository.findByAgendamentoId(idAgendamento))
+                    .thenReturn(List.of(item));
 
             StatusAgendamento statusCancelado = new StatusAgendamento();
             statusCancelado.setEstado("cancelado");
@@ -184,8 +191,11 @@ public class AgendamentoTest {
             Agendamento agendamento = new Agendamento();
             agendamento.setId(idAgendamento);
 
-            // já passou
-            agendamento.setInicio(LocalDateTime.now().minusHours(2));
+            AgendamentoItem item = new AgendamentoItem();
+            item.setInicioAtendimento(LocalDateTime.now().plusHours(2));
+
+            when(agendamentoItemRepository.findByAgendamentoId(idAgendamento))
+                    .thenReturn(List.of(item));
 
             StatusAgendamento statusCancelado = new StatusAgendamento();
             statusCancelado.setEstado("cancelado");
@@ -236,8 +246,11 @@ public class AgendamentoTest {
             Agendamento agendamento = new Agendamento();
             agendamento.setId(idAgendamento);
 
-            // menos de 24h
-            agendamento.setInicio(LocalDateTime.now().plusHours(5));
+            AgendamentoItem item = new AgendamentoItem();
+            item.setInicioAtendimento(LocalDateTime.now().plusHours(5));
+
+            when(agendamentoItemRepository.findByAgendamentoId(idAgendamento))
+                    .thenReturn(List.of(item));
 
             when(agendamentoHelper
                     .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
@@ -245,9 +258,6 @@ public class AgendamentoTest {
 
             when(agendamentoRepository.existsById(idAgendamento))
                     .thenReturn(true);
-
-            when(agendamentoRepository.findById(idAgendamento))
-                    .thenReturn(Optional.of(agendamento));
 
             when(usuarioRepository.findById(idUsuario))
                     .thenReturn(Optional.of(usuario));
@@ -298,6 +308,9 @@ public class AgendamentoTest {
 
             verify(agendamentoRepository, never())
                     .save(any());
+
+            verify(agendamentoItemRepository, never())
+                    .findByAgendamentoId(any());
         }
     }
 }
