@@ -19,5 +19,13 @@ public interface AgendamentoItemRepository extends JpaRepository<AgendamentoItem
             """)
     List<AgendamentoItem> findByProfissionalId(@Param("profissionalId") Long profissionalId);
 
+
+    @Query("""
+            SELECT ai FROM AgendamentoItem  ai
+            JOIN ai.agendamento a
+             WHERE a.cliente.id = :clienteId
+    """)
+    List<AgendamentoItem> findByClienteId(@Param("clienteId") Long clienteId);
+
     List<AgendamentoItem> findByAgendamentoId(@Param("agendamento_id") Long agendamentoId);
 }

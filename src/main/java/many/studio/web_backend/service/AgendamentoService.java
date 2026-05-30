@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import many.studio.web_backend.dto.agendamento.*;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
+import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.exception.NonAuthorizedException;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
@@ -71,6 +72,16 @@ public class AgendamentoService {
 //
 //    }
 
+    public List<Agendamento> buscarTodos() {
+        return agendamentoRepository.findAll();
+    }
+
+    public Agendamento buscarPorId(Long id) {
+        return agendamentoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
+    }
+
+
     public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
@@ -99,8 +110,9 @@ public class AgendamentoService {
         Agendamento saved = agendamentoRepository.save(agendamento);
         List<AgendamentoItem> itens = criarItens(saved, horarioAgendado);
         List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
+        saved.setItens(savedList);
 
-        return AgendamentoMapper.toResponse(agendamento, savedList);
+        return AgendamentoMapper.toResponse(saved);
     }
 
 
@@ -141,6 +153,10 @@ public class AgendamentoService {
     }
 
     public List<AgendamentoItem> criarItens(Agendamento agendamento, LocalDateTime horaraioAgendado) {
+
+        List<AgendamentoItem> agendamentosCliente = agendamentoItemRepository.findByClienteId(agendamento.getCliente().getId());
+        List<AgendamentoItem> agendamentosProfissional = agendamentoItemRepository.findByProfissionalId(agendamento.getProfissional().getId());
+
         return IntStream
                 .rangeClosed(0, agendamento.getPacote().getTotalSessoes() -1)
                 .mapToObj(sessao -> {
@@ -154,9 +170,5 @@ public class AgendamentoService {
                 })
                 .toList();
 
-    }
-
-    public List<AgendamentoItem> buscarItensPorProfissional(Long profissionalId) {
-        return agendamentoItemRepository.findByProfissionalId(profissionalId);
     }
 }

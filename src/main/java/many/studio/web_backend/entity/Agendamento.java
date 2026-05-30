@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "agendamentos")
@@ -52,6 +53,9 @@ public class Agendamento {
     @ManyToOne
     @JoinColumn(name = "criado_por_usuario_id")
     private Usuario criadoPorUsuario;
+
+    @OneToMany(mappedBy = "agendamento")
+    private List<AgendamentoItem> itens;
 
 
     public Long getId() {
@@ -156,5 +160,13 @@ public class Agendamento {
 
     public void setCriadoPorUsuario(Usuario criadoPorUsuario) {
         this.criadoPorUsuario = criadoPorUsuario;
+    }
+
+    public List<AgendamentoItem> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<AgendamentoItem> itens) {
+        this.itens = itens;
     }
 }
