@@ -1,6 +1,7 @@
 package many.studio.web_backend.service;
 
 import jakarta.transaction.Transactional;
+import many.studio.web_backend.config.twilio.WhatsAppService;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
 import many.studio.web_backend.dto.agendamento.AgendamentoItemCriacaoRequest;
@@ -33,6 +34,7 @@ public class AgendamentoService {
     private final ProfissionalRepository profissionalRepository;
     private final UsuarioRepository usuarioRepository;
     private final PerfilRepository perfilRepository;
+    private final WhatsAppService whatsAppService;
 
     private AgendamentoHelper agendamentoHelper;
 
@@ -43,7 +45,7 @@ public class AgendamentoService {
             StatusAgendamentoRepository statusAgendamentoRepository, PacoteRepository pacoteRepository,
             ServicoRepository servicoRepository,
             ProfissionalRepository profissionalRepository,
-            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, AgendamentoHelper agendamentoHelper
+            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, WhatsAppService whatsAppService, AgendamentoHelper agendamentoHelper
     ) {
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoItemRepository = agendamentoItemRepository;
@@ -54,10 +56,14 @@ public class AgendamentoService {
         this.profissionalRepository = profissionalRepository;
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
+        this.whatsAppService = whatsAppService;
         this.agendamentoHelper = agendamentoHelper;
     }
 
-    public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
+    public AgendamentoCriacaoResponse criar(
+            AgendamentoCriacaoRequest request,
+            LocalDateTime horarioAgendado) {
+
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
@@ -70,7 +76,8 @@ public class AgendamentoService {
         Usuario usuario = usuarioRepository.findById(request.getUsuarioCriadorId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        StatusAgendamento status = statusAgendamentoRepository.findByEstado("solicitar confirmacao agendamento")
+        StatusAgendamento status = statusAgendamentoRepository
+                .findByEstado("solicitar confirmacao agendamento")
                 .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
 
         Agendamento agendamento = new Agendamento();
@@ -86,7 +93,44 @@ public class AgendamentoService {
         List<AgendamentoItem> itens = criarItens(saved, horarioAgendado);
         List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
 
-        return AgendamentoMapper.toResponse(agendamento, savedList);
+        try {
+
+            String mensagem = """
+                    NOVA SOLICITAÇÃO DE AGENDAMENTO
+                    
+                    Cliente: %s
+                    
+                    Pacote: %s
+                    Serviço: %s
+                    Sessões: %d
+
+                    Valor Final: R$ %.2f
+                    
+                    Data/Hora: %s
+                    
+                    Responda:
+                    1 - Confirmar
+                    2 - Recusar
+                    """
+                    .formatted(
+                            cliente.getNome(),
+                            pacote.getNome(),
+                            pacote.getServico().getNome(),
+                            pacote.getTotalSessoes(),
+                            saved.getPrecoFinal(),
+                            horarioAgendado
+                    );
+
+            whatsAppService.enviarMensagem(
+                    profissional.getTelefone(),
+                    mensagem
+            );
+
+        } catch (Exception e) {
+            System.out.println("Erro ao enviar mensagem: " + e.fillInStackTrace());
+        }
+
+        return AgendamentoMapper.toResponse(saved, savedList);
     }
 
 
