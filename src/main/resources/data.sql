@@ -32,3 +32,5 @@ INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, ser
 --INSERT INTO clientes (nome, telefone, usuario_id) VALUES ('Joana Santos', '11999999999', 2);
 --INSERT INTO anamneses (informacao) VALUES ('Ficha Inicial Joana');
 --INSERT INTO anamnese_clientes (anamneses_id, clientes_id) VALUES (1, 1);
+
+INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Limpeza de Pele Avulsa', 1, 150.00, 30, TRUE, 1);

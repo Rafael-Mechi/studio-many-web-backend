@@ -13,6 +13,12 @@ public record ProfissionalUpdateDto(
         @Schema(description = "E-mail atualizado de acesso", example = "carlos.souza@email.com")
         String email,
 
+        @Schema(description = "Telefone do profissional", example = "(11) 98765-4321")
+        String telefone,
+
+        @Schema(description = "Documento/CPF", example = "123.456.789-01")
+        String documento,
+
         @Size(min = 6)
         @Schema(description = "Nova senha de acesso do usuário", example = "senha123")
         String senha

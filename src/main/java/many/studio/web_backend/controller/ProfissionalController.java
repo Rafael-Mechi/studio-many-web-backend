@@ -30,22 +30,22 @@ public class ProfissionalController {
         this.diasDeTrabalhoService = diasDeTrabalhoService;
     }
 
-//    @GetMapping("/{profissionalId}/clientes")
-//    public ResponseEntity<List<ClientePorProfissionalDto>> listarClientesPorProfissional(
-//            @PathVariable Long profissionalId
-//    ){
-//        List<ClientePorProfissionalDto> response = profissionalService.listarClientesPorProfissionalId(profissionalId);
-//        return ResponseEntity.ok(response);
-//    }
-//
-//    @GetMapping("/{profissionalId}/clientes/{clienteId}")
-//    public ResponseEntity<ClienteDetalheDto> listarClientePorProfissional(
-//            @PathVariable Long profissionalId,
-//            @PathVariable Long clienteId
-//    ){
-//        ClienteDetalheDto response = profissionalService.detalharClientePorProfissional(profissionalId, clienteId);
-//        return ResponseEntity.ok(response);
-//    }
+    @GetMapping("/{profissionalId}/clientes")
+    public ResponseEntity<List<ClientePorProfissionalDto>> listarClientesPorProfissional(
+            @PathVariable Long profissionalId
+    ){
+        List<ClientePorProfissionalDto> response = profissionalService.listarClientesPorProfissionalId(profissionalId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{profissionalId}/clientes/{clienteId}")
+    public ResponseEntity<ClienteDetalheDto> listarClientePorProfissional(
+            @PathVariable Long profissionalId,
+            @PathVariable Long clienteId
+    ){
+        ClienteDetalheDto response = profissionalService.detalharClientePorProfissional(profissionalId, clienteId);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/agenda")
     public ResponseEntity<DiasDeTrabalhoCriacaoResponse> registrarDiasDeTrabalho(@Valid @RequestBody DiasDeTrabalhoRequest request) {

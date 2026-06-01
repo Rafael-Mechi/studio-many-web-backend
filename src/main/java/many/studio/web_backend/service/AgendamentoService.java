@@ -2,6 +2,11 @@ package many.studio.web_backend.service;
 
 import jakarta.transaction.Transactional;
 import many.studio.web_backend.dto.agendamento.*;
+import many.studio.web_backend.config.twilio.WhatsAppService;
+import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
+import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
+import many.studio.web_backend.dto.agendamento.AgendamentoItemCriacaoRequest;
+import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
@@ -31,6 +36,7 @@ public class AgendamentoService {
     private final ProfissionalRepository profissionalRepository;
     private final UsuarioRepository usuarioRepository;
     private final PerfilRepository perfilRepository;
+    private final WhatsAppService whatsAppService;
 
     private final AgendamentoHelper agendamentoHelper;
 
@@ -41,7 +47,7 @@ public class AgendamentoService {
             StatusAgendamentoRepository statusAgendamentoRepository, PacoteRepository pacoteRepository,
             ServicoRepository servicoRepository,
             ProfissionalRepository profissionalRepository,
-            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, AgendamentoHelper agendamentoHelper
+            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, WhatsAppService whatsAppService, AgendamentoHelper agendamentoHelper
     ) {
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoItemRepository = agendamentoItemRepository;
@@ -52,25 +58,9 @@ public class AgendamentoService {
         this.profissionalRepository = profissionalRepository;
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
+        this.whatsAppService = whatsAppService;
         this.agendamentoHelper = agendamentoHelper;
     }
-
-//    public AgendamentoResponse buscarPorId(Long id) {
-//        Agendamento agendamento = agendamentoRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
-//
-//        Cliente cliente = clienteRepository.findById(agendamento.getCliente().getId())
-//                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
-//
-//        Profissional profissional = profissionalRepository.findById(agendamento.getProfissional().getId())
-//                .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
-//
-//        Pacote pacote = pacoteRepository.findById(agendamento.getPacote().getId())
-//                .orElseThrow(() -> new EntityNotFoundException("Pacote não encontrado"));
-//
-//
-//
-//    }
 
     public List<Agendamento> buscarTodos() {
         return agendamentoRepository.findAll();
@@ -83,6 +73,7 @@ public class AgendamentoService {
 
 
     public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
+
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
@@ -95,7 +86,8 @@ public class AgendamentoService {
         Usuario usuario = usuarioRepository.findById(request.getUsuarioCriadorId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        StatusAgendamento status = statusAgendamentoRepository.findByEstado("solicitar confirmacao agendamento")
+        StatusAgendamento status = statusAgendamentoRepository
+                .findByEstado("solicitar confirmacao agendamento")
                 .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
 
         Agendamento agendamento = new Agendamento();
@@ -112,6 +104,43 @@ public class AgendamentoService {
         List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
         saved.setItens(savedList);
 
+        try {
+
+            String mensagem = """
+                    NOVA SOLICITAÇÃO DE AGENDAMENTO
+                    
+                    Cliente: %s
+                    
+                    Pacote: %s
+                    Serviço: %s
+                    Sessões: %d
+
+                    Valor Final: R$ %.2f
+                    
+                    Data/Hora: %s
+                    
+                    Responda:
+                    1 - Confirmar
+                    2 - Recusar
+                    """
+                    .formatted(
+                            cliente.getNome(),
+                            pacote.getNome(),
+                            pacote.getServico().getNome(),
+                            pacote.getTotalSessoes(),
+                            saved.getPrecoFinal(),
+                            horarioAgendado
+                    );
+
+            whatsAppService.enviarMensagem(
+                    profissional.getTelefone(),
+                    mensagem
+            );
+
+        } catch (Exception e) {
+            System.out.println("Erro ao enviar mensagem: " + e.fillInStackTrace());
+        }
+
         return AgendamentoMapper.toResponse(saved);
     }
 
@@ -126,9 +155,8 @@ public class AgendamentoService {
             throw new EntityNotFoundException("Agendamento não encontrado");
         }
 
-        Optional<Agendamento> agendamento = agendamentoRepository.findById(idAgendamento);
-        LocalDateTime inicioAgendamento = agendamento.get().getCriadoEm();
-
+        List<AgendamentoItem> itens = agendamentoItemRepository.findByAgendamentoId(idAgendamento);
+        LocalDateTime inicioAgendamento = itens.get(0).getInicioAtendimento();
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
@@ -145,6 +173,7 @@ public class AgendamentoService {
                 .orElseThrow(() ->
                         new RuntimeException("Status cancelado não encontrado"));
 
+        Optional<Agendamento> agendamento = agendamentoRepository.findById(idAgendamento);
         agendamento.get().setStatusAgendamento(statusCancelado);
         agendamento.get().setCanceladoEm(LocalDateTime.now());
         agendamento.get().setCancelamentoMotivo(requestDto.getMotivo());

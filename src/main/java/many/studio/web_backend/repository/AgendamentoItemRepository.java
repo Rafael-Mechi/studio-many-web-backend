@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface AgendamentoItemRepository extends JpaRepository<AgendamentoItem, Long> {
     @Transactional
     void deleteByAgendamentoId(Long agendamentoId);
@@ -28,4 +30,6 @@ public interface AgendamentoItemRepository extends JpaRepository<AgendamentoItem
     List<AgendamentoItem> findByClienteId(@Param("clienteId") Long clienteId);
 
     List<AgendamentoItem> findByAgendamentoId(@Param("agendamento_id") Long agendamentoId);
+
+    List<AgendamentoItem> findByAgendamentoId(Long agendamentoId);
 }
