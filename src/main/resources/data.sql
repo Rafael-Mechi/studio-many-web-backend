@@ -26,7 +26,7 @@ INSERT INTO status_pagamentos (estado) VALUES
 --
 INSERT INTO servicos (nome, preco, duracao_minutos, ativo) VALUES ('Limpeza de pele', 150.00, 60, TRUE);
 INSERT INTO servicos (nome, preco, duracao_minutos, ativo) VALUES ('Unha', 150.00, 60, TRUE);
---INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, 1);
+INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, 1);
 --
 --INSERT INTO usuarios (email, senha, perfil_id) VALUES ('cliente.joana@email.com', 'hash456', 3);
 --INSERT INTO clientes (nome, telefone, usuario_id) VALUES ('Joana Santos', '11999999999', 2);

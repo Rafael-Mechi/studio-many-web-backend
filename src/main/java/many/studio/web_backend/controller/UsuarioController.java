@@ -8,9 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import many.studio.web_backend.dto.agendamento.AgendamentoResponse;
 import many.studio.web_backend.dto.usuario.*;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.mapper.UsuarioMapper;
+import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
+import many.studio.web_backend.service.AgendamentoService;
 import many.studio.web_backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +36,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private AgendamentoService agendamentoService;
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Void> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
@@ -373,6 +379,12 @@ public class UsuarioController {
     public ResponseEntity<Void> redefinirSenha(@Valid @RequestBody UsuarioRedefinirSenhaDto dto) {
         usuarioService.redefinirSenha(dto);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/{id}/agendamentos")
+    public ResponseEntity<List<AgendamentoResponse>> buscarAgendamentos(@PathVariable Long id) {
+        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarPorUsuarioId(id)));
     }
 
 //    @Operation(summary = "Atualizar perfil do usuário autenticado")

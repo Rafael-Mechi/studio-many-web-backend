@@ -1,6 +1,7 @@
 package many.studio.web_backend.service;
 
 import jakarta.transaction.Transactional;
+import many.studio.web_backend.dto.agendamento.*;
 import many.studio.web_backend.config.twilio.WhatsAppService;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
@@ -8,6 +9,7 @@ import many.studio.web_backend.dto.agendamento.AgendamentoItemCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
+import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.exception.NonAuthorizedException;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
@@ -36,7 +38,7 @@ public class AgendamentoService {
     private final PerfilRepository perfilRepository;
     private final WhatsAppService whatsAppService;
 
-    private AgendamentoHelper agendamentoHelper;
+    private final AgendamentoHelper agendamentoHelper;
 
     public AgendamentoService(
             AgendamentoRepository agendamentoRepository,
@@ -60,9 +62,25 @@ public class AgendamentoService {
         this.agendamentoHelper = agendamentoHelper;
     }
 
-    public AgendamentoCriacaoResponse criar(
-            AgendamentoCriacaoRequest request,
-            LocalDateTime horarioAgendado) {
+    public List<Agendamento> buscarTodos() {
+        return agendamentoRepository.findAll();
+    }
+
+    public Agendamento buscarPorId(Long id) {
+        return agendamentoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
+    }
+
+    public List<Agendamento> buscarPorUsuarioId(Long id) {
+        if(!usuarioRepository.existsById(id)) {
+            throw new EntityNotFoundException("Usuario não encontrado");
+        }
+
+        return agendamentoRepository.findByUsuarioId(id);
+    }
+
+
+    public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
 
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
@@ -92,6 +110,7 @@ public class AgendamentoService {
         Agendamento saved = agendamentoRepository.save(agendamento);
         List<AgendamentoItem> itens = criarItens(saved, horarioAgendado);
         List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
+        saved.setItens(savedList);
 
         try {
 
@@ -130,7 +149,7 @@ public class AgendamentoService {
             System.out.println("Erro ao enviar mensagem: " + e.fillInStackTrace());
         }
 
-        return AgendamentoMapper.toResponse(saved, savedList);
+        return AgendamentoMapper.toResponse(saved);
     }
 
 
@@ -170,7 +189,11 @@ public class AgendamentoService {
         agendamentoRepository.save(agendamento.get());
     }
 
-    private List<AgendamentoItem> criarItens(Agendamento agendamento, LocalDateTime horaraioAgendado) {
+    public List<AgendamentoItem> criarItens(Agendamento agendamento, LocalDateTime horaraioAgendado) {
+
+        List<AgendamentoItem> agendamentosCliente = agendamentoItemRepository.findByClienteId(agendamento.getCliente().getId());
+        List<AgendamentoItem> agendamentosProfissional = agendamentoItemRepository.findByProfissionalId(agendamento.getProfissional().getId());
+
         return IntStream
                 .rangeClosed(0, agendamento.getPacote().getTotalSessoes() -1)
                 .mapToObj(sessao -> {

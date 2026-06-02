@@ -2,37 +2,55 @@ package many.studio.web_backend.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
-import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
-import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
-import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
+import many.studio.web_backend.dto.agendamento.*;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
+import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
+import many.studio.web_backend.service.AgendamentoItemService;
 import many.studio.web_backend.service.AgendamentoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/agendamentos")
 public class AgendamentoController {
 
-    private final AgendamentoService service;
+    private final AgendamentoService agendamentoService;
+    private final AgendamentoItemService agendamentoItemService;
 
-    public AgendamentoController(AgendamentoService service) {
-        this.service = service;
+    public AgendamentoController(AgendamentoService agendamentoService, AgendamentoItemService agendamentoItemService) {
+        this.agendamentoService = agendamentoService;
+        this.agendamentoItemService = agendamentoItemService;
     }
 
 
+    @GetMapping
+    public ResponseEntity<List<AgendamentoResponse>> buscarTodos() {
+        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarTodos()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AgendamentoResponse> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponse(agendamentoService.buscarPorId(id)));
+    }
+
     @PostMapping
     public ResponseEntity<AgendamentoCriacaoResponse> criar(@Valid @RequestBody AgendamentoCriacaoRequest request, @Future LocalDateTime horario) {
-        return ResponseEntity.status(201).body(service.criar(request, horario));
+        return ResponseEntity.status(201).body(agendamentoService.criar(request, horario));
     }
 
     @PatchMapping("/{idAgendamento}/cancelar")
     public ResponseEntity<Void> cancelarAgendamento(@PathVariable Long idAgendamento, @RequestBody CancelarAgendamentoRequest requestDto, @AuthenticationPrincipal UsuarioDetalhesDto usuario){
-        service.cancelarAgendamento(idAgendamento, requestDto, usuario.getId());
+        agendamentoService.cancelarAgendamento(idAgendamento, requestDto, usuario.getId());
         return ResponseEntity.status(200).build();
+    }
+
+    @PatchMapping("/{itemId}/reagendar")
+    public ResponseEntity<AgendamentoItemResponse> reagendar(@PathVariable Long itemId, LocalDateTime novoHorario) {
+        return ResponseEntity.ok(AgendamentoItemMapper.toResponse(agendamentoItemService.reagendar(itemId, novoHorario)));
     }
 }
