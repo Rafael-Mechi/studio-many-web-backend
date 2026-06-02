@@ -71,6 +71,14 @@ public class AgendamentoService {
                 .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
     }
 
+    public List<Agendamento> buscarPorUsuarioId(Long id) {
+        if(!usuarioRepository.existsById(id)) {
+            throw new EntityNotFoundException("Usuario não encontrado");
+        }
+
+        return agendamentoRepository.findByUsuarioId(id);
+    }
+
 
     public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
 

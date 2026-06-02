@@ -133,4 +133,14 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         )
     """)
     List<HorarioIndisponivelDto> buscarBloqueios(String nomeServico);
+
+    @Query("""
+        SELECT a
+        FROM Agendamento a
+        JOIN a.profissional p
+        JOIN a.cliente c
+        WHERE p.usuario.id = :usuarioId
+        OR c.usuario.id = :usuarioId
+    """)
+    List<Agendamento> findByUsuarioId(Long usuarioId);
 }
