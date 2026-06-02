@@ -1,6 +1,7 @@
 package many.studio.web_backend.service;
 
 import many.studio.web_backend.dto.pacote.PacoteListarDto;
+import many.studio.web_backend.dto.servico.ServicoCadastroDto;
 import many.studio.web_backend.dto.servico.ServicoListarDto;
 import many.studio.web_backend.entity.Servico;
 import many.studio.web_backend.mapper.PacoteMapper;
@@ -22,12 +23,18 @@ public class ServicoService {
         this.servicoRepository = servicoRepository;
     }
 
+
     public List<ServicoListarDto> listar(){
         return  ServicoMapper.toResponse(servicoRepository.findAll());
     }
 
     public List<PacoteListarDto> listarPacotesPorServico(Long id){
         return PacoteMapper.toResponse(pacoteRepository.findByServicoId(id));
+    }
+
+    public ServicoListarDto criar(ServicoCadastroDto cadastroDto){
+        Servico entity = ServicoMapper.toEntity(cadastroDto);
+        return ServicoMapper.toResponse(servicoRepository.save(entity));
     }
 
 }

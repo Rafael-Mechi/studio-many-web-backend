@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-public class ServicoListarDto {
-
-    @Schema(description = "Id do serviço", example = "1")
-    private Long id;
+public class ServicoCadastroDto {
 
     @Schema(description = "Nome do serviço", example = "Limpeza de pele")
     private String nome;
@@ -23,6 +20,7 @@ public class ServicoListarDto {
 
     @Schema(description = "Custo do serviço", example = "120,00")
     private Double preco;
+
 
     @Schema(description = "Custo do sinal para aquele serviço", example = "50,00")
     private Double sinalValor;
@@ -75,13 +73,6 @@ public class ServicoListarDto {
         this.fotoUrl = fotoUrl;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getNome() {
         return nome;
