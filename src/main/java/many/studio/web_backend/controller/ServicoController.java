@@ -1,6 +1,7 @@
 package many.studio.web_backend.controller;
 
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import many.studio.web_backend.dto.pacote.PacoteListarDto;
 import many.studio.web_backend.dto.servico.ServicoCadastroDto;
 import many.studio.web_backend.dto.servico.ServicoListarDto;
@@ -26,18 +27,21 @@ public class ServicoController {
 
 
     @GetMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<ServicoListarDto>> listar(){
         return ResponseEntity.ok(servicoService.listar());
     }
 
     @GetMapping("/{servicoId}/pacotes")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<PacoteListarDto>> listarPacotesPorServico(@PathVariable Long id){
         return ResponseEntity.ok(servicoService.listarPacotesPorServico(id));
     }
 
     @PostMapping("/cadastrar")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<ServicoListarDto> cadastrar(@RequestBody ServicoCadastroDto request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(servicoService.cadastrar(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(servicoService.criar(request));
     }
 
 

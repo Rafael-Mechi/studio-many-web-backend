@@ -72,6 +72,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/logout")
+    @SecurityRequirement(name = "Bearer")
     @Operation(
             summary = "Fazer logout")
     @ApiResponses(value = {
@@ -169,6 +170,7 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Atualizar usuário")
+    @SecurityRequirement(name = "Bearer")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Dados para cadastro",
             required = true,
@@ -335,6 +337,7 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Redefinir senha por e-mail")
+    @SecurityRequirement(name = "Bearer")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "E-mail do usuário e nova senha",
             required = true,

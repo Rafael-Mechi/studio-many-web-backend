@@ -1,5 +1,6 @@
 package many.studio.web_backend.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import many.studio.web_backend.dto.agendamento.*;
@@ -29,28 +30,41 @@ public class AgendamentoController {
 
 
     @GetMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<AgendamentoResponse>> buscarTodos() {
         return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarTodos()));
     }
 
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<AgendamentoResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponse(agendamentoService.buscarPorId(id)));
     }
 
     @PostMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<AgendamentoCriacaoResponse> criar(@Valid @RequestBody AgendamentoCriacaoRequest request, @Future LocalDateTime horario) {
         return ResponseEntity.status(201).body(agendamentoService.criar(request, horario));
     }
 
     @PatchMapping("/{idAgendamento}/cancelar")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> cancelarAgendamento(@PathVariable Long idAgendamento, @RequestBody CancelarAgendamentoRequest requestDto, @AuthenticationPrincipal UsuarioDetalhesDto usuario){
         agendamentoService.cancelarAgendamento(idAgendamento, requestDto, usuario.getId());
         return ResponseEntity.status(200).build();
     }
 
     @PatchMapping("/{itemId}/reagendar")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<AgendamentoItemResponse> reagendar(@PathVariable Long itemId, LocalDateTime novoHorario) {
         return ResponseEntity.ok(AgendamentoItemMapper.toResponse(agendamentoItemService.reagendar(itemId, novoHorario)));
+    }
+
+    @PatchMapping("/{idAgendamento}/confirmar")
+    public ResponseEntity<Void> confirmar(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+
+        agendamentoService.confirmar(idAgendamento, usuario);
+
+        return ResponseEntity.ok().build();
     }
 }

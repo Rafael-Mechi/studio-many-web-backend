@@ -7,6 +7,7 @@ import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
 import many.studio.web_backend.dto.agendamento.AgendamentoItemCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
+import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
@@ -16,7 +17,9 @@ import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.repository.*;
 import many.studio.web_backend.service.helper.AgendamentoHelper;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -150,6 +153,53 @@ public class AgendamentoService {
         }
 
         return AgendamentoMapper.toResponse(saved);
+    }
+
+    public void confirmar(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
+
+        Agendamento agendamento = buscarPorId(idAgendamento);
+
+        boolean admin = usuarioLogado.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!admin) {
+
+            boolean funcionario = usuarioLogado.getAuthorities()
+                    .stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
+
+            if (!funcionario) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Apenas administradores e funcionários podem confirmar agendamentos"
+                );
+            }
+
+            Long usuarioDoProfissional =
+                    agendamento.getProfissional()
+                            .getUsuario()
+                            .getId();
+
+            if (!usuarioDoProfissional.equals(usuarioLogado.getId())) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Você não pode confirmar agendamentos de outro profissional"
+                );
+            }
+        }
+
+        StatusAgendamento statusConfirmado =
+                statusAgendamentoRepository
+                        .findByEstado("agendado")
+                        .orElseThrow(() ->
+                                new EntityNotFoundException(
+                                        "Status AGENDADO não encontrado"
+                                ));
+
+        agendamento.setStatusAgendamento(statusConfirmado);
+
+        agendamentoRepository.save(agendamento);
     }
 
 
