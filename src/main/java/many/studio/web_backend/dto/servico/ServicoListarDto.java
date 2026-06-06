@@ -1,8 +1,7 @@
 package many.studio.web_backend.dto.servico;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
-import many.studio.web_backend.entity.enums.TipoSinal;
+
 
 import java.time.LocalDateTime;
 

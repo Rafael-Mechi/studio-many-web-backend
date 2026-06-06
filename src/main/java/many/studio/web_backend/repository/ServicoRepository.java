@@ -12,5 +12,6 @@ public interface ServicoRepository extends JpaRepository<Servico,Long> {
 
     List<Servico> findAllByProfissionalId(Long id);
 
+    Boolean existsByNome(String nome);
 
 }
