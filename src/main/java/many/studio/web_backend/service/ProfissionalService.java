@@ -31,57 +31,57 @@ public class ProfissionalService {
         this.usuarioRepository = usuarioRepository;
     }
 
-//    public List<ClientePorProfissionalDto> listarClientesPorProfissionalId(Long profissionalId){
-//        Profissional profissional = profissionalRepository.findById(profissionalId)
-//                .orElseThrow(() -> new EntityNotFoundException("Profissional não existe"));
-//
-//        List<ClienteAgregado> agregados = clienteRepository.findClientesByProfissionalId(profissionalId);
-//        if (agregados.isEmpty()){
-//            throw new EntityNotFoundException("Nenhum cliente para esse profissional");
-//        }
-//
-//        return agregados.stream().map(item -> {
-//            Cliente cliente = item.getCliente();
-//            LocalDateTime ultimaVisita = item.getUltimaVisita();
-//            Double totalGasto = (item.getTotalGasto() != null) ? item.getTotalGasto() : 0.0;
-//            List<String> servicos = agendamentoRepository.findServicoPreferidoByClienteId(cliente.getId());
-//            String preferido = (!servicos.isEmpty()) ? servicos.get(0) : "Nenhum serviço";
-//
-//            return ProfissionalMapper.toResponse(
-//                    cliente,
-//                    profissional.getNome(),
-//                    ultimaVisita,
-//                    totalGasto,
-//                    preferido);
-//        }).toList();
-//    }
+    public List<ClientePorProfissionalDto> listarClientesPorProfissionalId(Long profissionalId){
+        Profissional profissional = profissionalRepository.findById(profissionalId)
+                .orElseThrow(() -> new EntityNotFoundException("Profissional não existe"));
 
-//    public ClienteDetalheDto detalharClientePorProfissional(Long profissionalId, Long clienteId) {
-//        if (!profissionalRepository.existsById(profissionalId)) {
-//            throw new EntityNotFoundException("Profissional não existe");
-//        }
-//
-//        ClienteAgregado agregado = clienteRepository.findClienteByProfissionalIdEClienteId(profissionalId, clienteId)
-//                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado para este profissional"));
-//
-//        Cliente cliente = agregado.getCliente();
-//        LocalDateTime ultimaVisita = agregado.getUltimaVisita();
-//        Double totalGasto = (agregado.getTotalGasto() != null) ? agregado.getTotalGasto() : 0.0;
-//
-//        List<AgendamentoHistoricoDto> historico = agendamentoRepository.findHistoricoRecenteByClienteId(clienteId);
-//
-//        return new ClienteDetalheDto(
-//                cliente.getId(),
-//                cliente.getNome(),
-//                cliente.getTelefone(),
-//                cliente.getDocumento(),
-//                cliente.getUsuario().getEmail(),
-//                cliente.getTotalNoShows(),
-//                ultimaVisita,
-//                totalGasto,
-//                historico
-//        );
-//    }
+        List<ClienteAgregado> agregados = clienteRepository.findClientesByProfissionalId(profissionalId);
+        if (agregados.isEmpty()){
+            throw new EntityNotFoundException("Nenhum cliente para esse profissional");
+        }
+
+        return agregados.stream().map(item -> {
+            Cliente cliente = item.getCliente();
+            LocalDateTime ultimaVisita = item.getUltimaVisita();
+            Double totalGasto = (item.getTotalGasto() != null) ? item.getTotalGasto() : 0.0;
+            List<String> servicos = agendamentoRepository.findServicoPreferidoByClienteId(cliente.getId());
+            String preferido = (!servicos.isEmpty()) ? servicos.get(0) : "Nenhum serviço";
+
+            return ProfissionalMapper.toResponse(
+                    cliente,
+                    profissional.getNome(),
+                    ultimaVisita,
+                    totalGasto,
+                    preferido);
+        }).toList();
+    }
+
+    public ClienteDetalheDto detalharClientePorProfissional(Long profissionalId, Long clienteId) {
+        if (!profissionalRepository.existsById(profissionalId)) {
+            throw new EntityNotFoundException("Profissional não existe");
+        }
+
+        ClienteAgregado agregado = clienteRepository.findClienteByProfissionalIdEClienteId(profissionalId, clienteId)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado para este profissional"));
+
+        Cliente cliente = agregado.getCliente();
+        LocalDateTime ultimaVisita = agregado.getUltimaVisita();
+        Double totalGasto = (agregado.getTotalGasto() != null) ? agregado.getTotalGasto() : 0.0;
+
+        List<AgendamentoHistoricoDto> historico = agendamentoRepository.findHistoricoRecenteByClienteId(clienteId);
+
+        return new ClienteDetalheDto(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getTelefone(),
+                cliente.getDocumento(),
+                cliente.getUsuario().getEmail(),
+                cliente.getTotalNoShows(),
+                ultimaVisita,
+                totalGasto,
+                historico
+        );
+    }
 
     @Transactional
     public ProfissionalResponseDto atualizarProfissional(Long profissionalId, ProfissionalUpdateDto dto) {

@@ -5,10 +5,7 @@ import many.studio.web_backend.entity.Cliente;
 import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.exception.EntityNotFoundException;
-import many.studio.web_backend.repository.AgendamentoRepository;
-import many.studio.web_backend.repository.ClienteAgregado;
-import many.studio.web_backend.repository.ClienteRepository;
-import many.studio.web_backend.repository.ProfissionalRepository;
+import many.studio.web_backend.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,6 +36,12 @@ class ProfissionalServiceTest {
 
     @Mock
     private AgendamentoRepository agendamentoRepository;
+
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private ProfissionalService profissionalService;
@@ -82,7 +86,7 @@ class ProfissionalServiceTest {
             when(profissionalRepository.findById(1L)).thenReturn(Optional.of(profissional));
             when(clienteRepository.findClientesByProfissionalId(1L)).thenReturn(List.of(clienteAgregadoMock));
             when(clienteAgregadoMock.getCliente()).thenReturn(cliente);
-            when(clienteAgregadoMock.getUltimaVisita()).thenReturn(LocalDate.now());
+            when(clienteAgregadoMock.getUltimaVisita()).thenReturn(LocalDateTime.now());
             when(clienteAgregadoMock.getTotalGasto()).thenReturn(250.0);
             when(agendamentoRepository.findServicoPreferidoByClienteId(10L)).thenReturn(List.of("Depilação a laser"));
 
@@ -160,15 +164,21 @@ class ProfissionalServiceTest {
         @Test
         @DisplayName("Deve atualizar os dados do profissional e do usuário de forma casada")
         void deveAtualizarProfissionalEUsuarioComSucesso() {
-            ProfissionalUpdateDto updateDto = new ProfissionalUpdateDto("Carlos Souza", "carlos.souza@email.com", "novaSenha123");
+            ProfissionalUpdateDto updateDto = new ProfissionalUpdateDto(
+                    "Carlos Souza", "carlos.souza@email.com", "(11) 98765-4321", "123.456.789-01", "novaSenha123"
+            );
             when(profissionalRepository.findById(1L)).thenReturn(Optional.of(profissional));
+            when(usuarioRepository.existsByEmail("carlos.souza@email.com")).thenReturn(false);
+            when(passwordEncoder.encode("novaSenha123")).thenReturn("novaSenha123Criptografada");
 
             ProfissionalResponseDto resultado = profissionalService.atualizarProfissional(1L, updateDto);
 
             assertNotNull(resultado);
             assertEquals("Carlos Souza", profissional.getNome());
             assertEquals("carlos.souza@email.com", profissional.getUsuario().getEmail());
-            assertEquals("novaSenha123", profissional.getUsuario().getSenha());
+
+            assertEquals("novaSenha123Criptografada", profissional.getUsuario().getSenha());
+
             verify(profissionalRepository, times(1)).save(profissional);
         }
     }

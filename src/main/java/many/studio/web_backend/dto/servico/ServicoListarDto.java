@@ -2,7 +2,6 @@ package many.studio.web_backend.dto.servico;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-
 import java.time.LocalDateTime;
 
 public class ServicoListarDto {
@@ -24,7 +23,6 @@ public class ServicoListarDto {
 
     @Schema(description = "Custo do serviço", example = "120,00")
     private Double preco;
-
 
     @Schema(description = "Custo do sinal para aquele serviço", example = "50,00")
     private Double sinalValor;

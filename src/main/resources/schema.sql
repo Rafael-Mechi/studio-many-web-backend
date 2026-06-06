@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE TABLE IF NOT EXISTS profissionais (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         nome VARCHAR(75),
-
+        telefone VARCHAR(30),
+        documento VARCHAR(75),
         usuario_id INT UNIQUE,
 
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)

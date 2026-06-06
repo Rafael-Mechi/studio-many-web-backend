@@ -34,6 +34,8 @@ public class ProfissionalCriacaoStrategy implements UsuarioCriacaoStrategy {
         Profissional profissional = new Profissional();
         profissional.setNome(dto.getNome());
         profissional.setUsuario(usuario);
+        profissional.setTelefone(dto.getTelefone());
+        profissional.setDocumento(dto.getDocumento());
 
         profissionalRepository.save(profissional);
 
