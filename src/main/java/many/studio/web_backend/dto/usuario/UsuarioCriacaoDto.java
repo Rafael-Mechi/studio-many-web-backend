@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.br.CPF;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class UsuarioCriacaoDto {
     @Schema(description = "Telefone do usuário", example = "987654321")
     private String telefone;
 
+    @CPF
     @Schema(description = "cpf do usuário", example = "54345743331")
     private String documento;
 
