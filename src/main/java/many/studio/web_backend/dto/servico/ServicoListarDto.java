@@ -33,8 +33,6 @@ public class ServicoListarDto {
     @Schema(description = "Data de criação do serviço", example = "15/09/2026")
     private LocalDateTime criadoEm;
 
-
-
     public Boolean getAtivo() {
         return ativo;
     }

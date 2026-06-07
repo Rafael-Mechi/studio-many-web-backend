@@ -52,5 +52,4 @@ public class Servico {
     public Boolean getAtivo() { return ativo; }
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public LocalDateTime getCriadoEm() { return criadoEm; }
-    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
-}
+    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }}
