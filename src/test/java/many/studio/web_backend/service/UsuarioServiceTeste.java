@@ -1,10 +1,7 @@
 package many.studio.web_backend.service;
 
-import many.studio.web_backend.dto.usuario.UsuarioCriacaoDto;
+import many.studio.web_backend.dto.usuario.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
-import many.studio.web_backend.dto.usuario.UsuarioAtualizarPerfilDto;
-import many.studio.web_backend.dto.usuario.UsuarioAtualizarSenhaDto;
-import many.studio.web_backend.dto.usuario.UsuarioRedefinirSenhaDto;
 import many.studio.web_backend.entity.Cliente;
 import many.studio.web_backend.entity.Perfil;
 import many.studio.web_backend.entity.Profissional;
@@ -450,5 +447,386 @@ class UsuarioServiceTeste {
 
         assertEquals("Ana Silva", profissional.getNome());
         verify(profissionalRepository).save(profissional);
+    }
+
+    @Test
+    void atualizar_deveAtualizarEmailESenhaComSucesso() {
+        // given
+        UsuarioAtualizarDto dto = new UsuarioAtualizarDto();
+        dto.setEmail("novo@email.com");
+        dto.setSenha("novaSenha");
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuario));
+
+        when(usuarioRepository.existsByEmail("novo@email.com"))
+                .thenReturn(false);
+
+        when(passwordEncoder.encode("novaSenha"))
+                .thenReturn("hash-novo");
+
+        // when
+        usuarioService.atualizar(1L, dto);
+
+        // then
+        assertEquals("novo@email.com", usuario.getEmail());
+        assertEquals("hash-novo", usuario.getSenha());
+
+        verify(passwordEncoder).encode("novaSenha");
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void atualizar_deveLancarExcecaoQuandoUsuarioNaoExistir() {
+        // given
+        UsuarioAtualizarDto dto = new UsuarioAtualizarDto();
+        dto.setEmail("novo@email.com");
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        // then
+        assertThrows(EntityNotFoundException.class,
+                () -> usuarioService.atualizar(1L, dto));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void atualizar_deveLancarExcecaoQuandoNovoEmailJaExistir() {
+        // given
+        UsuarioAtualizarDto dto = new UsuarioAtualizarDto();
+        dto.setEmail("existente@email.com");
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuario));
+
+        when(usuarioRepository.existsByEmail("existente@email.com"))
+                .thenReturn(true);
+
+        // then
+        assertThrows(EntityConflictException.class,
+                () -> usuarioService.atualizar(1L, dto));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void removerPorId_deveRemoverUsuarioQuandoExistir() {
+        // given
+        when(usuarioRepository.existsById(1L))
+                .thenReturn(true);
+
+        // when
+        usuarioService.removerPorId(1L);
+
+        // then
+        verify(usuarioRepository).deleteById(1L);
+    }
+
+    @Test
+    void removerPorId_deveLancarExcecaoQuandoUsuarioNaoExistir() {
+        // given
+        when(usuarioRepository.existsById(1L))
+                .thenReturn(false);
+
+        // then
+        assertThrows(EntityNotFoundException.class,
+                () -> usuarioService.removerPorId(1L));
+
+        verify(usuarioRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void atualizarPerfil_deveAtualizarEmailDoUsuarioComSucesso() {
+        // given
+        autenticarComo("giovana@email.com");
+
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setEmail("novo@email.com");
+
+        Cliente cliente = new Cliente();
+        cliente.setUsuario(usuario);
+
+        when(usuarioRepository.findByEmail("giovana@email.com"))
+                .thenReturn(Optional.of(usuario));
+
+        when(usuarioRepository.existsByEmail("novo@email.com"))
+                .thenReturn(false);
+
+        when(clienteRepository.findByUsuario_Id(1L))
+                .thenReturn(Optional.of(cliente));
+
+        // when
+        usuarioService.atualizarPerfil(dto);
+
+        // then
+        assertEquals("novo@email.com", usuario.getEmail());
+
+        verify(usuarioRepository).save(usuario);
+        verify(clienteRepository).save(cliente);
+    }
+
+    @Test
+    void atualizarPerfil_deveLancarExcecaoQuandoClienteNaoExistir() {
+        // given
+        autenticarComo("giovana@email.com");
+
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setNome("Novo Nome");
+
+        when(usuarioRepository.findByEmail("giovana@email.com"))
+                .thenReturn(Optional.of(usuario));
+
+        when(clienteRepository.findByUsuario_Id(1L))
+                .thenReturn(Optional.empty());
+
+        // then
+        assertThrows(EntityNotFoundException.class,
+                () -> usuarioService.atualizarPerfil(dto));
+
+        verify(clienteRepository, never()).save(any());
+    }
+
+    @Test
+    void atualizarPerfil_deveLancarExcecaoQuandoProfissionalNaoExistir() {
+        // given
+        Perfil perfilProfissional = new Perfil();
+        perfilProfissional.setId(2L);
+
+        usuario.setPerfil(perfilProfissional);
+        usuario.setEmail("profissional@email.com");
+
+        autenticarComo("profissional@email.com");
+
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setNome("Novo Nome");
+
+        when(usuarioRepository.findByEmail("profissional@email.com"))
+                .thenReturn(Optional.of(usuario));
+
+        when(profissionalRepository.findByUsuario_Id(1L))
+                .thenReturn(Optional.empty());
+
+        // then
+        assertThrows(EntityNotFoundException.class,
+                () -> usuarioService.atualizarPerfil(dto));
+
+        verify(profissionalRepository, never()).save(any());
+    }
+
+    @Test
+    void atualizarPerfil_deveLancarExcecaoQuandoUsuarioAutenticadoNaoExistir() {
+        // given
+        autenticarComo("inexistente@email.com");
+
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setNome("Nome");
+
+        when(usuarioRepository.findByEmail("inexistente@email.com"))
+                .thenReturn(Optional.empty());
+
+        // then
+        assertThrows(EntityNotFoundException.class,
+                () -> usuarioService.atualizarPerfil(dto));
+    }
+
+    @Test
+    void deveListarTodosUsuariosComSucesso() {
+        Usuario usuario2 = new Usuario();
+        usuario2.setId(2L);
+        usuario2.setEmail("joao@email.com");
+        usuario2.setAtivo(true);
+        usuario2.setPerfil(perfilCliente);
+
+        when(usuarioRepository.findAll()).thenReturn(List.of(usuario, usuario2));
+
+        List<UsuarioListarDto> resultado = usuarioService.listarTodos();
+
+        assertEquals(2, resultado.size());
+        verify(usuarioRepository).findAll();
+    }
+
+    @Test
+    void atualizarPerfilDeveNaoFazerNadaQuandoEmailNaoForAlterado() {
+        autenticarComo("giovana@email.com");
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setEmail("giovana@email.com");
+
+        Cliente cliente = new Cliente();
+        cliente.setUsuario(usuario);
+
+        when(usuarioRepository.findByEmail("giovana@email.com"))
+                .thenReturn(Optional.of(usuario));
+        when(clienteRepository.findByUsuario_Id(1L))
+                .thenReturn(Optional.of(cliente));
+
+        usuarioService.atualizarPerfil(dto);
+
+        verify(usuarioRepository, never()).save(any());
+        verify(clienteRepository).save(cliente);
+    }
+
+    @Test
+    void atualizarPerfilDeveAtualizarApenasDocumentoDoCliente() {
+        autenticarComo("giovana@email.com");
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setDocumento("98765432100");
+
+        Cliente cliente = new Cliente();
+        cliente.setUsuario(usuario);
+
+        when(usuarioRepository.findByEmail("giovana@email.com"))
+                .thenReturn(Optional.of(usuario));
+        when(clienteRepository.findByUsuario_Id(1L))
+                .thenReturn(Optional.of(cliente));
+
+        usuarioService.atualizarPerfil(dto);
+
+        assertEquals("98765432100", cliente.getDocumento());
+        verify(clienteRepository).save(cliente);
+    }
+
+    @Test
+    void atualizarPerfilDeveAtualizarApenasTelefoneDoCliente() {
+        autenticarComo("giovana@email.com");
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setTelefone("11888887777");
+
+        Cliente cliente = new Cliente();
+        cliente.setUsuario(usuario);
+
+        when(usuarioRepository.findByEmail("giovana@email.com"))
+                .thenReturn(Optional.of(usuario));
+        when(clienteRepository.findByUsuario_Id(1L))
+                .thenReturn(Optional.of(cliente));
+
+        usuarioService.atualizarPerfil(dto);
+
+        assertEquals("11888887777", cliente.getTelefone());
+        verify(clienteRepository).save(cliente);
+    }
+
+    @Test
+    void atualizarDeveAtualizarApenasEmail() {
+        UsuarioAtualizarDto dto = new UsuarioAtualizarDto();
+        dto.setEmail("somenteemail@email.com");
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuario));
+        when(usuarioRepository.existsByEmail("somenteemail@email.com"))
+                .thenReturn(false);
+
+        usuarioService.atualizar(1L, dto);
+
+        assertEquals("somenteemail@email.com", usuario.getEmail());
+        assertEquals("hash-antigo", usuario.getSenha());
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+    @Test
+    void atualizarDeveAtualizarApenasSenha() {
+        UsuarioAtualizarDto dto = new UsuarioAtualizarDto();
+        dto.setSenha("novaSenha123");
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuario));
+        when(passwordEncoder.encode("novaSenha123"))
+                .thenReturn("hash-novo");
+
+        usuarioService.atualizar(1L, dto);
+
+        assertEquals("giovana@email.com", usuario.getEmail());
+        assertEquals("hash-novo", usuario.getSenha());
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void atualizarDeveNaoFazerNadaQuandoAmbosCamposNulos() {
+        UsuarioAtualizarDto dto = new UsuarioAtualizarDto();
+
+        when(usuarioRepository.findById(1L))
+                .thenReturn(Optional.of(usuario));
+
+        usuarioService.atualizar(1L, dto);
+
+        assertEquals("giovana@email.com", usuario.getEmail());
+        assertEquals("hash-antigo", usuario.getSenha());
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void atualizarPerfilDeveAtualizarNomeDoClienteQuandoOutrosCamposNulos() {
+        autenticarComo("giovana@email.com");
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setNome("Giovana Atualizada");
+
+        Cliente cliente = new Cliente();
+        cliente.setUsuario(usuario);
+
+        when(usuarioRepository.findByEmail("giovana@email.com"))
+                .thenReturn(Optional.of(usuario));
+        when(clienteRepository.findByUsuario_Id(1L))
+                .thenReturn(Optional.of(cliente));
+
+        usuarioService.atualizarPerfil(dto);
+
+        assertEquals("Giovana Atualizada", cliente.getNome());
+        verify(clienteRepository).save(cliente);
+    }
+
+    @Test
+    void atualizarPerfilDeveAtualizarApenasNomeDoProfissional() {
+        Perfil perfilProfissional = new Perfil();
+        perfilProfissional.setId(2L);
+        usuario.setPerfil(perfilProfissional);
+        usuario.setEmail("profissional@email.com");
+
+        autenticarComo("profissional@email.com");
+
+        UsuarioAtualizarPerfilDto dto = new UsuarioAtualizarPerfilDto();
+        dto.setNome("Profissional Atualizado");
+
+        Profissional profissional = new Profissional();
+        profissional.setUsuario(usuario);
+
+        when(usuarioRepository.findByEmail("profissional@email.com"))
+                .thenReturn(Optional.of(usuario));
+        when(profissionalRepository.findByUsuario_Id(1L))
+                .thenReturn(Optional.of(profissional));
+
+        usuarioService.atualizarPerfil(dto);
+
+        assertEquals("Profissional Atualizado", profissional.getNome());
+        verify(profissionalRepository).save(profissional);
+    }
+
+    @Test
+    void obterUsuarioAutenticadoDeveLancar401QuandoNaoAutenticado() {
+        SecurityContextHolder.clearContext();
+
+        UsuarioAtualizarSenhaDto dto = new UsuarioAtualizarSenhaDto();
+        dto.setSenhaAtual("123456");
+        dto.setSenhaNova("nova");
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> usuarioService.atualizarSenha(dto));
+
+        assertEquals(HttpStatus.UNAUTHORIZED, ex.getStatusCode());
+    }
+
+    @Test
+    void obterUsuarioAutenticadoDeveLancar404QuandoEmailNaoEncontrado() {
+        autenticarComo("naoexiste@email.com");
+
+        when(usuarioRepository.findByEmail("naoexiste@email.com"))
+                .thenReturn(Optional.empty());
+
+        UsuarioAtualizarSenhaDto dto = new UsuarioAtualizarSenhaDto();
+        dto.setSenhaAtual("123456");
+        dto.setSenhaNova("nova");
+
+        assertThrows(EntityNotFoundException.class,
+                () -> usuarioService.atualizarSenha(dto));
     }
 }
