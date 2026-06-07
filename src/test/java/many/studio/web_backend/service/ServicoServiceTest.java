@@ -192,7 +192,7 @@ class ServicoServiceTest {
          Mockito.when(servicoRepository.existsByNome(servico.getNome())).thenReturn(false);
          Mockito.when(servicoRepository.save(servico)).thenReturn(servico);
 
-         assertEquals(servico,servicoService.cadastrar(dto));
+         assertEquals(servico,servicoService.criar(dto));
       }
 
 
@@ -225,7 +225,7 @@ class ServicoServiceTest {
 
          Assertions.assertThrows(
                  EntityConflictException.class,
-                 () ->  servicoService.cadastrar(dto));
+                 () ->  servicoService.criar(dto));
       }
       }
 

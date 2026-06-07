@@ -59,7 +59,7 @@ public class ServicoService {
     }
 
 
-    public ServicoListarDto cadastrar(ServicoCadastroDto cadastroDto){
+    public ServicoListarDto criar(ServicoCadastroDto cadastroDto){
         if (servicoRepository.existsByNome(cadastroDto.getNome())){
             throw new EntityConflictException("já existe um serviço com esse nome");
         }
