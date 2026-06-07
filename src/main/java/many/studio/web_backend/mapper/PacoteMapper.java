@@ -40,7 +40,4 @@ public class PacoteMapper {
         return entity;
     }
 
-    public static List<Pacote> toEntity(List<PacoteListarDto> dtos){
-        return dtos.stream().map(PacoteMapper :: toEntity).toList();
-    }
 }

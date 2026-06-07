@@ -27,53 +27,52 @@ public class ServicoService {
         this.servicoRepository = servicoRepository;
     }
 
-    public List<ServicoListarDto> listar(){
+    public List<Servico> listar(){
         List<Servico> servicos = servicoRepository.findAll();
 
         if (servicos.isEmpty()) {
             throw new EntityNotFoundException("Nenhum serviço encontrado");
         }
 
-        return ServicoMapper.toResponse(servicos);
+        return servicos;
     }
 
-    public List<PacoteListarDto> listarPacotesPorServico(Long id){
+    public List<Pacote> listarPacotesPorServico(Long id){
         List<Pacote> pacotes = pacoteRepository.findByServicoId(id);
 
         if (pacotes.isEmpty()) {
             throw new EntityNotFoundException("Nenhum pacote encontrado para o serviço informado");
         }
 
-        return PacoteMapper.toResponse(pacotes);
+        return pacotes;
     }
 
 
-    public List<ServicoListarDto> listarServicosPorProfissional(Long id){
+    public List<Servico> listarServicosPorProfissional(Long id){
         List<Servico> servicos = servicoRepository.findAllByProfissionalId(id);
 
         if (servicos.isEmpty()) {
             throw new EntityNotFoundException("Nenhum serviço encontrado para o profissional informado");
         }
 
-        return ServicoMapper.toResponse(servicos);
+        return servicos;
     }
 
-
-    public ServicoListarDto criar(ServicoCadastroDto cadastroDto){
+    public Servico criar(ServicoCadastroDto cadastroDto){
         if (servicoRepository.existsByNome(cadastroDto.getNome())){
             throw new EntityConflictException("já existe um serviço com esse nome");
         }
         Servico entity = ServicoMapper.toEntity(cadastroDto);
-        return ServicoMapper.toResponse(servicoRepository.save(entity));
+        return servicoRepository.save(entity);
     }
 
-    public ServicoListarDto editar(Long id, ServicoCadastroDto dto) {
+    public Servico editar(Long id, ServicoCadastroDto dto) {
         if (!servicoRepository.existsById(id)){
             throw new EntityNotFoundException("Serviço não encontrado");
         }
         Servico entity = ServicoMapper.toEntity(dto);
 
-        return ServicoMapper.toResponse(servicoRepository.save(entity));
+        return servicoRepository.save(entity);
     }
 
     public void deletar(Long id) {
@@ -83,13 +82,13 @@ public class ServicoService {
         servicoRepository.deleteById(id);
     }
 
-    public  PacoteListarDto editarPacote(Long pacoteId, PacoteCadastroDto dto) {
+    public  Pacote editarPacote(Long pacoteId, PacoteCadastroDto dto) {
         if (!pacoteRepository.existsById(pacoteId)) {
             throw new EntityNotFoundException("Pacote não encontrado");
         }
         Pacote pacote = PacoteMapper.toEntity(dto);
         pacote.setId(pacoteId);
-        return PacoteMapper.toResponse(pacoteRepository.save(pacote));
+        return pacoteRepository.save(pacote);
     }
 
     public  void deletarPacote(Long pacoteId) {
@@ -99,7 +98,7 @@ public class ServicoService {
         pacoteRepository.deleteById(pacoteId);
     }
 
-    public  PacoteListarDto cadastrarPacote(PacoteCadastroDto dto) {
-        return PacoteMapper.toResponse(pacoteRepository.save(PacoteMapper.toEntity(dto)));
+    public  Pacote cadastrarPacote(PacoteCadastroDto dto) {
+        return pacoteRepository.save(PacoteMapper.toEntity(dto));
     }
 }

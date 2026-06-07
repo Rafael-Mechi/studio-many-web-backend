@@ -1,10 +1,12 @@
 package many.studio.web_backend.service;
 
 import many.studio.web_backend.dto.servico.ServicoCadastroDto;
+import many.studio.web_backend.dto.servico.ServicoListarDto;
 import many.studio.web_backend.entity.Pacote;
 import many.studio.web_backend.entity.Servico;
 import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
+import many.studio.web_backend.mapper.ServicoMapper;
 import many.studio.web_backend.repository.PacoteRepository;
 import many.studio.web_backend.repository.ServicoRepository;
 import org.junit.jupiter.api.Assertions;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class ServicoServiceTest {
@@ -146,6 +149,7 @@ class ServicoServiceTest {
 
          Mockito.when(servicoRepository.findAllByProfissionalId(1L)).thenReturn(list);
 
+
          assertIterableEquals(list, servicoService.listarServicosPorProfissional(1L));
       }
 
@@ -181,16 +185,16 @@ class ServicoServiceTest {
 
 
          ServicoCadastroDto dto = new ServicoCadastroDto();
-         servico.setNome("Limpeza de pele");
-         servico.setDescricao("Procedimento de remover impurezas, células mortas, cravos e miliuns da superfície do rosto.");
-         servico.setFotoUrl("https://[NOME_DO_BUCKET].s3.[REGIÃO]://[CAMINHO/DA/IMAGEM.jpg]");
-         servico.setDuracaoMinutos(40);
-         servico.setPreco(120.00);
-         servico.setAtivo(true);
-         servico.setCriadoEm(LocalDateTime.now());
+         dto.setNome("Limpeza de pele");
+         dto.setDescricao("Procedimento de remover impurezas, células mortas, cravos e miliuns da superfície do rosto.");
+         dto.setFotoUrl("https://[NOME_DO_BUCKET].s3.[REGIÃO]://[CAMINHO/DA/IMAGEM.jpg]");
+         dto.setDuracaoMinutos(40);
+         dto.setPreco(120.00);
+         dto.setAtivo(true);
+         dto.setCriadoEm(LocalDateTime.now());
 
          Mockito.when(servicoRepository.existsByNome(servico.getNome())).thenReturn(false);
-         Mockito.when(servicoRepository.save(servico)).thenReturn(servico);
+         Mockito.when(servicoRepository.save(any(Servico.class))).thenReturn(servico);
 
          assertEquals(servico,servicoService.criar(dto));
       }
@@ -211,13 +215,13 @@ class ServicoServiceTest {
 
 
          ServicoCadastroDto dto = new ServicoCadastroDto();
-         servico.setNome("Limpeza de pele");
-         servico.setDescricao("Procedimento de remover impurezas, células mortas, cravos e miliuns da superfície do rosto.");
-         servico.setFotoUrl("https://[NOME_DO_BUCKET].s3.[REGIÃO]://[CAMINHO/DA/IMAGEM.jpg]");
-         servico.setDuracaoMinutos(40);
-         servico.setPreco(120.00);
-         servico.setAtivo(true);
-         servico.setCriadoEm(LocalDateTime.now());
+         dto.setNome("Limpeza de pele");
+         dto.setDescricao("Procedimento de remover impurezas, células mortas, cravos e miliuns da superfície do rosto.");
+         dto.setFotoUrl("https://[NOME_DO_BUCKET].s3.[REGIÃO]://[CAMINHO/DA/IMAGEM.jpg]");
+         dto.setDuracaoMinutos(40);
+         dto.setPreco(120.00);
+         dto.setAtivo(true);
+         dto.setCriadoEm(LocalDateTime.now());
 
 
 
