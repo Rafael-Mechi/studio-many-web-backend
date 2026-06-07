@@ -4,10 +4,12 @@ import many.studio.web_backend.dto.servico.ServicoCadastroDto;
 import many.studio.web_backend.dto.servico.ServicoListarDto;
 import many.studio.web_backend.entity.Pacote;
 import many.studio.web_backend.entity.Servico;
+import many.studio.web_backend.entity.ServicoProfissional;
 import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.ServicoMapper;
 import many.studio.web_backend.repository.PacoteRepository;
+import many.studio.web_backend.repository.ServicoProfissionalRepository;
 import many.studio.web_backend.repository.ServicoRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +36,9 @@ class ServicoServiceTest {
 
    @Mock
    private ServicoRepository servicoRepository;
+
+   @Mock
+   private ServicoProfissionalRepository servicoProfissionalRepository;
 
    @InjectMocks
     private ServicoService servicoService;
@@ -144,21 +149,26 @@ class ServicoServiceTest {
          servico.setAtivo(true);
          servico.setCriadoEm(LocalDateTime.now());
 
-         List<Servico> list = new ArrayList<>();
-         list.add(servico);
+         ServicoProfissional servicoProfissional = new ServicoProfissional();
+         servicoProfissional.setServico(servico);
 
-         Mockito.when(servicoRepository.findAllByProfissionalId(1L)).thenReturn(list);
+         List<ServicoProfissional> listServicoProfissional = new ArrayList<>();
+         listServicoProfissional.add(servicoProfissional);
 
+         List<Servico> listServicos = List.of(servico);
 
-         assertIterableEquals(list, servicoService.listarServicosPorProfissional(1L));
+         Mockito.when(servicoProfissionalRepository.findAllByProfissionalId(1L))
+                 .thenReturn(listServicoProfissional);
+
+         assertIterableEquals(listServicos, servicoService.listarServicosPorProfissional(1L));
       }
 
       @Test
       @DisplayName("Deve retornar exception se nenhum serviço encontrado para o profissional")
       void deveRetornarExceptionSeListaVazia() {
-         List<Servico> list = new ArrayList<>();
+         List<ServicoProfissional> list = new ArrayList<>();
 
-         Mockito.when(servicoRepository.findAllByProfissionalId(1L)).thenReturn(list);
+         Mockito.when(servicoProfissionalRepository.findAllByProfissionalId(1L)).thenReturn(list);
 
          Assertions.assertThrows(
                  EntityNotFoundException.class,

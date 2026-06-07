@@ -6,14 +6,17 @@ import many.studio.web_backend.dto.servico.ServicoCadastroDto;
 import many.studio.web_backend.dto.servico.ServicoListarDto;
 import many.studio.web_backend.entity.Pacote;
 import many.studio.web_backend.entity.Servico;
+import many.studio.web_backend.entity.ServicoProfissional;
 import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.PacoteMapper;
 import many.studio.web_backend.mapper.ServicoMapper;
 import many.studio.web_backend.repository.PacoteRepository;
+import many.studio.web_backend.repository.ServicoProfissionalRepository;
 import many.studio.web_backend.repository.ServicoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,10 +24,12 @@ public class ServicoService {
 
     private final ServicoRepository servicoRepository;
     private final PacoteRepository pacoteRepository;
+    private final ServicoProfissionalRepository servicoProfissionalRepository;
 
-    public ServicoService(PacoteRepository pacoteRepository, ServicoRepository servicoRepository) {
+    public ServicoService(PacoteRepository pacoteRepository, ServicoRepository servicoRepository, ServicoProfissionalRepository servicoProfissionalRepository) {
         this.pacoteRepository = pacoteRepository;
         this.servicoRepository = servicoRepository;
+        this.servicoProfissionalRepository = servicoProfissionalRepository;
     }
 
     public List<Servico> listar(){
@@ -49,10 +54,16 @@ public class ServicoService {
 
 
     public List<Servico> listarServicosPorProfissional(Long id){
-        List<Servico> servicos = servicoRepository.findAllByProfissionalId(id);
+        List<ServicoProfissional> servicoProfissionals = servicoProfissionalRepository.findAllByProfissionalId(id);
 
-        if (servicos.isEmpty()) {
+        if (servicoProfissionals.isEmpty()) {
             throw new EntityNotFoundException("Nenhum serviço encontrado para o profissional informado");
+        }
+
+        List<Servico> servicos = new ArrayList<>();
+
+        for (ServicoProfissional servicoProfissional : servicoProfissionals) {
+            servicos.add(servicoProfissional.getServico());
         }
 
         return servicos;
