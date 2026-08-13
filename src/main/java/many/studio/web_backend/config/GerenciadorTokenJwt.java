@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,9 +28,12 @@ public class GerenciadorTokenJwt {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        UsuarioDetalhesDto dto = (UsuarioDetalhesDto) authentication.getPrincipal();
+
         return Jwts.builder()
                 .subject(authentication.getName())
                 .claim("authorities", authorities)
+                .claim("id", dto.getId())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1_000))
                 .signWith(parseSecret())

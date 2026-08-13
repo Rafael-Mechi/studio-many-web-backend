@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 public class UsuarioTokenDto {
 
     private Long userId;
-    private String nome;
     private String email;
     private String token;
 
@@ -17,14 +16,6 @@ public class UsuarioTokenDto {
 
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
     }
 
     public String getEmail() {
