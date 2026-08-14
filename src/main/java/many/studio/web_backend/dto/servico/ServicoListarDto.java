@@ -33,6 +33,24 @@ public class ServicoListarDto {
     @Schema(description = "Data de criação do serviço", example = "15/09/2026")
     private LocalDateTime criadoEm;
 
+    @Schema(description = "Categoria do serviço", example = "Facial")
+    private String categoria;
+
+    public ServicoListarDto(Long id, String nome, String descricao, String fotoUrl, Integer duracaoMinutos, Double preco, Double sinalValor, Boolean ativo, LocalDateTime criadoEm, String categoria) {
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.fotoUrl = fotoUrl;
+        this.duracaoMinutos = duracaoMinutos;
+        this.preco = preco;
+        this.sinalValor = sinalValor;
+        this.ativo = ativo;
+        this.criadoEm = criadoEm;
+        this.categoria = categoria;
+    }
+
+    public ServicoListarDto(){}
+
     public Boolean getAtivo() {
         return ativo;
     }
@@ -103,5 +121,13 @@ public class ServicoListarDto {
 
     public void setSinalValor(Double sinalValor) {
         this.sinalValor = sinalValor;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 }

@@ -24,13 +24,59 @@ INSERT INTO status_pagamentos (estado) VALUES
 --INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('ana.estetica@email.com', 'hash123', 2, NOW());
 --INSERT INTO profissionais (nome, usuario_id) VALUES ('Ana Silva', 1);
 --
-INSERT INTO servicos (nome, preco, duracao_minutos, ativo) VALUES ('Limpeza de pele', 150.00, 60, TRUE);
-INSERT INTO servicos (nome, preco, duracao_minutos, ativo) VALUES ('Unha', 150.00, 60, TRUE);
-INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, 1);
 --
 --INSERT INTO usuarios (email, senha, perfil_id) VALUES ('cliente.joana@email.com', 'hash456', 3);
 --INSERT INTO clientes (nome, telefone, usuario_id) VALUES ('Joana Santos', '11999999999', 2);
 --INSERT INTO anamneses (informacao) VALUES ('Ficha Inicial Joana');
 --INSERT INTO anamnese_clientes (anamneses_id, clientes_id) VALUES (1, 1);
 
+INSERT INTO categoria_servicos (categoria) VALUES('Corporal');
+INSERT INTO categoria_servicos (categoria) VALUES('Facial');
+
+INSERT INTO servicos (
+    nome,
+    descricao,
+    foto_url,
+    duracao_minutos,
+    preco,
+    sinal_valor,
+    ativo,
+    criado_em,
+    fk_categoria_servico
+) VALUES (
+    'Limpeza de pele',
+    'Procedimento para remover impurezas, células mortas, cravos e miliuns da superfície do rosto.',
+    'https://link_bucket',
+    60,
+    150.00,
+    50.00,
+    TRUE,
+    CURRENT_TIMESTAMP,
+    1
+);
+
+INSERT INTO servicos (
+    nome,
+    descricao,
+    foto_url,
+    duracao_minutos,
+    preco,
+    sinal_valor,
+    ativo,
+    criado_em,
+    fk_categoria_servico
+) VALUES (
+    'Remoção de cravos',
+    'Procedimento para remoção de cravos.',
+    'https://link_bucket',
+    60,
+    150.00,
+    50.00,
+    TRUE,
+    CURRENT_TIMESTAMP,
+    2
+);
+
+
+INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, 1);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Limpeza de Pele Avulsa', 1, 150.00, 30, TRUE, 1);

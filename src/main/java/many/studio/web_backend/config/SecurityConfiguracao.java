@@ -58,7 +58,8 @@ public class SecurityConfiguracao {
             "/usuarios/logout/**",
             "/h2-console/**",
             "/h2-console/*/**",
-            "/error/**"
+            "/error/**",
+            "/servicos"
     };
 
     @Bean
