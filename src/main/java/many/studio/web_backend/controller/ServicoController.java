@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/servico")
+@RequestMapping("/servicos")
 public class ServicoController {
 
 
@@ -30,7 +30,6 @@ public class ServicoController {
 
 
     @GetMapping
-    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<ServicoListarDto>> listar(){
         return ResponseEntity.ok(ServicoMapper.toResponse(servicoService.listar()));
     }

@@ -35,6 +35,10 @@ public class Servico {
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
 
+    @ManyToOne
+    @JoinColumn(name = "fk_categoria_servico")
+    private CategoriaServico categoriaServico;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
@@ -52,4 +56,13 @@ public class Servico {
     public Boolean getAtivo() { return ativo; }
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public LocalDateTime getCriadoEm() { return criadoEm; }
-    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }}
+    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
+
+    public CategoriaServico getCategoriaServico() {
+        return categoriaServico;
+    }
+
+    public void setCategoriaServico(CategoriaServico categoriaServico) {
+        this.categoriaServico = categoriaServico;
+    }
+}
