@@ -38,6 +38,7 @@ public class ServicoMapper {
         response.setPreco(servico.getPreco());
         response.setFotoUrl(servico.getFotoUrl());
         response.setSinalValor(servico.getSinalValor());
+        response.setCategoria(servico.getCategoriaServico().getCategoria());
 
         return response;
     }
