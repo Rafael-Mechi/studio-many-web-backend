@@ -143,4 +143,8 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         OR c.usuario.id = :usuarioId
     """)
     List<Agendamento> findByUsuarioId(Long usuarioId);
+
+    List<Agendamento> findByClienteUsuarioId(Long id);
+
+    List<Agendamento> findByProfissionalUsuarioId(Long id);
 }

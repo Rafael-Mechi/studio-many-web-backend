@@ -2,7 +2,6 @@ package many.studio.web_backend.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Future;
 import many.studio.web_backend.dto.agendamento.*;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
@@ -43,8 +42,8 @@ public class AgendamentoController {
 
     @PostMapping
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<AgendamentoCriacaoResponse> criar(@Valid @RequestBody AgendamentoCriacaoRequest request, @Future LocalDateTime horario) {
-        return ResponseEntity.status(201).body(agendamentoService.criar(request, horario));
+    public ResponseEntity<AgendamentoCriacaoResponse> criar(@Valid @RequestBody AgendamentoCriacaoRequest request) {
+        return ResponseEntity.status(201).body(agendamentoService.criar(request, request.getHorario()));
     }
 
     @PatchMapping("/{idAgendamento}/cancelar")
