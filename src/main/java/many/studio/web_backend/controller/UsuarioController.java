@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -385,9 +386,18 @@ public class UsuarioController {
     }
 
 
-    @GetMapping("/{id}/agendamentos")
-    public ResponseEntity<List<AgendamentoResponse>> buscarAgendamentos(@PathVariable Long id) {
-        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarPorUsuarioId(id)));
+    @GetMapping("/me/agendamentos")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<AgendamentoResponse>> buscarAgendamentos(Authentication authentication) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Long id = usuario.getId();
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarAgendamentos(id, role)));
     }
 
 //    @Operation(summary = "Atualizar perfil do usuário autenticado")

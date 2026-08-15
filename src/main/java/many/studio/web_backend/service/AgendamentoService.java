@@ -74,11 +74,13 @@ public class AgendamentoService {
                 .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
     }
 
-    public List<Agendamento> buscarPorUsuarioId(Long id) {
-        if(!usuarioRepository.existsById(id)) {
-            throw new EntityNotFoundException("Usuario não encontrado");
+    public List<Agendamento> buscarAgendamentos(Long id, String role) {
+        if(role.equalsIgnoreCase("ROLE_ADMIN")){
+            return agendamentoRepository.findAll();
         }
-
+        else if(role.equalsIgnoreCase("ROLE_PROFISSIONAL")){
+            return agendamentoRepository.findByProfissionalUsuarioId(id);
+        }
         return agendamentoRepository.findByUsuarioId(id);
     }
 
