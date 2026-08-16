@@ -9,6 +9,7 @@ import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoItemService;
 import many.studio.web_backend.service.AgendamentoService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,8 +43,15 @@ public class AgendamentoController {
 
     @PostMapping
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<AgendamentoCriacaoResponse> criar(@Valid @RequestBody AgendamentoCriacaoRequest request) {
-        return ResponseEntity.status(201).body(agendamentoService.criar(request, request.getHorario()));
+    public ResponseEntity<AgendamentoCriacaoResponse> criar(@Valid @RequestBody AgendamentoCriacaoRequest request, Authentication authentication) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Long id = usuario.getId();
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+        return ResponseEntity.status(201).body(agendamentoService.criar(id, request, request.getHorario()));
     }
 
     @PatchMapping("/{idAgendamento}/cancelar")
