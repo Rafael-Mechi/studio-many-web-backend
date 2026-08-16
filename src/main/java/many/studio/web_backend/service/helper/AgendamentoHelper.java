@@ -1,10 +1,13 @@
 package many.studio.web_backend.service.helper;
 
-import many.studio.web_backend.entity.Agendamento;
-import many.studio.web_backend.entity.Usuario;
+import many.studio.web_backend.entity.*;
+import many.studio.web_backend.exception.EntityConflictException;
+import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.repository.*;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -17,8 +20,9 @@ public class AgendamentoHelper {
     private final ServicoRepository servicoRepository;
     private final ProfissionalRepository profissionalRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PacoteRepository pacoteRepository;
 
-    public AgendamentoHelper(AgendamentoRepository agendamentoRepository, AgendamentoItemRepository agendamentoItemRepository, ClienteRepository clienteRepository, StatusAgendamentoRepository statusAgendamentoRepository, ServicoRepository servicoRepository, ProfissionalRepository profissionalRepository, UsuarioRepository usuarioRepository) {
+    public AgendamentoHelper(AgendamentoRepository agendamentoRepository, AgendamentoItemRepository agendamentoItemRepository, ClienteRepository clienteRepository, StatusAgendamentoRepository statusAgendamentoRepository, ServicoRepository servicoRepository, ProfissionalRepository profissionalRepository, UsuarioRepository usuarioRepository, PacoteRepository pacoteRepository) {
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoItemRepository = agendamentoItemRepository;
         this.clienteRepository = clienteRepository;
@@ -26,6 +30,7 @@ public class AgendamentoHelper {
         this.servicoRepository = servicoRepository;
         this.profissionalRepository = profissionalRepository;
         this.usuarioRepository = usuarioRepository;
+        this.pacoteRepository = pacoteRepository;
     }
 
     public Boolean isUsuarioValidoParaCancelamentoDeAgendamento(Long idUsuario, Long idAgendamento){
@@ -40,5 +45,49 @@ public class AgendamentoHelper {
         Long perfilUsuario = u.get().getPerfil().getId();
 
         return Objects.equals(fkUsuarioAgendamento, idUsuario) || perfilUsuario.equals(1L);
+    }
+
+    public void validarIntegridadeUsuario(Long id, Long clienteId) {
+        Optional<Cliente> u = clienteRepository.findByUsuario_Id(id);
+        Long idCliente = u.get().getId();
+
+        if(idCliente != clienteId){
+            throw new EntityNotFoundException("Cliente não encontrado"); // <- caso um usuário passe o id de outro usuário com a intenção de criar um agendamento no nome daquele usuário
+        }
+    }
+
+    public Boolean isPacoteAtivo(Long pacoteId) {
+        Optional<Pacote> p = pacoteRepository.findById(pacoteId);
+        Pacote pacote = p.get();
+
+        return pacote.getAtivo();
+    }
+
+    public void validarConflitoHorarioAgendamento(LocalDateTime horario, Long idProfissional, Long pacoteId
+    ) {
+        List<Agendamento> agendamentos = agendamentoRepository.findByProfissionalId(idProfissional);
+
+        List<Pacote> pacotes =  pacoteRepository.findByServicoId(pacoteId);
+        Pacote pacote = pacotes.getFirst();
+
+        Servico servico = pacote.getServico();
+
+        LocalDateTime novoInicio = horario;
+        LocalDateTime novoFim = horario.plusMinutes(servico.getDuracaoMinutos());
+
+        for (Agendamento a : agendamentos) {
+
+            List<AgendamentoItem> itens = agendamentoItemRepository.findByAgendamentoId(a.getId());
+            AgendamentoItem item = itens.getFirst();
+
+            LocalDateTime inicioExistente = item.getInicioAtendimento();
+            LocalDateTime fimExistente = item.getFimAtendimento();
+
+            boolean conflita = novoInicio.isBefore(fimExistente) && novoFim.isAfter(inicioExistente);
+
+            if (conflita && !a.getStatusAgendamento().equals("cancelado")) {
+                throw new EntityConflictException("O profissional já possui um agendamento nesse horário");
+            }
+        }
     }
 }
