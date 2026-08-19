@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UsuarioCriacaoDto {
 
-    @Size(min = 3, max = 10)
+    @Size(min = 3, max = 75)
     @Schema(description = "Nome do usuário", example = "noa")
     private String nome;
 
