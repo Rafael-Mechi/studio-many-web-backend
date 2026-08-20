@@ -2,9 +2,11 @@ package many.studio.web_backend.service;
 
 import many.studio.web_backend.dto.pacote.PacoteCadastroDto;
 import many.studio.web_backend.dto.pacote.PacoteListarDto;
+import many.studio.web_backend.dto.servico.ProfissionaisPorServicoDto;
 import many.studio.web_backend.dto.servico.ServicoCadastroDto;
 import many.studio.web_backend.dto.servico.ServicoListarDto;
 import many.studio.web_backend.entity.Pacote;
+import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.Servico;
 import many.studio.web_backend.entity.ServicoProfissional;
 import many.studio.web_backend.exception.EntityConflictException;
@@ -32,14 +34,40 @@ public class ServicoService {
         this.servicoProfissionalRepository = servicoProfissionalRepository;
     }
 
-    public List<Servico> listar(){
+    public List<ServicoListarDto> listar(){
         List<Servico> servicos = servicoRepository.findAll();
+        List<ServicoListarDto> lista = new ArrayList<>();
+        List<ProfissionaisPorServicoDto> profissionaisPorServicoDto = new ArrayList<>();
 
         if (servicos.isEmpty()) {
             throw new EntityNotFoundException("Nenhum serviço encontrado");
         }
 
-        return servicos;
+        for(Servico s : servicos){
+            ServicoListarDto servicoListarDto = new ServicoListarDto();
+            servicoListarDto.setId(s.getId());
+            servicoListarDto.setNome(s.getNome());
+            servicoListarDto.setFotoUrl(s.getFotoUrl());
+            servicoListarDto.setDuracaoMinutos(s.getDuracaoMinutos());
+            servicoListarDto.setPreco(s.getPreco());
+            servicoListarDto.setSinalValor(s.getSinalValor());
+            servicoListarDto.setAtivo(s.getAtivo());
+            servicoListarDto.setCriadoEm(s.getCriadoEm());
+
+            List<Profissional> profissionaisPorServico = servicoProfissionalRepository.findByServicoId(s.getId());
+
+            for(Profissional p : profissionaisPorServico){
+                ProfissionaisPorServicoDto profissionalPorServico = new ProfissionaisPorServicoDto();
+                profissionalPorServico.setId(p.getId());
+                profissionalPorServico.setNomeFuncionario(p.getNome());
+
+                profissionaisPorServicoDto.add(profissionalPorServico);
+            }
+
+            servicoListarDto.setProfissionais(profissionaisPorServicoDto);
+        }
+
+        return lista;
     }
 
     public List<Pacote> listarPacotesPorServico(Long id){
