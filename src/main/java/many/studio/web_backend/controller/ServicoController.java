@@ -20,7 +20,6 @@ import java.util.List;
 @RequestMapping("/servicos")
 public class ServicoController {
 
-
     private final ServicoService servicoService;
 
     public ServicoController(ServicoService servicoService) {
@@ -36,12 +35,12 @@ public class ServicoController {
 
     @GetMapping("/{servicoId}/pacotes")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<PacoteListarDto>> listarPacotesPorServico(@PathVariable Long id){
-        return ResponseEntity.ok(PacoteMapper.toResponse(servicoService.listarPacotesPorServico(id)));
+    public ResponseEntity<List<PacoteListarDto>> listarPacotesPorServico(@PathVariable Long servicoId){
+        return ResponseEntity.ok(PacoteMapper.toResponse(servicoService.listarPacotesPorServico(servicoId)));
     }
 
 
-    @PostMapping("/cadastrar")
+    @PostMapping
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<ServicoListarDto> cadastrar(@RequestBody ServicoCadastroDto request){
         return ResponseEntity.status(HttpStatus.CREATED).body(ServicoMapper.toResponse(servicoService.criar(request)));
@@ -49,36 +48,37 @@ public class ServicoController {
 
     @GetMapping("/profissionais/{profissionalId}")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<ServicoListarDto>> listarServicosPorProfissional(@PathVariable Long id){
-        return ResponseEntity.ok(ServicoMapper.toResponse(servicoService.listarServicosPorProfissional(id)));
+    public ResponseEntity<List<ServicoListarDto>> listarServicosPorProfissional(@PathVariable Long profissionalId){
+        return ResponseEntity.ok(ServicoMapper.toResponse(servicoService.listarServicosPorProfissional(profissionalId)));
     }
 
-    @PatchMapping("/servicos/{servicoId}/editar")
+    @PatchMapping("/{servicoId}/editar")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<ServicoListarDto> editar(@PathVariable Long id, ServicoCadastroDto dto ){
-        return ResponseEntity.ok(ServicoMapper.toResponse(servicoService.editar(id,dto)));
+    public ResponseEntity<ServicoListarDto> editar(@PathVariable Long servicoId, ServicoCadastroDto dto ){
+        return ResponseEntity.ok(ServicoMapper.toResponse(servicoService.editar(servicoId,dto)));
     }
 
-    @DeleteMapping("/servicos/{servicoId}/excluir")
+    @DeleteMapping("/{servicoId}/excluir")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletar(@PathVariable Long id){
         servicoService.deletar(id);
         return ResponseEntity.status(204).build();
     }
-    @PatchMapping("/servicos/pacotes/{pacoteId}/editar")
+
+    @PatchMapping("/pacotes/{pacoteId}/editar")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<PacoteListarDto> editarPacote(@PathVariable Long pacoteId , PacoteCadastroDto dto ){
         return ResponseEntity.ok(PacoteMapper.toResponse(servicoService.editarPacote(pacoteId,dto)));
     }
 
-    @DeleteMapping("/servicos/pacotes/{pacoteId}/excluir")
+    @DeleteMapping("/pacotes/{pacoteId}/excluir")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletarPacote(@PathVariable  Long pacoteId){
         servicoService.deletarPacote(pacoteId);
         return ResponseEntity.status(204).build();
     }
 
-    @PostMapping("/servicos/{servicoId}/pacotes")
+    @PostMapping("/{servicoId}/pacotes")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<PacoteListarDto> cadastrarPacote(@PathVariable PacoteCadastroDto dto){
         return ResponseEntity.status(201).body(PacoteMapper.toResponse(servicoService.cadastrarPacote(dto)));
