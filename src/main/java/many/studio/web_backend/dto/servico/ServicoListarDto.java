@@ -1,8 +1,10 @@
 package many.studio.web_backend.dto.servico;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import many.studio.web_backend.entity.Profissional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ServicoListarDto {
 
@@ -36,7 +38,10 @@ public class ServicoListarDto {
     @Schema(description = "Categoria do serviço", example = "Facial")
     private String categoria;
 
-    public ServicoListarDto(Long id, String nome, String descricao, String fotoUrl, Integer duracaoMinutos, Double preco, Double sinalValor, Boolean ativo, LocalDateTime criadoEm, String categoria) {
+    @Schema(description = "Profissionais que fazem o serviço", example = "[{\"id\": 1, \"name\": \"Juliana\"}, {\"id\": 2, \"name\": \"Caroline\"}]")
+    private List<ProfissionaisPorServicoDto> profissionais;
+
+    public ServicoListarDto(Long id, String nome, String descricao, String fotoUrl, Integer duracaoMinutos, Double preco, Double sinalValor, Boolean ativo, LocalDateTime criadoEm, String categoria, List<ProfissionaisPorServicoDto> profissionais) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -47,6 +52,7 @@ public class ServicoListarDto {
         this.ativo = ativo;
         this.criadoEm = criadoEm;
         this.categoria = categoria;
+        this.profissionais = profissionais;
     }
 
     public ServicoListarDto(){}
@@ -129,5 +135,13 @@ public class ServicoListarDto {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+
+    public List<ProfissionaisPorServicoDto> getProfissionais() {
+        return profissionais;
+    }
+
+    public void setProfissionais(List<ProfissionaisPorServicoDto> profissionais) {
+        this.profissionais = profissionais;
     }
 }
