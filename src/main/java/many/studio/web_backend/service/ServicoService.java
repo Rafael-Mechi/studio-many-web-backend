@@ -37,7 +37,6 @@ public class ServicoService {
     public List<ServicoListarDto> listar(){
         List<Servico> servicos = servicoRepository.findAll();
         List<ServicoListarDto> lista = new ArrayList<>();
-        List<ProfissionaisPorServicoDto> profissionaisPorServicoDto = new ArrayList<>();
 
         if (servicos.isEmpty()) {
             throw new EntityNotFoundException("Nenhum serviço encontrado");
@@ -47,19 +46,21 @@ public class ServicoService {
             ServicoListarDto servicoListarDto = new ServicoListarDto();
             servicoListarDto.setId(s.getId());
             servicoListarDto.setNome(s.getNome());
+            servicoListarDto.setDescricao(s.getDescricao());
             servicoListarDto.setFotoUrl(s.getFotoUrl());
             servicoListarDto.setDuracaoMinutos(s.getDuracaoMinutos());
             servicoListarDto.setPreco(s.getPreco());
             servicoListarDto.setSinalValor(s.getSinalValor());
             servicoListarDto.setAtivo(s.getAtivo());
+            servicoListarDto.setCategoria(s.getCategoriaServico().getCategoria());
             servicoListarDto.setCriadoEm(s.getCriadoEm());
 
-            List<Profissional> profissionaisPorServico = servicoProfissionalRepository.findByServicoId(s.getId());
-
-            for(Profissional p : profissionaisPorServico){
+            List<ServicoProfissional> servicosProfissionais = servicoProfissionalRepository.findByServicoId(s.getId());
+            List<ProfissionaisPorServicoDto> profissionaisPorServicoDto = new ArrayList<>();
+            for(ServicoProfissional sp : servicosProfissionais){
                 ProfissionaisPorServicoDto profissionalPorServico = new ProfissionaisPorServicoDto();
-                profissionalPorServico.setId(p.getId());
-                profissionalPorServico.setNomeFuncionario(p.getNome());
+                profissionalPorServico.setId(sp.getProfissional().getId());
+                profissionalPorServico.setNomeFuncionario(sp.getProfissional().getNome());
 
                 profissionaisPorServicoDto.add(profissionalPorServico);
             }
