@@ -65,6 +65,7 @@ public class ServicoService {
             }
 
             servicoListarDto.setProfissionais(profissionaisPorServicoDto);
+            lista.add(servicoListarDto);
         }
 
         return lista;
