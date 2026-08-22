@@ -59,7 +59,6 @@ public class ProfissionalController {
     }
 
     @GetMapping("/agenda/{profissionalId}")
-    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<SlotsResponse>> buscarDiasDeTrabalhoPorProfissional(@PathVariable Long profissionalId,
                                                                                    @RequestParam String mes) {
         return ResponseEntity.ok()
