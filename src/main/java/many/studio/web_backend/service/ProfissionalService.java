@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProfissionalService {
@@ -119,5 +120,16 @@ public class ProfissionalService {
         usuario.setAtivo(false);
 
         profissionalRepository.save(profissional);
+    }
+
+    public Profissional findByUsuarioId(Long id) {
+        Optional<Profissional> profissionalOpt = profissionalRepository.findByUsuario_Id(id);
+
+        if(profissionalOpt.isEmpty()){
+            throw new EntityNotFoundException("Profissional não encontrado");
+        }
+
+        return profissionalOpt.get();
+
     }
 }

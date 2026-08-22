@@ -27,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -189,5 +190,56 @@ public class UsuarioService {
         }
         return usuarioRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+    }
+
+    public Usuario findById(Long id) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        Usuario usuario = usuarioOpt.get();
+
+        if(usuario == null){
+            throw new EntityNotFoundException("Usuário não encontrado");
+        }
+        return usuario;
+    }
+
+    public UsuarioPerfilResponseDto buscarUsuarioPerfil(UsuarioDetalhesDto usuarioDetalhesDto){
+        String nome = null;
+
+        String role = usuarioDetalhesDto.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(authority -> authority.getAuthority())
+                .orElse(null);
+
+        if(role.equalsIgnoreCase("ROLE_ADMIN") || role.equalsIgnoreCase("ROLE_PROFISSIONAL")){
+            Optional<Profissional> profissionalOpt = profissionalRepository.findByUsuario_Id(usuarioDetalhesDto.getId());
+
+            if(profissionalOpt.isEmpty()){
+                throw new EntityNotFoundException("Profissional não encontrado");
+            }
+
+            Profissional profissional = profissionalOpt.get();
+
+            nome = profissional.getNome();
+        }
+
+        else{
+            Optional<Cliente> clienteOpt = clienteRepository.findByUsuario_Id(usuarioDetalhesDto.getId());
+
+            if(clienteOpt.isEmpty()){
+                throw new EntityNotFoundException("Profissional não encontrado");
+            }
+
+            Cliente cliente = clienteOpt.get();
+
+            nome = cliente.getNome();
+        }
+
+        Optional<Usuario> u = usuarioRepository.findById(usuarioDetalhesDto.getId());
+        Usuario usuario = u.get();
+
+        UsuarioPerfilResponseDto dto = new UsuarioPerfilResponseDto(usuario.getId(), nome, role);
+
+        return dto;
     }
 }
