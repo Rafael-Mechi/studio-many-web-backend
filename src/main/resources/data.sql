@@ -94,3 +94,19 @@ INSERT INTO profissionais (nome, telefone, usuario_id) VALUES ('Isabelly Profiss
 INSERT INTO servicos_profissionais (servicos_id, profissionais_id) VALUES (1, 1);
 INSERT INTO servicos_profissionais (servicos_id, profissionais_id) VALUES (1, 2);
 INSERT INTO servicos_profissionais (servicos_id, profissionais_id) VALUES (2, 2);
+
+-- Dias de trabalho dos profissionais
+-- Beatriz Administradora (id 1) - Segunda a Sexta, 09:00 as 18:00
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Segunda', '2024-01-01 09:00:00', '2024-01-01 18:00:00', 1);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Terca', '2024-01-01 09:00:00', '2024-01-01 18:00:00', 1);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Quarta', '2024-01-01 09:00:00', '2024-01-01 18:00:00', 1);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Quinta', '2024-01-01 09:00:00', '2024-01-01 18:00:00', 1);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Sexta', '2024-01-01 09:00:00', '2024-01-01 18:00:00', 1);
+
+-- Isabelly Profissional (id 2) - Segunda a Sabado, 08:00 as 19:00
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Segunda', '2024-01-01 08:00:00', '2024-01-01 19:00:00', 2);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Terca', '2024-01-01 08:00:00', '2024-01-01 19:00:00', 2);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Quarta', '2024-01-01 08:00:00', '2024-01-01 19:00:00', 2);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Quinta', '2024-01-01 08:00:00', '2024-01-01 19:00:00', 2);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Sexta', '2024-01-01 08:00:00', '2024-01-01 19:00:00', 2);
+INSERT INTO dias_de_trabalho (dia_da_semana, hora_inicio, hora_fim, profissional_id) VALUES ('Sabado', '2024-01-01 08:00:00', '2024-01-01 14:00:00', 2);
