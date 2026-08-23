@@ -189,9 +189,14 @@ CREATE TABLE IF NOT EXISTS agendamento_itens (
                                                  inicio_atendimento TIMESTAMP,
                                                  fim_atendimento TIMESTAMP,
                                                  checkin_em TIMESTAMP,
+
                                                  agendamento_id INT,
+                                                 servico_id INT,
+                                                 profissional_id INT,
 
                                                  FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id),
+                                                 FOREIGN KEY (servico_id) REFERENCES servicos(id),
+                                                 FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
 );
 
 CREATE TABLE IF NOT EXISTS dias_de_trabalho (

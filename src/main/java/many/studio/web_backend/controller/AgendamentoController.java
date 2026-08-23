@@ -3,11 +3,14 @@ package many.studio.web_backend.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import many.studio.web_backend.dto.agendamento.*;
+import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeRequest;
+import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeResponse;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoItemService;
 import many.studio.web_backend.service.AgendamentoService;
+import many.studio.web_backend.service.DisponibilidadeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,10 +25,12 @@ public class AgendamentoController {
 
     private final AgendamentoService agendamentoService;
     private final AgendamentoItemService agendamentoItemService;
+    private final DisponibilidadeService disponibilidadeService;
 
-    public AgendamentoController(AgendamentoService agendamentoService, AgendamentoItemService agendamentoItemService) {
+    public AgendamentoController(AgendamentoService agendamentoService, AgendamentoItemService agendamentoItemService, DisponibilidadeService disponibilidadeService) {
         this.agendamentoService = agendamentoService;
         this.agendamentoItemService = agendamentoItemService;
+        this.disponibilidadeService = disponibilidadeService;
     }
 
 
@@ -73,5 +78,12 @@ public class AgendamentoController {
         agendamentoService.confirmar(idAgendamento, usuario);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/disponibilidade")
+    public ResponseEntity<DisponibilidadeResponse> disponibilidade(@RequestBody DisponibilidadeRequest disponibilidadeRequest){
+        DisponibilidadeResponse response = disponibilidadeService.calcular(disponibilidadeRequest);
+
+        return ResponseEntity.status(200).body(response);
     }
 }
