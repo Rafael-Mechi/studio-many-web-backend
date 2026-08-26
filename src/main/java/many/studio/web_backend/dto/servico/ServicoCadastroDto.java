@@ -45,26 +45,14 @@ public class ServicoCadastroDto {
     private Boolean ativo;
 
     @NotNull
-    @PastOrPresent
-    @Schema(description = "Data de criação do serviço", example = "15/09/2026")
-    private LocalDateTime criadoEm;
+    private Long categoriaId;
 
-
-
-    public Boolean getAtivo() {
-        return ativo;
+    public String getNome() {
+        return nome;
     }
 
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    public LocalDateTime getCriadoEm() {
-        return criadoEm;
-    }
-
-    public void setCriadoEm(LocalDateTime criadoEm) {
-        this.criadoEm = criadoEm;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getDescricao() {
@@ -75,14 +63,6 @@ public class ServicoCadastroDto {
         this.descricao = descricao;
     }
 
-    public Integer getDuracaoMinutos() {
-        return duracaoMinutos;
-    }
-
-    public void setDuracaoMinutos(Integer duracaoMinutos) {
-        this.duracaoMinutos = duracaoMinutos;
-    }
-
     public String getFotoUrl() {
         return fotoUrl;
     }
@@ -91,13 +71,12 @@ public class ServicoCadastroDto {
         this.fotoUrl = fotoUrl;
     }
 
-
-    public String getNome() {
-        return nome;
+    public Integer getDuracaoMinutos() {
+        return duracaoMinutos;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setDuracaoMinutos(Integer duracaoMinutos) {
+        this.duracaoMinutos = duracaoMinutos;
     }
 
     public Double getPreco() {
@@ -114,5 +93,21 @@ public class ServicoCadastroDto {
 
     public void setSinalValor(Double sinalValor) {
         this.sinalValor = sinalValor;
+    }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public Long getCategoriaId() {
+        return categoriaId;
+    }
+
+    public void setCategoriaId(Long categoriaId) {
+        this.categoriaId = categoriaId;
     }
 }
