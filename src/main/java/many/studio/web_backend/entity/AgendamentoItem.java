@@ -24,6 +24,14 @@ public class AgendamentoItem {
     @JoinColumn(name = "agendamento_id")
     private Agendamento agendamento;
 
+    @ManyToOne
+    @JoinColumn(name = "servico_id")
+    private Servico servico;
+
+    @ManyToOne
+    @JoinColumn(name = "profissional_id")
+    private Profissional profissional;
+
     public Long getId() {
         return id;
     }

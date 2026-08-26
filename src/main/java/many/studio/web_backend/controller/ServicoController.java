@@ -30,7 +30,7 @@ public class ServicoController {
 
     @GetMapping
     public ResponseEntity<List<ServicoListarDto>> listar(){
-        return ResponseEntity.ok(ServicoMapper.toResponse(servicoService.listar()));
+        return ResponseEntity.ok(servicoService.listar());
     }
 
     @GetMapping("/{servicoId}/pacotes")

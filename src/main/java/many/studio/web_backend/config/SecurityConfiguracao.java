@@ -59,7 +59,9 @@ public class SecurityConfiguracao {
             "/h2-console/**",
             "/h2-console/*/**",
             "/error/**",
-            "/servicos"
+            "/servicos",
+            "/agenda/*",
+            "/agendamentos/disponibilidade"
     };
 
     @Bean

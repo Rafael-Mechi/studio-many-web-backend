@@ -10,10 +10,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import many.studio.web_backend.dto.agendamento.AgendamentoResponse;
 import many.studio.web_backend.dto.usuario.*;
+import many.studio.web_backend.entity.Cliente;
+import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.mapper.UsuarioMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoService;
+import many.studio.web_backend.service.ProfissionalService;
 import many.studio.web_backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -385,6 +388,15 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/me")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<UsuarioPerfilResponseDto> meuPerfil(Authentication authentication){
+        UsuarioDetalhesDto detalhes = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        UsuarioPerfilResponseDto dto = usuarioService.buscarUsuarioPerfil(detalhes);
+
+        return ResponseEntity.status(200).body(dto);
+    }
 
     @GetMapping("/me/agendamentos")
     @SecurityRequirement(name = "Bearer")

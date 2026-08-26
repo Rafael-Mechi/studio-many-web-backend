@@ -2,9 +2,11 @@ package many.studio.web_backend.service;
 
 import many.studio.web_backend.dto.pacote.PacoteCadastroDto;
 import many.studio.web_backend.dto.pacote.PacoteListarDto;
+import many.studio.web_backend.dto.servico.ProfissionaisPorServicoDto;
 import many.studio.web_backend.dto.servico.ServicoCadastroDto;
 import many.studio.web_backend.dto.servico.ServicoListarDto;
 import many.studio.web_backend.entity.Pacote;
+import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.Servico;
 import many.studio.web_backend.entity.ServicoProfissional;
 import many.studio.web_backend.exception.EntityConflictException;
@@ -35,11 +37,46 @@ public class ServicoService {
         this.profissionalRepository = profissionalRepository;
     }
 
-    public List<Servico> listar(){
-        return servicoRepository.findAll();
+    public List<ServicoListarDto> listar(){
+        List<Servico> servicos = servicoRepository.findAll();
+        List<ServicoListarDto> lista = new ArrayList<>();
+
+        if (servicos.isEmpty()) {
+            throw new EntityNotFoundException("Nenhum serviço encontrado");
+        }
+
+        for(Servico s : servicos){
+            ServicoListarDto servicoListarDto = new ServicoListarDto();
+            servicoListarDto.setId(s.getId());
+            servicoListarDto.setNome(s.getNome());
+            servicoListarDto.setDescricao(s.getDescricao());
+            servicoListarDto.setFotoUrl(s.getFotoUrl());
+            servicoListarDto.setDuracaoMinutos(s.getDuracaoMinutos());
+            servicoListarDto.setPreco(s.getPreco());
+            servicoListarDto.setSinalValor(s.getSinalValor());
+            servicoListarDto.setAtivo(s.getAtivo());
+            servicoListarDto.setCategoria(s.getCategoriaServico().getCategoria());
+            servicoListarDto.setCriadoEm(s.getCriadoEm());
+
+            List<ServicoProfissional> servicosProfissionais = servicoProfissionalRepository.findByServicoId(s.getId());
+            List<ProfissionaisPorServicoDto> profissionaisPorServicoDto = new ArrayList<>();
+            for(ServicoProfissional sp : servicosProfissionais){
+                ProfissionaisPorServicoDto profissionalPorServico = new ProfissionaisPorServicoDto();
+                profissionalPorServico.setId(sp.getProfissional().getId());
+                profissionalPorServico.setNomeFuncionario(sp.getProfissional().getNome());
+
+                profissionaisPorServicoDto.add(profissionalPorServico);
+            }
+
+            servicoListarDto.setProfissionais(profissionaisPorServicoDto);
+            lista.add(servicoListarDto);
+        }
+
+        return lista;
     }
 
     public List<Pacote> listarPacotesPorServico(Long id){
+        List<Pacote> pacotes = pacoteRepository.findByServicoId(id);
 
         if(!servicoRepository.existsById(id)) {
             throw new EntityNotFoundException("Serviço não encontrado");
@@ -50,6 +87,7 @@ public class ServicoService {
 
 
     public List<Servico> listarServicosPorProfissional(Long id){
+        List<ServicoProfissional> servicoProfissionals = servicoProfissionalRepository.findAllByProfissionalId(id);
 
         if(!profissionalRepository.existsById(id)) {
             throw new EntityNotFoundException("Profissional não encontrado");

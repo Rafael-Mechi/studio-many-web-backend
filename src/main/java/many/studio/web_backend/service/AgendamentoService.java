@@ -1,28 +1,22 @@
 package many.studio.web_backend.service;
 
 import jakarta.transaction.Transactional;
-import many.studio.web_backend.dto.agendamento.*;
 import many.studio.web_backend.config.twilio.WhatsAppService;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
-import many.studio.web_backend.dto.agendamento.AgendamentoItemCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
-import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.exception.NonAuthorizedException;
-import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.repository.*;
 import many.studio.web_backend.service.helper.AgendamentoHelper;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.Optional;
@@ -85,7 +79,14 @@ public class AgendamentoService {
     }
 
 
-    public AgendamentoCriacaoResponse criar(AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
+    public AgendamentoCriacaoResponse criar(Long id, AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
+        agendamentoHelper.validarIntegridadeUsuario(id, request.getClienteId());
+
+        if(!agendamentoHelper.isPacoteAtivo(request.getPacoteId())){
+            throw new EntityNotFoundException("Pacote não ativo");
+        }
+
+        agendamentoHelper.validarConflitoHorarioAgendamento(horarioAgendado, request.getProfissionalId(), request.getPacoteId());
 
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
@@ -96,7 +97,7 @@ public class AgendamentoService {
         Profissional profissional = profissionalRepository.findById(request.getProfissionalId())
                 .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
 
-        Usuario usuario = usuarioRepository.findById(request.getUsuarioCriadorId())
+        Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
         StatusAgendamento status = statusAgendamentoRepository

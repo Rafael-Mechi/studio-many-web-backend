@@ -16,9 +16,6 @@ public class AgendamentoCriacaoRequest {
     private Long pacoteId;
 
     @NotNull
-    private Long usuarioCriadorId;
-
-    @NotNull
     @Future
     private LocalDateTime horario;
 
@@ -44,14 +41,6 @@ public class AgendamentoCriacaoRequest {
 
     public void setPacoteId(Long pacoteId) {
         this.pacoteId = pacoteId;
-    }
-
-    public Long getUsuarioCriadorId() {
-        return usuarioCriadorId;
-    }
-
-    public void setUsuarioCriadorId(Long usuarioCriadorId) {
-        this.usuarioCriadorId = usuarioCriadorId;
     }
 
     public LocalDateTime getHorario() {
