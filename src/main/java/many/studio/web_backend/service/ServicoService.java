@@ -14,6 +14,7 @@ import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.PacoteMapper;
 import many.studio.web_backend.mapper.ServicoMapper;
 import many.studio.web_backend.repository.PacoteRepository;
+import many.studio.web_backend.repository.ProfissionalRepository;
 import many.studio.web_backend.repository.ServicoProfissionalRepository;
 import many.studio.web_backend.repository.ServicoRepository;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,13 @@ public class ServicoService {
     private final ServicoRepository servicoRepository;
     private final PacoteRepository pacoteRepository;
     private final ServicoProfissionalRepository servicoProfissionalRepository;
+    private final ProfissionalRepository profissionalRepository;
 
-    public ServicoService(PacoteRepository pacoteRepository, ServicoRepository servicoRepository, ServicoProfissionalRepository servicoProfissionalRepository) {
+    public ServicoService(PacoteRepository pacoteRepository, ServicoRepository servicoRepository, ServicoProfissionalRepository servicoProfissionalRepository, ProfissionalRepository profissionalRepository) {
         this.pacoteRepository = pacoteRepository;
         this.servicoRepository = servicoRepository;
         this.servicoProfissionalRepository = servicoProfissionalRepository;
+        this.profissionalRepository = profissionalRepository;
     }
 
     public List<ServicoListarDto> listar(){
@@ -75,24 +78,26 @@ public class ServicoService {
     public List<Pacote> listarPacotesPorServico(Long id){
         List<Pacote> pacotes = pacoteRepository.findByServicoId(id);
 
-        if (pacotes.isEmpty()) {
-            throw new EntityNotFoundException("Nenhum pacote encontrado para o serviço informado");
+        if(!servicoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Serviço não encontrado");
         }
 
-        return pacotes;
+        return pacoteRepository.findByServicoId(id);
     }
 
 
     public List<Servico> listarServicosPorProfissional(Long id){
         List<ServicoProfissional> servicoProfissionals = servicoProfissionalRepository.findAllByProfissionalId(id);
 
-        if (servicoProfissionals.isEmpty()) {
-            throw new EntityNotFoundException("Nenhum serviço encontrado para o profissional informado");
+        if(!profissionalRepository.existsById(id)) {
+            throw new EntityNotFoundException("Profissional não encontrado");
         }
+
+        List<ServicoProfissional> servicoProfissionais = servicoProfissionalRepository.findAllByProfissionalId(id);
 
         List<Servico> servicos = new ArrayList<>();
 
-        for (ServicoProfissional servicoProfissional : servicoProfissionals) {
+        for (ServicoProfissional servicoProfissional : servicoProfissionais) {
             servicos.add(servicoProfissional.getServico());
         }
 
@@ -103,6 +108,7 @@ public class ServicoService {
         if (servicoRepository.existsByNome(cadastroDto.getNome())){
             throw new EntityConflictException("já existe um serviço com esse nome");
         }
+
         Servico entity = ServicoMapper.toEntity(cadastroDto);
         return servicoRepository.save(entity);
     }
@@ -111,6 +117,7 @@ public class ServicoService {
         if (!servicoRepository.existsById(id)){
             throw new EntityNotFoundException("Serviço não encontrado");
         }
+
         Servico entity = ServicoMapper.toEntity(dto);
 
         return servicoRepository.save(entity);
