@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.Optional;
@@ -79,48 +80,54 @@ public class AgendamentoService {
     }
 
 
-    public AgendamentoCriacaoResponse criar(Long id, AgendamentoCriacaoRequest request, LocalDateTime horarioAgendado) {
-        agendamentoHelper.validarIntegridadeUsuario(id, request.getClienteId());
+    public List<AgendamentoCriacaoResponse> criar(Long id, List<AgendamentoCriacaoRequest> request) {
+        List<Agendamento> agendamentosCriados = new ArrayList<>();
 
-        if(!agendamentoHelper.isPacoteAtivo(request.getPacoteId())){
-            throw new EntityNotFoundException("Pacote não ativo");
-        }
+        for(AgendamentoCriacaoRequest agendamentoRequest : request) {
+            agendamentoHelper.validarIntegridadeUsuario(id, agendamentoRequest.getClienteId());
 
-        agendamentoHelper.validarConflitoHorarioAgendamento(horarioAgendado, request.getProfissionalId(), request.getPacoteId());
+            if(!agendamentoHelper.isPacoteAtivo(agendamentoRequest.getPacoteId())){
+                throw new EntityNotFoundException("Pacote não ativo");
+            }
 
-        Cliente cliente = clienteRepository.findById(request.getClienteId())
-                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+            agendamentoHelper.validarConflitoHorarioAgendamento(agendamentoRequest.getHorario(),
+                    agendamentoRequest.getProfissionalId(), agendamentoRequest.getPacoteId());
 
-        Pacote pacote = pacoteRepository.findById(request.getPacoteId())
-                .orElseThrow(() -> new EntityNotFoundException("Pacote não encontrado"));
+            Cliente cliente = clienteRepository.findById(agendamentoRequest.getClienteId())
+                    .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
-        Profissional profissional = profissionalRepository.findById(request.getProfissionalId())
-                .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+            Pacote pacote = pacoteRepository.findById(agendamentoRequest.getPacoteId())
+                    .orElseThrow(() -> new EntityNotFoundException("Pacote não encontrado"));
 
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+            Profissional profissional = profissionalRepository.findById(agendamentoRequest.getProfissionalId())
+                    .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
 
-        StatusAgendamento status = statusAgendamentoRepository
-                .findByEstado("solicitar confirmacao agendamento")
-                .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
+            Usuario usuario = usuarioRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        Agendamento agendamento = new Agendamento();
-        agendamento.setCliente(cliente);
-        agendamento.setPacote(pacote);
-        agendamento.setStatusAgendamento(status);
-        agendamento.setProfissional(profissional);
-        agendamento.setCriadoPorUsuario(usuario);
-        agendamento.setPreco(pacote.getPrecoTotal());
-        agendamento.setPrecoFinal(pacote.getPrecoTotal());
+            StatusAgendamento status = statusAgendamentoRepository
+                    .findByEstado("aguardando sinal")
+                    .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
 
-        Agendamento saved = agendamentoRepository.save(agendamento);
-        List<AgendamentoItem> itens = criarItens(saved, horarioAgendado);
-        List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
-        saved.setItens(savedList);
+            Agendamento agendamento = new Agendamento();
+            agendamento.setCliente(cliente);
+            agendamento.setPacote(pacote);
+            agendamento.setStatusAgendamento(status);
+            agendamento.setProfissional(profissional);
+            agendamento.setCriadoPorUsuario(usuario);
+            agendamento.setPreco(pacote.getPrecoTotal());
+            agendamento.setPrecoFinal(pacote.getPrecoTotal());
 
-        try {
+            Agendamento saved = agendamentoRepository.save(agendamento);
+            List<AgendamentoItem> itens = criarItens(saved, agendamentoRequest.getHorario());
+            List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
+            saved.setItens(savedList);
+            agendamentosCriados.add(saved);
 
-            String mensagem = """
+
+            try {
+
+                String mensagem = """
                     NOVA SOLICITAÇÃO DE AGENDAMENTO
                     
                     Cliente: %s
@@ -137,25 +144,26 @@ public class AgendamentoService {
                     1 - Confirmar
                     2 - Recusar
                     """
-                    .formatted(
-                            cliente.getNome(),
-                            pacote.getNome(),
-                            pacote.getServico().getNome(),
-                            pacote.getTotalSessoes(),
-                            saved.getPrecoFinal(),
-                            horarioAgendado
-                    );
+                        .formatted(
+                                cliente.getNome(),
+                                pacote.getNome(),
+                                pacote.getServico().getNome(),
+                                pacote.getTotalSessoes(),
+                                saved.getPrecoFinal(),
+                                agendamentoRequest.getHorario()
+                        );
 
-            whatsAppService.enviarMensagem(
-                    profissional.getTelefone(),
-                    mensagem
-            );
+                whatsAppService.enviarMensagem(
+                        profissional.getTelefone(),
+                        mensagem
+                );
 
-        } catch (Exception e) {
-            System.out.println("Erro ao enviar mensagem: " + e.fillInStackTrace());
+            } catch (Exception e) {
+                System.out.println("Erro ao enviar mensagem: " + e.fillInStackTrace());
+            }
         }
 
-        return AgendamentoMapper.toResponse(saved);
+        return AgendamentoMapper.toResponseList(agendamentosCriados);
     }
 
     public void confirmar(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {

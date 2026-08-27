@@ -14,6 +14,7 @@ INSERT INTO status_agendamentos (estado) VALUES
     ('recusado'),
     ('concluido'),
     ('faltou'),
+    ('aguardando sinal'),
     ('em atendimento');
 
 INSERT INTO status_pagamentos (estado) VALUES
