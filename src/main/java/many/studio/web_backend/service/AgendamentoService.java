@@ -6,6 +6,7 @@ import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
+import many.studio.web_backend.dto.usuario.VisaoGeralClienteResponse;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
@@ -69,14 +70,10 @@ public class AgendamentoService {
                 .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
     }
 
-    public List<Agendamento> buscarAgendamentos(Long id, String role) {
-        if(role.equalsIgnoreCase("ROLE_ADMIN")){
-            return agendamentoRepository.findAll();
+    public List<VisaoGeralClienteResponse> buscarAgendamentos(Long id, String role) {
+        if(role.equals("ROLE_CLIENTE")){
+//            StatusAgendamento noShows = agendamentoRepository.findBy
         }
-        else if(role.equalsIgnoreCase("ROLE_PROFISSIONAL")){
-            return agendamentoRepository.findByProfissionalUsuarioId(id);
-        }
-        return agendamentoRepository.findByUsuarioId(id);
     }
 
 

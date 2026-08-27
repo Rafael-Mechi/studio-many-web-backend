@@ -398,19 +398,21 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(dto);
     }
 
-    @GetMapping("/me/agendamentos")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<AgendamentoResponse>> buscarAgendamentos(Authentication authentication) {
-        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+//    @GetMapping("/me/agendamentos")
+//    @SecurityRequirement(name = "Bearer")
+//    public ResponseEntity<List<VisaoGeralClienteResponse>> buscarAgendamentos(Authentication authentication) {
+//        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+//
+//        Long id = usuario.getId();
+//        String role = usuario.getAuthorities()
+//                .iterator()
+//                .next()
+//                .getAuthority();
+//
+//        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarAgendamentos(id, role)));
+//    }
 
-        Long id = usuario.getId();
-        String role = usuario.getAuthorities()
-                .iterator()
-                .next()
-                .getAuthority();
-
-        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarAgendamentos(id, role)));
-    }
+   // @GetMapping("/")
 
 //    @Operation(summary = "Atualizar perfil do usuário autenticado")
 //    @io.swagger.v3.oas.annotations.parameters.RequestBody(
