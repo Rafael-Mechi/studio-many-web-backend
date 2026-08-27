@@ -61,7 +61,8 @@ public class SecurityConfiguracao {
             "/error/**",
             "/servicos",
             "/agenda/*",
-            "/agendamentos/disponibilidade"
+            "/agendamentos/disponibilidade",
+            "/servicos/*/pacotes"
     };
 
     @Bean
