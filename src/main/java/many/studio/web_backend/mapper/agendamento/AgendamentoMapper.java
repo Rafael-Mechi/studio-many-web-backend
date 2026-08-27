@@ -96,4 +96,10 @@ public class AgendamentoMapper {
                 .toList();
     }
 
+    public static List<AgendamentoCriacaoResponse> toResponseList(List<Agendamento> agendamentos) {
+        return agendamentos.stream()
+                .map(AgendamentoMapper::toResponse)
+                .toList();
+    }
+
 }

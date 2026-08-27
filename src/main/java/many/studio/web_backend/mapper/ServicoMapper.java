@@ -17,7 +17,6 @@ public class ServicoMapper {
         entity.setPreco(cadastroDto.getPreco());
         entity.setFotoUrl(cadastroDto.getFotoUrl());
         entity.setDuracaoMinutos(cadastroDto.getDuracaoMinutos());
-        entity.setCriadoEm(cadastroDto.getCriadoEm());
         entity.setSinalValor(cadastroDto.getSinalValor());
         return entity;
     }
