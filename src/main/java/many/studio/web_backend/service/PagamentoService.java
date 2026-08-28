@@ -1,16 +1,9 @@
 package many.studio.web_backend.service;
 
 import many.studio.web_backend.dto.pagamento.PagamentoRequest;
-import many.studio.web_backend.dto.pagamento.PagamentoResponse;
-import many.studio.web_backend.entity.Agendamento;
-import many.studio.web_backend.entity.Pagamento;
-import many.studio.web_backend.entity.StatusPagamento;
-import many.studio.web_backend.entity.TipoPagamento;
+import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
-import many.studio.web_backend.repository.AgendamentoRepository;
-import many.studio.web_backend.repository.PagamentoRepository;
-import many.studio.web_backend.repository.StatusPagamentoRepository;
-import many.studio.web_backend.repository.TipoPagamentoRepository;
+import many.studio.web_backend.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,19 +15,24 @@ public class PagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
     private final AgendamentoRepository agendamentoRepository;
+    private final StatusAgendamentoRepository statusAgendamentoRepository;
     private final StatusPagamentoRepository statusPagamentoRepository;
     private final TipoPagamentoRepository tipoPagamentoRepository;
 
     public PagamentoService(PagamentoRepository pagamentoRepository, AgendamentoRepository agendamentoRepository,
+                            StatusAgendamentoRepository statusAgendamentoRepository,
                             StatusPagamentoRepository statusPagamentoRepository, TipoPagamentoRepository tipoPagamentoRepository) {
         this.pagamentoRepository = pagamentoRepository;
         this.agendamentoRepository = agendamentoRepository;
+        this.statusAgendamentoRepository = statusAgendamentoRepository;
         this.statusPagamentoRepository = statusPagamentoRepository;
         this.tipoPagamentoRepository = tipoPagamentoRepository;
     }
 
-    public List<PagamentoResponse> criarSinal(List<Long> idAgendamentos, PagamentoRequest sinal) {
+    public List<Pagamento> criarSinal(List<Long> idAgendamentos, PagamentoRequest sinal) {
         List<Pagamento> pagamentos = new ArrayList<>();
+
+        StatusAgendamento statusAgendamento = statusAgendamentoRepository.findByEstado("solicitar confirmacao agendamento").get();
 
         for(Long id : idAgendamentos) {
 
@@ -52,6 +50,11 @@ public class PagamentoService {
             pagamento.setStatusPagamento(status);
             Pagamento saved = pagamentoRepository.save(pagamento);
             pagamentos.add(saved);
+
+            agendamento.setStatusAgendamento(statusAgendamento);
+            agendamentoRepository.save(agendamento);
         }
+
+        return pagamentos;
     }
 }

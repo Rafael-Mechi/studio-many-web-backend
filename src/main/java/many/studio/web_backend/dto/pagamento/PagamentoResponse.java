@@ -9,6 +9,8 @@ public class PagamentoResponse {
     private LocalDateTime pagoEm;
     private String comprovanteUrl;
     private AgendamentoDto agendamento;
+    private String status;
+    private String tipo;
 
     public static class AgendamentoDto {
 
@@ -70,5 +72,21 @@ public class PagamentoResponse {
 
     public void setAgendamento(AgendamentoDto agendamento) {
         this.agendamento = agendamento;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 }
