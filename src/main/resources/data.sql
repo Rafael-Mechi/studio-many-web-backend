@@ -22,6 +22,8 @@ INSERT INTO status_pagamentos (estado) VALUES
     ('pendente'),
     ('pago');
 
+INSERT INTO tipo_pagamentos (tipo) VALUES ('Sinal');
+
 --INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('ana.estetica@email.com', 'hash123', 2, NOW());
 --INSERT INTO profissionais (nome, usuario_id) VALUES ('Ana Silva', 1);
 --

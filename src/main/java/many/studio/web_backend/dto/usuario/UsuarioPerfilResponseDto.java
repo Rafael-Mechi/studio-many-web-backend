@@ -2,16 +2,16 @@ package many.studio.web_backend.dto.usuario;
 
 public class UsuarioPerfilResponseDto {
     private Long id;
+    private Long clienteId;
     private String nome;
     private String role;
 
-    public UsuarioPerfilResponseDto(Long id, String nome, String role) {
+    public UsuarioPerfilResponseDto(Long id, Long clienteId, String nome, String role) {
         this.id = id;
+        this.clienteId = clienteId;
         this.nome = nome;
         this.role = role;
     }
-
-    public UsuarioPerfilResponseDto(){}
 
     public Long getId() {
         return id;
@@ -19,6 +19,14 @@ public class UsuarioPerfilResponseDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getClienteId() {
+        return clienteId;
+    }
+
+    public void setClienteId(Long clienteId) {
+        this.clienteId = clienteId;
     }
 
     public String getNome() {

@@ -13,13 +13,6 @@ public class TipoPagamento {
     @Column(name = "tipo")
     private String tipo;
 
-    public TipoPagamento() {}
-
-    public TipoPagamento(Long id, String tipo) {
-        this.id = id;
-        this.tipo = tipo;
-    }
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTipo() { return tipo; }

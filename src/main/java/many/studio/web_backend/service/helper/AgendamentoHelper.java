@@ -67,8 +67,7 @@ public class AgendamentoHelper {
     ) {
         List<Agendamento> agendamentos = agendamentoRepository.findByProfissionalId(idProfissional);
 
-        List<Pacote> pacotes =  pacoteRepository.findByServicoId(pacoteId);
-        Pacote pacote = pacotes.getFirst();
+        Pacote pacote =  pacoteRepository.findById(pacoteId).get();
 
         Servico servico = pacote.getServico();
 
