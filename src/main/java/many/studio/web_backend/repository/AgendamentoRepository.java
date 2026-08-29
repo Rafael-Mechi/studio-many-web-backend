@@ -1,5 +1,6 @@
 package many.studio.web_backend.repository;
 
+import many.studio.web_backend.dto.agendamento.ResumoAgendamento;
 import many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto;
 import many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto;
 import many.studio.web_backend.entity.Agendamento;
@@ -148,4 +149,43 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     List<Agendamento> findByClienteUsuarioId(Long id);
 
     List<Agendamento> findByProfissionalUsuarioId(Long id);
+
+    List<Agendamento> findByClienteIdAndStatusAgendamentoEstado(
+            Long clienteId,
+            String estado
+    );
+
+    @Query("""
+    SELECT new many.studio.web_backend.dto.agendamento.ResumoAgendamento(
+        a.id,
+        cast(FUNCTION('DATE', ai.inicioAtendimento) as LocalDate),
+        cast(FUNCTION('TIME', ai.inicioAtendimento) as LocalTime),
+        s.id, s.nome, s.preco, s.duracaoMinutos,
+        cs.categoria,
+        p.id, p.nome,
+        prof.id, prof.usuario.email, prof.telefone
+    )
+    FROM Agendamento a
+    JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
+    JOIN Servico s ON s.id = ai.servico.id
+    JOIN CategoriaServico cs ON cs.id = s.categoriaServico.id
+    JOIN Pacote p ON p.id = a.pacote.id
+    JOIN Profissional prof ON prof.id = a.profissional.id
+    WHERE a.cliente.id = :clienteId
+    ORDER BY ai.inicioAtendimento DESC
+""")
+    List<ResumoAgendamento> buscarResumoCliente(@Param("clienteId") Long clienteId);
+
+    @Query("""
+            SELECT COUNT(DISTINCT a)
+            FROM Agendamento a
+            JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
+            WHERE a.cliente.id = :clienteId
+              AND a.statusAgendamento.estado IN :status
+              AND ai.inicioAtendimento >= CURRENT_TIMESTAMP
+        """)
+    Long countAgendamentosPendentes(
+            @Param("clienteId") Long clienteId,
+            @Param("status") List<String> status
+    );
 }

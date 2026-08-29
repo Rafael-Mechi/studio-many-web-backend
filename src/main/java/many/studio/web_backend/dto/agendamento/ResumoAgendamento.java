@@ -4,21 +4,21 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class ResumoAgendamento {
-    private Integer idAgendamento;
+    private Long idAgendamento;
     private LocalDate dataAgendamento;
     private LocalTime horaAgendamento;
-    private Integer idServico;
+    private Long idServico;
     private String nomeServico;
     private Double precoServico;
     private Integer duracaoServico;
     private String categoriaServico;
-    private Integer idPacote;
+    private Long idPacote;
     private String nomePacote;
-    private Integer idProfissional;
+    private Long idProfissional;
     private String emailProfissional;
-    private String telefone;
+    private String telefoneProfissional;
 
-    public ResumoAgendamento(Integer idAgendamento, LocalDate dataAgendamento, LocalTime horaAgendamento, Integer idServico, String nomeServico, Double precoServico, Integer duracaoServico, String categoriaServico, Integer idPacote, String nomePacote, Integer idProfissional, String emailProfissional, String telefone) {
+    public ResumoAgendamento(Long idAgendamento, LocalDate dataAgendamento, LocalTime horaAgendamento, Long idServico, String nomeServico, Double precoServico, Integer duracaoServico, String categoriaServico, Long idPacote, String nomePacote, Long idProfissional, String emailProfissional, String telefoneProfissional) {
         this.idAgendamento = idAgendamento;
         this.dataAgendamento = dataAgendamento;
         this.horaAgendamento = horaAgendamento;
@@ -31,16 +31,16 @@ public class ResumoAgendamento {
         this.nomePacote = nomePacote;
         this.idProfissional = idProfissional;
         this.emailProfissional = emailProfissional;
-        this.telefone = telefone;
+        this.telefoneProfissional = telefoneProfissional;
     }
 
     public ResumoAgendamento(){}
 
-    public Integer getIdAgendamento() {
+    public Long getIdAgendamento() {
         return idAgendamento;
     }
 
-    public void setIdAgendamento(Integer idAgendamento) {
+    public void setIdAgendamento(Long idAgendamento) {
         this.idAgendamento = idAgendamento;
     }
 
@@ -60,11 +60,11 @@ public class ResumoAgendamento {
         this.horaAgendamento = horaAgendamento;
     }
 
-    public Integer getIdServico() {
+    public Long getIdServico() {
         return idServico;
     }
 
-    public void setIdServico(Integer idServico) {
+    public void setIdServico(Long idServico) {
         this.idServico = idServico;
     }
 
@@ -100,11 +100,11 @@ public class ResumoAgendamento {
         this.categoriaServico = categoriaServico;
     }
 
-    public Integer getIdPacote() {
+    public Long getIdPacote() {
         return idPacote;
     }
 
-    public void setIdPacote(Integer idPacote) {
+    public void setIdPacote(Long idPacote) {
         this.idPacote = idPacote;
     }
 
@@ -116,11 +116,11 @@ public class ResumoAgendamento {
         this.nomePacote = nomePacote;
     }
 
-    public Integer getIdProfissional() {
+    public Long getIdProfissional() {
         return idProfissional;
     }
 
-    public void setIdProfissional(Integer idProfissional) {
+    public void setIdProfissional(Long idProfissional) {
         this.idProfissional = idProfissional;
     }
 
@@ -132,11 +132,11 @@ public class ResumoAgendamento {
         this.emailProfissional = emailProfissional;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getTelefoneProfissional() {
+        return telefoneProfissional;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void setTelefoneProfissional(String telefoneProfissional) {
+        this.telefoneProfissional = telefoneProfissional;
     }
 }
