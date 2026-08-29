@@ -5,7 +5,9 @@ import many.studio.web_backend.config.twilio.WhatsAppService;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
+import many.studio.web_backend.dto.agendamento.ResumoAgendamento;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
+import many.studio.web_backend.dto.usuario.VisaoGeralClienteResponse;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
@@ -35,6 +37,7 @@ public class AgendamentoService {
     private final UsuarioRepository usuarioRepository;
     private final PerfilRepository perfilRepository;
     private final WhatsAppService whatsAppService;
+    private final PagamentoRepository pagamentoRepository;
 
     private final AgendamentoHelper agendamentoHelper;
 
@@ -45,7 +48,7 @@ public class AgendamentoService {
             StatusAgendamentoRepository statusAgendamentoRepository, PacoteRepository pacoteRepository,
             ServicoRepository servicoRepository,
             ProfissionalRepository profissionalRepository,
-            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, WhatsAppService whatsAppService, AgendamentoHelper agendamentoHelper
+            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, WhatsAppService whatsAppService, PagamentoRepository pagamentoRepository, AgendamentoHelper agendamentoHelper
     ) {
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoItemRepository = agendamentoItemRepository;
@@ -57,6 +60,7 @@ public class AgendamentoService {
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
         this.whatsAppService = whatsAppService;
+        this.pagamentoRepository = pagamentoRepository;
         this.agendamentoHelper = agendamentoHelper;
     }
 
@@ -69,14 +73,113 @@ public class AgendamentoService {
                 .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
     }
 
-    public List<Agendamento> buscarAgendamentos(Long id, String role) {
-        if(role.equalsIgnoreCase("ROLE_ADMIN")){
-            return agendamentoRepository.findAll();
+    public List<VisaoGeralClienteResponse> buscarAgendamentos(
+            Long id,
+            String role
+    ) {
+
+        List<String> statusPendentes = List.of(
+                "agendado",
+                "confirmado",
+                "reagendado",
+                "solicitar cancelamento",
+                "solicitar reagendamento",
+                "em atendimento"
+        );
+
+        List<Cliente> clientes;
+
+        if (role.equals("ROLE_CLIENTE")) {
+
+            Cliente cliente = clienteRepository
+                    .findByUsuario_Id(id)
+                    .orElseThrow(() ->
+                            new EntityNotFoundException(
+                                    "Cliente não encontrado"
+                            )
+                    );
+
+            clientes = List.of(cliente);
+
+        } else if (role.equals("ROLE_ADMIN")) {
+
+            clientes = clienteRepository.findAll();
+
+        } else if (role.equals("ROLE_FUNCIONARIO")) {
+
+            clientes = clienteRepository
+                    .findClientesByProfissionalUsuarioId(id);
+
+        } else {
+
+            throw new IllegalArgumentException(
+                    "Role inválida: " + role
+            );
         }
-        else if(role.equalsIgnoreCase("ROLE_PROFISSIONAL")){
-            return agendamentoRepository.findByProfissionalUsuarioId(id);
+
+        List<VisaoGeralClienteResponse> respostas = new ArrayList<>();
+
+        for (Cliente cliente : clientes) {
+
+            Long clienteId = cliente.getId();
+
+            Integer qtdNoShows =
+                    agendamentoRepository
+                            .findByClienteIdAndStatusAgendamentoEstado(
+                                    clienteId,
+                                    "faltou"
+                            )
+                            .size();
+
+            List<Pagamento> pagamentosPagos =
+                    pagamentoRepository
+                            .findByAgendamentoClienteIdAndStatusPagamentoEstado(
+                                    clienteId,
+                                    "pago"
+                            );
+
+            Double somaPagamentos = pagamentosPagos
+                    .stream()
+                    .mapToDouble(Pagamento::getValor)
+                    .sum();
+
+            Integer qtdAgendamentosPendentes =
+                    agendamentoRepository
+                            .countAgendamentosPendentes(
+                                    clienteId,
+                                    statusPendentes
+                            )
+                            .intValue();
+
+            List<ResumoAgendamento> resumoAgendamentos =
+                    agendamentoRepository
+                            .buscarResumoCliente(clienteId);
+
+            VisaoGeralClienteResponse response =
+                    new VisaoGeralClienteResponse();
+
+            response.setNomeUsuario(cliente.getNome());
+
+            response.setEmailUsuario(
+                    cliente.getUsuario().getEmail()
+            );
+
+            response.setNoShow(qtdNoShows);
+
+            response.setTotalGasto(somaPagamentos);
+
+            response.setAtendimentosPendentes(
+                    qtdAgendamentosPendentes
+            );
+
+            response.setResumoAgendamentos(
+                    resumoAgendamentos
+            );
+
+            respostas.add(response);
         }
-        return agendamentoRepository.findByUsuarioId(id);
+
+        return respostas;
     }
 
 

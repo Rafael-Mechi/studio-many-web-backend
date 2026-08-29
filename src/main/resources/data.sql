@@ -18,9 +18,9 @@ INSERT INTO status_agendamentos (estado) VALUES
     ('em atendimento');
 
 INSERT INTO status_pagamentos (estado) VALUES
-    ('Cancelado'),
-    ('Pendente'),
-    ('Pago');
+    ('cancelado'),
+    ('pendente'),
+    ('pago');
 
 INSERT INTO tipo_pagamentos (tipo) VALUES ('Sinal');
 

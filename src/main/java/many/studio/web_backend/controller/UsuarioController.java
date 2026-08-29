@@ -400,7 +400,7 @@ public class UsuarioController {
 
     @GetMapping("/me/agendamentos")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<AgendamentoResponse>> buscarAgendamentos(Authentication authentication) {
+    public ResponseEntity<List<VisaoGeralClienteResponse>> buscarAgendamentos(Authentication authentication) {
         UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
 
         Long id = usuario.getId();
@@ -409,7 +409,7 @@ public class UsuarioController {
                 .next()
                 .getAuthority();
 
-        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarAgendamentos(id, role)));
+        return ResponseEntity.ok(agendamentoService.buscarAgendamentos(id, role));
     }
 
 //    @Operation(summary = "Atualizar perfil do usuário autenticado")

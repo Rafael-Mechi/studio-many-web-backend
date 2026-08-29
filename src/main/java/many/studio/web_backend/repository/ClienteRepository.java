@@ -37,4 +37,14 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
             @Param("profissionalId") Long profissionalId,
             @Param("clienteId") Long clienteId
     );
+
+        @Query("""
+        SELECT DISTINCT c
+        FROM Cliente c
+        JOIN Agendamento a ON a.cliente.id = c.id
+        WHERE a.profissional.usuario.id = :usuarioId
+    """)
+    List<Cliente> findClientesByProfissionalUsuarioId(
+            @Param("usuarioId") Long usuarioId
+    );
 }
