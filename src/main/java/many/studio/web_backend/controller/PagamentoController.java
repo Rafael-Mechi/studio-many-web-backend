@@ -5,11 +5,12 @@ import many.studio.web_backend.dto.pagamento.PagamentoRequest;
 import many.studio.web_backend.dto.pagamento.PagamentoResponse;
 import many.studio.web_backend.mapper.PagamentoMapper;
 import many.studio.web_backend.service.PagamentoService;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -23,8 +24,14 @@ public class PagamentoController {
         this.pagamentoService = pagamentoService;
     }
 
-    @PostMapping("/sinal")
-    public ResponseEntity<List<PagamentoResponse>> pagarSinal(@RequestBody List<Long> idAgendamentos, @Valid @RequestBody PagamentoRequest request) {
-        return ResponseEntity.status(201).body(PagamentoMapper.toResponseList(pagamentoService.criarSinal(idAgendamentos, request)));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<PagamentoResponse>> pagarSinal(@RequestParam("comprovante") MultipartFile comprovante,
+                                                              @RequestBody List<Long> idAgendamentos) {
+
+        if(comprovante == null || comprovante.isEmpty()) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400));
+        }
+
+        return ResponseEntity.status(201).body(PagamentoMapper.toResponseList(pagamentoService.criarSinal(idAgendamentos)));
     }
 }
