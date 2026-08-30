@@ -29,7 +29,7 @@ public class PagamentoService {
         this.tipoPagamentoRepository = tipoPagamentoRepository;
     }
 
-    public List<Pagamento> criarSinal(List<Long> idAgendamentos, PagamentoRequest sinal) {
+    public List<Pagamento> criarSinal(List<Long> idAgendamentos) {
         List<Pagamento> pagamentos = new ArrayList<>();
 
         StatusAgendamento statusAgendamento = statusAgendamentoRepository.findByEstado("solicitar confirmacao agendamento").get();
@@ -44,7 +44,7 @@ public class PagamentoService {
 
 
             Pagamento pagamento = new Pagamento();
-            pagamento.setValor(sinal.getValor());
+            pagamento.setValor(agendamento.getPacote().getServico().getSinalValor());
             pagamento.setAgendamento(agendamento);
             pagamento.setTipoPagamento(tipoPagamento);
             pagamento.setStatusPagamento(status);
