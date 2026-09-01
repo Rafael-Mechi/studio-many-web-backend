@@ -83,6 +83,7 @@ INSERT INTO servicos (
 
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, 1);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Limpeza de Pele Avulsa', 1, 150.00, 30, TRUE, 1);
+INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Remoção de cravos avulsa', 1, 700.00, 30, TRUE, 2);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Kit remoção de cravos 5x', 5, 700.00, 30, TRUE, 2);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Kit remoção de cravos 10x', 10, 1500.00, 30, TRUE, 2);
 -- Usuarios e Profissionais
