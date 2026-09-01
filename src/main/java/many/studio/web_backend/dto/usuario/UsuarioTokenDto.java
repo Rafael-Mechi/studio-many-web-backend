@@ -42,7 +42,7 @@ public class UsuarioTokenDto {
         private String email;
 
         @NotBlank
-        @Schema(description = "Senha do usuário", example = "123456")
+        @Schema(description = "Senha do usuário", example = "admin123")
         private String senha;
 
         public String getEmail() {
