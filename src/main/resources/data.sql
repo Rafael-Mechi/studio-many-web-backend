@@ -83,7 +83,8 @@ INSERT INTO servicos (
 
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, 1);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Limpeza de Pele Avulsa', 1, 150.00, 30, TRUE, 1);
-
+INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Kit remoção de cravos 5x', 5, 700.00, 30, TRUE, 2);
+INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Kit remoção de cravos 10x', 10, 1500.00, 30, TRUE, 2);
 -- Usuarios e Profissionais
 INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('noa@gmail.com', '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS', 1, CURRENT_TIMESTAMP);
 INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('profissional@studio.com', 'hash_profissional', 2, CURRENT_TIMESTAMP);
