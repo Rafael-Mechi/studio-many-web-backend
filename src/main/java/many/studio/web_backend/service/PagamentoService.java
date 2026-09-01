@@ -39,8 +39,8 @@ public class PagamentoService {
             Agendamento agendamento = agendamentoRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Agendameto não encontrado"));
 
-            StatusPagamento status = statusPagamentoRepository.findByEstado("Pago");
-            TipoPagamento tipoPagamento = tipoPagamentoRepository.findByTipo("Sinal");
+            StatusPagamento status = statusPagamentoRepository.findByEstado("pago");
+            TipoPagamento tipoPagamento = tipoPagamentoRepository.findByTipo("sinal");
 
 
             Pagamento pagamento = new Pagamento();
