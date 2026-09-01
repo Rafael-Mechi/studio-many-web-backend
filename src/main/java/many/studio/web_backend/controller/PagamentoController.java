@@ -26,7 +26,7 @@ public class PagamentoController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<PagamentoResponse>> pagarSinal(@RequestParam("comprovante") MultipartFile comprovante,
-                                                              @RequestBody List<Long> idAgendamentos) {
+                                                              @RequestParam List<Long> idAgendamentos) {
 
         if(comprovante == null || comprovante.isEmpty()) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(400));
