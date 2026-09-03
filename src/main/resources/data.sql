@@ -88,7 +88,7 @@ INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, ser
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Kit remoção de cravos 10x', 10, 1500.00, 30, TRUE, 2);
 -- Usuarios e Profissionais
 INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('noa@gmail.com', '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS', 1, CURRENT_TIMESTAMP);
-INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('profissional@studio.com', 'hash_profissional', 2, CURRENT_TIMESTAMP);
+INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('noa2@gmail.com', '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS', 2, CURRENT_TIMESTAMP);
 
 INSERT INTO profissionais (nome, telefone, usuario_id) VALUES ('Beatriz Administradora', '11988887777', 1);
 INSERT INTO profissionais (nome, telefone, usuario_id) VALUES ('Isabelly Profissional', '11977776666', 2);
@@ -132,8 +132,8 @@ VALUES ('SATURDAY', '08:00:00', '14:00:00', 2);
 -- INSERCOES PARA TESTAR A DISPONIBILIDADE DO AGENDAMENTO
 INSERT INTO usuarios (email, senha, perfil_id, criado_em)
 VALUES (
-    'cliente@studio.com',
-    'hash_cliente',
+    'noa3@gmail.com',
+    '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS',
     3,
     CURRENT_TIMESTAMP
 );

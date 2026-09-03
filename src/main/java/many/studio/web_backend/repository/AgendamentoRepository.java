@@ -158,8 +158,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     @Query("""
     SELECT new many.studio.web_backend.dto.agendamento.ResumoAgendamento(
         a.id,
-        cast(FUNCTION('DATE', ai.inicioAtendimento) as LocalDate),
-        cast(FUNCTION('TIME', ai.inicioAtendimento) as LocalTime),
+        ai.inicioAtendimento,
         s.id, s.nome, s.preco, s.duracaoMinutos,
         cs.categoria,
         p.id, p.nome,

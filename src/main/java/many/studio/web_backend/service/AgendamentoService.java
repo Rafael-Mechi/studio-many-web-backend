@@ -105,7 +105,7 @@ public class AgendamentoService {
 
             clientes = clienteRepository.findAll();
 
-        } else if (role.equals("ROLE_FUNCIONARIO")) {
+        } else if (role.equals("ROLE_PROFISSIONAL")) {
 
             clientes = clienteRepository
                     .findClientesByProfissionalUsuarioId(id);

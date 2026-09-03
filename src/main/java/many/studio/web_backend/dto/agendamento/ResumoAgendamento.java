@@ -1,142 +1,154 @@
 package many.studio.web_backend.dto.agendamento;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class ResumoAgendamento {
-    private Long idAgendamento;
-    private LocalDate dataAgendamento;
-    private LocalTime horaAgendamento;
-    private Long idServico;
-    private String nomeServico;
-    private Double precoServico;
-    private Integer duracaoServico;
-    private String categoriaServico;
-    private Long idPacote;
-    private String nomePacote;
-    private Long idProfissional;
-    private String emailProfissional;
-    private String telefoneProfissional;
+    private Long id;
+    private LocalDate data;
+    private LocalTime hora;
+    private Long servicoId;
+    private String servicoNome;
+    private Double servicoPreco;
+    private Integer servicoDuracao;
+    private String categoria;
+    private Long pacoteId;
+    private String pacoteNome;
+    private Long profissionalId;
+    private String profissionalEmail;
+    private String profissionalTelefone;
 
-    public ResumoAgendamento(Long idAgendamento, LocalDate dataAgendamento, LocalTime horaAgendamento, Long idServico, String nomeServico, Double precoServico, Integer duracaoServico, String categoriaServico, Long idPacote, String nomePacote, Long idProfissional, String emailProfissional, String telefoneProfissional) {
-        this.idAgendamento = idAgendamento;
-        this.dataAgendamento = dataAgendamento;
-        this.horaAgendamento = horaAgendamento;
-        this.idServico = idServico;
-        this.nomeServico = nomeServico;
-        this.precoServico = precoServico;
-        this.duracaoServico = duracaoServico;
-        this.categoriaServico = categoriaServico;
-        this.idPacote = idPacote;
-        this.nomePacote = nomePacote;
-        this.idProfissional = idProfissional;
-        this.emailProfissional = emailProfissional;
-        this.telefoneProfissional = telefoneProfissional;
+    public ResumoAgendamento(
+            Long id,
+            LocalDateTime inicioAtendimento,
+            Long servicoId,
+            String servicoNome,
+            Double servicoPreco,
+            Integer servicoDuracao,
+            String categoria,
+            Long pacoteId,
+            String pacoteNome,
+            Long profissionalId,
+            String profissionalEmail,
+            String profissionalTelefone
+    ) {
+        this.id = id;
+        this.data = inicioAtendimento.toLocalDate();
+        this.hora = inicioAtendimento.toLocalTime();
+        this.servicoId = servicoId;
+        this.servicoNome = servicoNome;
+        this.servicoPreco = servicoPreco;
+        this.servicoDuracao = servicoDuracao;
+        this.categoria = categoria;
+        this.pacoteId = pacoteId;
+        this.pacoteNome = pacoteNome;
+        this.profissionalId = profissionalId;
+        this.profissionalEmail = profissionalEmail;
+        this.profissionalTelefone = profissionalTelefone;
     }
 
-    public ResumoAgendamento(){}
-
-    public Long getIdAgendamento() {
-        return idAgendamento;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdAgendamento(Long idAgendamento) {
-        this.idAgendamento = idAgendamento;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public LocalDate getDataAgendamento() {
-        return dataAgendamento;
+    public LocalDate getData() {
+        return data;
     }
 
-    public void setDataAgendamento(LocalDate dataAgendamento) {
-        this.dataAgendamento = dataAgendamento;
+    public void setData(LocalDate data) {
+        this.data = data;
     }
 
-    public LocalTime getHoraAgendamento() {
-        return horaAgendamento;
+    public LocalTime getHora() {
+        return hora;
     }
 
-    public void setHoraAgendamento(LocalTime horaAgendamento) {
-        this.horaAgendamento = horaAgendamento;
+    public void setHora(LocalTime hora) {
+        this.hora = hora;
     }
 
-    public Long getIdServico() {
-        return idServico;
+    public Long getServicoId() {
+        return servicoId;
     }
 
-    public void setIdServico(Long idServico) {
-        this.idServico = idServico;
+    public void setServicoId(Long servicoId) {
+        this.servicoId = servicoId;
     }
 
-    public String getNomeServico() {
-        return nomeServico;
+    public String getServicoNome() {
+        return servicoNome;
     }
 
-    public void setNomeServico(String nomeServico) {
-        this.nomeServico = nomeServico;
+    public void setServicoNome(String servicoNome) {
+        this.servicoNome = servicoNome;
     }
 
-    public Double getPrecoServico() {
-        return precoServico;
+    public Double getServicoPreco() {
+        return servicoPreco;
     }
 
-    public void setPrecoServico(Double precoServico) {
-        this.precoServico = precoServico;
+    public void setServicoPreco(Double servicoPreco) {
+        this.servicoPreco = servicoPreco;
     }
 
-    public Integer getDuracaoServico() {
-        return duracaoServico;
+    public Integer getServicoDuracao() {
+        return servicoDuracao;
     }
 
-    public void setDuracaoServico(Integer duracaoServico) {
-        this.duracaoServico = duracaoServico;
+    public void setServicoDuracao(Integer servicoDuracao) {
+        this.servicoDuracao = servicoDuracao;
     }
 
-    public String getCategoriaServico() {
-        return categoriaServico;
+    public String getCategoria() {
+        return categoria;
     }
 
-    public void setCategoriaServico(String categoriaServico) {
-        this.categoriaServico = categoriaServico;
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
-    public Long getIdPacote() {
-        return idPacote;
+    public Long getPacoteId() {
+        return pacoteId;
     }
 
-    public void setIdPacote(Long idPacote) {
-        this.idPacote = idPacote;
+    public void setPacoteId(Long pacoteId) {
+        this.pacoteId = pacoteId;
     }
 
-    public String getNomePacote() {
-        return nomePacote;
+    public String getPacoteNome() {
+        return pacoteNome;
     }
 
-    public void setNomePacote(String nomePacote) {
-        this.nomePacote = nomePacote;
+    public void setPacoteNome(String pacoteNome) {
+        this.pacoteNome = pacoteNome;
     }
 
-    public Long getIdProfissional() {
-        return idProfissional;
+    public Long getProfissionalId() {
+        return profissionalId;
     }
 
-    public void setIdProfissional(Long idProfissional) {
-        this.idProfissional = idProfissional;
+    public void setProfissionalId(Long profissionalId) {
+        this.profissionalId = profissionalId;
     }
 
-    public String getEmailProfissional() {
-        return emailProfissional;
+    public String getProfissionalEmail() {
+        return profissionalEmail;
     }
 
-    public void setEmailProfissional(String emailProfissional) {
-        this.emailProfissional = emailProfissional;
+    public void setProfissionalEmail(String profissionalEmail) {
+        this.profissionalEmail = profissionalEmail;
     }
 
-    public String getTelefoneProfissional() {
-        return telefoneProfissional;
+    public String getProfissionalTelefone() {
+        return profissionalTelefone;
     }
 
-    public void setTelefoneProfissional(String telefoneProfissional) {
-        this.telefoneProfissional = telefoneProfissional;
+    public void setProfissionalTelefone(String profissionalTelefone) {
+        this.profissionalTelefone = profissionalTelefone;
     }
 }
