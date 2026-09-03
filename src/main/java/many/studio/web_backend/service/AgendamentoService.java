@@ -80,6 +80,7 @@ public class AgendamentoService {
 
         List<String> statusPendentes = List.of(
                 "agendado",
+                "solicitar confirmacao agendamento",
                 "confirmado",
                 "reagendado",
                 "solicitar cancelamento",
