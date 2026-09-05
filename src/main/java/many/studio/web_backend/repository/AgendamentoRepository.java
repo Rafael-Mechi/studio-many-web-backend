@@ -162,7 +162,8 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         s.id, s.nome, s.preco, s.duracaoMinutos,
         cs.categoria,
         p.id, p.nome,
-        prof.id, prof.usuario.email, prof.telefone
+        prof.id, prof.usuario.email, prof.telefone,
+        sa.estado
     )
     FROM Agendamento a
     JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
@@ -170,10 +171,13 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     JOIN CategoriaServico cs ON cs.id = s.categoriaServico.id
     JOIN Pacote p ON p.id = a.pacote.id
     JOIN Profissional prof ON prof.id = a.profissional.id
+    JOIN a.statusAgendamento sa
     WHERE a.cliente.id = :clienteId
     ORDER BY ai.inicioAtendimento DESC
 """)
-    List<ResumoAgendamento> buscarResumoCliente(@Param("clienteId") Long clienteId);
+    List<ResumoAgendamento> buscarResumoCliente(
+            @Param("clienteId") Long clienteId
+    );
 
     @Query("""
             SELECT COUNT(DISTINCT a)
