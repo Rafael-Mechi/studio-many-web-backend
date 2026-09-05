@@ -56,7 +56,7 @@ public class AgendamentoController {
                 .iterator()
                 .next()
                 .getAuthority();
-        return ResponseEntity.status(201).body(agendamentoService.criar(id, request));
+        return ResponseEntity.status(201).body(agendamentoService.criar(id, role, request));
     }
 
     @PatchMapping("/{idAgendamento}/cancelar")

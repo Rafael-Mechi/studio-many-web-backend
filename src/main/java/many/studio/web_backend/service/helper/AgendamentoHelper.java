@@ -47,12 +47,22 @@ public class AgendamentoHelper {
         return Objects.equals(fkUsuarioAgendamento, idUsuario) || perfilUsuario.equals(1L);
     }
 
-    public void validarIntegridadeUsuario(Long id, Long clienteId) {
-        Optional<Cliente> u = clienteRepository.findByUsuario_Id(id);
-        Long idCliente = u.get().getId();
+    public void validarIntegridadeUsuario(Long id, String role, Long clienteId) {
 
-        if(idCliente != clienteId){
-            throw new EntityNotFoundException("Cliente não encontrado"); // <- caso um usuário passe o id de outro usuário com a intenção de criar um agendamento no nome daquele usuário
+        if ("ROLE_CLIENTE".equals(role)) {
+            Cliente cliente = clienteRepository
+                    .findByUsuario_Id(id)
+                    .orElseThrow(() ->
+                            new EntityNotFoundException(
+                                    "Cliente não encontrado"
+                            )
+                    );
+
+            if (!cliente.getId().equals(clienteId)) {
+                throw new EntityNotFoundException(
+                        "Cliente não encontrado"
+                );
+            }
         }
     }
 

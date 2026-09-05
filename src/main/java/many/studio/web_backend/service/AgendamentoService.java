@@ -184,11 +184,11 @@ public class AgendamentoService {
     }
 
 
-    public List<AgendamentoCriacaoResponse> criar(Long id, List<AgendamentoCriacaoRequest> request) {
+    public List<AgendamentoCriacaoResponse> criar(Long id, String role, List<AgendamentoCriacaoRequest> request) {
         List<Agendamento> agendamentosCriados = new ArrayList<>();
 
         for(AgendamentoCriacaoRequest agendamentoRequest : request) {
-            agendamentoHelper.validarIntegridadeUsuario(id, agendamentoRequest.getClienteId());
+            agendamentoHelper.validarIntegridadeUsuario(id, role, agendamentoRequest.getClienteId());
 
             if(!agendamentoHelper.isPacoteAtivo(agendamentoRequest.getPacoteId())){
                 throw new EntityNotFoundException("Pacote não ativo");
