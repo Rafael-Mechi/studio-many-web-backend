@@ -85,7 +85,8 @@ public class AgendamentoService {
                 "reagendado",
                 "solicitar cancelamento",
                 "solicitar reagendamento",
-                "em atendimento"
+                "em atendimento",
+                "aguardando sinal"
         );
 
         List<Cliente> clientes;
@@ -354,23 +355,45 @@ public class AgendamentoService {
         agendamentoRepository.save(agendamento.get());
     }
 
-    public List<AgendamentoItem> criarItens(Agendamento agendamento, LocalDateTime horaraioAgendado) {
-
-        List<AgendamentoItem> agendamentosCliente = agendamentoItemRepository.findByClienteId(agendamento.getCliente().getId());
-        List<AgendamentoItem> agendamentosProfissional = agendamentoItemRepository.findByProfissionalId(agendamento.getProfissional().getId());
+    public List<AgendamentoItem> criarItens(
+            Agendamento agendamento,
+            LocalDateTime horarioAgendado
+    ) {
 
         return IntStream
-                .rangeClosed(0, agendamento.getPacote().getTotalSessoes() -1)
+                .rangeClosed(
+                        0,
+                        agendamento.getPacote().getTotalSessoes() - 1
+                )
                 .mapToObj(sessao -> {
 
                     AgendamentoItem item = new AgendamentoItem();
-                    item.setInicioAtendimento(horaraioAgendado.plusDays(sessao * 7L));
-                    item.setFimAtendimento(item.getInicioAtendimento().plusMinutes(agendamento.getPacote().getServico().getDuracaoMinutos()));
+
+                    item.setInicioAtendimento(
+                            horarioAgendado.plusDays(sessao * 7L)
+                    );
+
+                    item.setFimAtendimento(
+                            item.getInicioAtendimento()
+                                    .plusMinutes(
+                                            agendamento.getPacote()
+                                                    .getServico()
+                                                    .getDuracaoMinutos()
+                                    )
+                    );
+
                     item.setAgendamento(agendamento);
+
+                    item.setServico(
+                            agendamento.getPacote().getServico()
+                    );
+
+                    item.setProfissional(
+                            agendamento.getProfissional()
+                    );
 
                     return item;
                 })
                 .toList();
-
     }
 }

@@ -71,4 +71,20 @@ public class AgendamentoItem {
     public void setAgendamento(Agendamento agendamento) {
         this.agendamento = agendamento;
     }
+
+    public Servico getServico() {
+        return servico;
+    }
+
+    public void setServico(Servico servico) {
+        this.servico = servico;
+    }
+
+    public Profissional getProfissional() {
+        return profissional;
+    }
+
+    public void setProfissional(Profissional profissional) {
+        this.profissional = profissional;
+    }
 }
