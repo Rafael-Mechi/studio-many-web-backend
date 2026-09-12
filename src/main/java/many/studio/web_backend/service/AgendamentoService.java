@@ -1,6 +1,5 @@
 package many.studio.web_backend.service;
 
-import jakarta.transaction.Transactional;
 import many.studio.web_backend.config.twilio.WhatsAppService;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
@@ -16,6 +15,7 @@ import many.studio.web_backend.repository.*;
 import many.studio.web_backend.service.helper.AgendamentoHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -191,48 +191,75 @@ public class AgendamentoService {
     }
 
 
-    public List<AgendamentoCriacaoResponse> criar(Long id, String role, List<AgendamentoCriacaoRequest> request, MultipartFile pdf) throws IOException {
+    @Transactional(rollbackFor = Exception.class)
+    public List<AgendamentoCriacaoResponse> criar(
+            Long id,
+            String role,
+            List<AgendamentoCriacaoRequest> request,
+            MultipartFile pdf
+    ) throws IOException {
+
         List<Agendamento> agendamentosCriados = new ArrayList<>();
 
-        for(AgendamentoCriacaoRequest agendamentoRequest : request) {
-            agendamentoHelper.validarIntegridadeUsuario(id, role, agendamentoRequest.getClienteId());
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-            if(!agendamentoHelper.isPacoteAtivo(agendamentoRequest.getPacoteId())){
+        for (AgendamentoCriacaoRequest agendamentoRequest : request) {
+
+            agendamentoHelper.validarIntegridadeUsuario(
+                    id,
+                    role,
+                    agendamentoRequest.getClienteId()
+            );
+
+            if (!agendamentoHelper.isPacoteAtivo(
+                    agendamentoRequest.getPacoteId())) {
+
                 throw new EntityNotFoundException("Pacote não ativo");
             }
 
-            agendamentoHelper.validarConflitoHorarioAgendamento(agendamentoRequest.getHorario(),
-                    agendamentoRequest.getProfissionalId(), agendamentoRequest.getPacoteId());
+            agendamentoHelper.validarConflitoHorarioAgendamento(
+                    agendamentoRequest.getHorario(),
+                    agendamentoRequest.getProfissionalId(),
+                    agendamentoRequest.getPacoteId()
+            );
+        }
 
-            Cliente cliente = clienteRepository.findById(agendamentoRequest.getClienteId())
-                    .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+        byte[] bytes = pdf.getBytes();
 
-            Pacote pacote = pacoteRepository.findById(agendamentoRequest.getPacoteId())
-                    .orElseThrow(() -> new EntityNotFoundException("Pacote não encontrado"));
+        String pdfBase64 = Base64.getEncoder()
+                .encodeToString(bytes);
 
-            Profissional profissional = profissionalRepository.findById(agendamentoRequest.getProfissionalId())
-                    .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+        ComprovantePrv comprovantePrv = new ComprovantePrv();
+        comprovantePrv.setPdf(pdfBase64);
+        comprovantePrv.setUsuario(usuario);
 
-            Usuario usuario = usuarioRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+        comprovantePrvRepository.save(comprovantePrv);
+
+        for (AgendamentoCriacaoRequest agendamentoRequest : request) {
+
+            Cliente cliente = clienteRepository.findById(
+                    agendamentoRequest.getClienteId()
+            ).orElseThrow(() ->
+                    new EntityNotFoundException("Cliente não encontrado"));
+
+            Pacote pacote = pacoteRepository.findById(
+                    agendamentoRequest.getPacoteId()
+            ).orElseThrow(() ->
+                    new EntityNotFoundException("Pacote não encontrado"));
+
+            Profissional profissional = profissionalRepository.findById(
+                    agendamentoRequest.getProfissionalId()
+            ).orElseThrow(() ->
+                    new EntityNotFoundException("Profissional não encontrado"));
 
             StatusAgendamento status = statusAgendamentoRepository
                     .findByEstado("aguardando sinal")
-                    .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
-
-            byte[] bytes = pdf.getBytes();
-
-            String pdfBase64 = Base64.getEncoder()
-                    .encodeToString(bytes);
-
-            ComprovantePrv comprovantePrv = new ComprovantePrv();
-
-            comprovantePrv.setPdf(pdfBase64);
-            comprovantePrv.setUsuario(usuario);
-
-            comprovantePrvRepository.save(comprovantePrv);
+                    .orElseThrow(() ->
+                            new EntityNotFoundException("Status não existe"));
 
             Agendamento agendamento = new Agendamento();
+
             agendamento.setCliente(cliente);
             agendamento.setPacote(pacote);
             agendamento.setStatusAgendamento(status);
@@ -241,12 +268,18 @@ public class AgendamentoService {
             agendamento.setPreco(pacote.getPrecoTotal());
             agendamento.setPrecoFinal(pacote.getPrecoTotal());
 
+            agendamento.setComprovantePrv(comprovantePrv);
+
             Agendamento saved = agendamentoRepository.save(agendamento);
-            List<AgendamentoItem> itens = criarItens(saved, agendamentoRequest.getHorario());
-            List<AgendamentoItem> savedList = agendamentoItemRepository.saveAll(itens);
+
+            List<AgendamentoItem> itens =
+                    criarItens(saved, agendamentoRequest.getHorario());
+
+            List<AgendamentoItem> savedList =
+                    agendamentoItemRepository.saveAll(itens);
+
             saved.setItens(savedList);
             agendamentosCriados.add(saved);
-
 
             try {
 
@@ -413,5 +446,12 @@ public class AgendamentoService {
                     return item;
                 })
                 .toList();
+    }
+
+    public ComprovantePrv getComprovante(Long idAgendamento) {
+        Agendamento agendamento = agendamentoRepository.findById(idAgendamento)
+                .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
+
+        return agendamento.getComprovantePrv();
     }
 }

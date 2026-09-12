@@ -54,6 +54,10 @@ public class Agendamento {
     @JoinColumn(name = "criado_por_usuario_id")
     private Usuario criadoPorUsuario;
 
+    @ManyToOne
+    @JoinColumn(name = "comprovante_id")
+    private ComprovantePrv comprovantePrv;
+
     @OneToMany(mappedBy = "agendamento")
     private List<AgendamentoItem> itens;
 
@@ -168,5 +172,13 @@ public class Agendamento {
 
     public void setItens(List<AgendamentoItem> itens) {
         this.itens = itens;
+    }
+
+    public ComprovantePrv getComprovantePrv() {
+        return comprovantePrv;
+    }
+
+    public void setComprovantePrv(ComprovantePrv comprovantePrv) {
+        this.comprovantePrv = comprovantePrv;
     }
 }

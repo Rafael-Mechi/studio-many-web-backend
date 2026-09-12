@@ -49,14 +49,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
       FOREIGN KEY (perfil_id) REFERENCES perfis(id)
 );
 
-CREATE TABLE IF NOT EXISTS comprovante_prv( -- <- SOLUÇÃO PROVISÓRIA. REMOVER QUANDO TIVER PDF NO BUCKET
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    pdf longtext NOT NULL,
-    usuario_id INT NOT NULL,
-
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-);
-
 CREATE TABLE IF NOT EXISTS profissionais (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         nome VARCHAR(75),
@@ -140,6 +132,15 @@ CREATE TABLE IF NOT EXISTS pacotes (
      FOREIGN KEY (servicos_id) REFERENCES servicos(id)
 );
 
+CREATE TABLE IF NOT EXISTS comprovante_prv( -- <- SOLUÇÃO PROVISÓRIA. REMOVER QUANDO TIVER PDF NO BUCKET
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    pdf longtext NOT NULL,
+    usuario_id INT NOT NULL,
+    agendamento_id INT NOT NULL,
+
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
 CREATE TABLE IF NOT EXISTS agendamentos (
                                             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                                             cancelamento_motivo VARCHAR(255),
@@ -154,12 +155,14 @@ CREATE TABLE IF NOT EXISTS agendamentos (
                                             pacote_id INT,
                                             profissional_id INT,
                                             status_agendamento_id INT,
+                                            comprovante_id INT,
 
                                             FOREIGN KEY (cliente_id) REFERENCES clientes(id),
                                             FOREIGN KEY (pacote_id) REFERENCES pacotes(id),
                                             FOREIGN KEY (profissional_id) REFERENCES profissionais(id),
                                             FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamentos(id),
                                             FOREIGN KEY (criado_por_usuario_id) REFERENCES usuarios(id)
+                                            FOREIGN KEY (comprovante_id) REFERENCES comprovante_prv(id)
 );
 
 CREATE TABLE IF NOT EXISTS pagamentos (

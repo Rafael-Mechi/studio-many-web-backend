@@ -1,16 +1,19 @@
 package many.studio.web_backend.controller;
 
+import com.twilio.http.Response;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import many.studio.web_backend.dto.agendamento.*;
+import many.studio.web_backend.dto.comprovante.ComprovanteResponse;
 import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeRequest;
 import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeResponse;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
+import many.studio.web_backend.mapper.comprovante.ComprovanteMapper;
 import many.studio.web_backend.service.AgendamentoItemService;
 import many.studio.web_backend.service.AgendamentoService;
 import many.studio.web_backend.service.DisponibilidadeService;
@@ -52,6 +55,7 @@ public class AgendamentoController {
         return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponse(agendamentoService.buscarPorId(id)));
     }
 
+    //ESSE ENDPOINT ESTÁ SALVANDO O PDF DO COMPROVANTE NO BANCO NA TABELA "comprovante_prv". DESFAZER ESSA MUDANÇA QUANDO HOUVER PDF NO BUCKET
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "Bearer")
     @RequestBody(content = @Content(
@@ -72,6 +76,13 @@ public class AgendamentoController {
                 .next()
                 .getAuthority();
         return ResponseEntity.status(201).body(agendamentoService.criar(id, role, request.getAgendamentos(), pdf));
+    }
+
+    // ENDPOINT PARA EXIBIR COMPROVANTE COM A ABORDAGEM PROVISÓRIA ENQUANTO NAO TIVER PDF NO BUCKET
+    @GetMapping("/{idAgendamento}/comprovante")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<ComprovanteResponse>getComprovante(@PathVariable Long idAgendamento){
+        return ResponseEntity.status(200).body(ComprovanteMapper.toResponse(agendamentoService.getComprovante(idAgendamento)));
     }
 
     @PatchMapping("/{idAgendamento}/cancelar")

@@ -5,6 +5,7 @@ import many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto;
 import many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto;
 import many.studio.web_backend.entity.Agendamento;
 import many.studio.web_backend.entity.AgendamentoItem;
+import many.studio.web_backend.entity.ComprovantePrv;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
