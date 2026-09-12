@@ -49,6 +49,14 @@ CREATE TABLE IF NOT EXISTS usuarios (
       FOREIGN KEY (perfil_id) REFERENCES perfis(id)
 );
 
+CREATE TABLE IF NOT EXISTS comprovante_prv( -- <- SOLUÇÃO PROVISÓRIA. REMOVER QUANDO TIVER PDF NO BUCKET
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    pdf longtext NOT NULL,
+    usuario_id INT NOT NULL,
+
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
 CREATE TABLE IF NOT EXISTS profissionais (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         nome VARCHAR(75),

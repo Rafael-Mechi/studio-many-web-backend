@@ -1,6 +1,9 @@
 package many.studio.web_backend.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import many.studio.web_backend.dto.agendamento.*;
 import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeRequest;
@@ -11,11 +14,14 @@ import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoItemService;
 import many.studio.web_backend.service.AgendamentoService;
 import many.studio.web_backend.service.DisponibilidadeService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -46,9 +52,18 @@ public class AgendamentoController {
         return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponse(agendamentoService.buscarPorId(id)));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<AgendamentoCriacaoResponse>> criar(@Valid @RequestBody List<AgendamentoCriacaoRequest> request, Authentication authentication) {
+    @RequestBody(content = @Content(
+            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+            encoding = @Encoding(
+                    name = "request",
+                    contentType = MediaType.APPLICATION_JSON_VALUE
+            )
+    ))
+    public ResponseEntity<List<AgendamentoCriacaoResponse>> criar(@Valid @RequestPart("request") AgendamentosCriacaoRequest request,
+                                                                  @RequestPart("pdf") MultipartFile pdf,
+                                                                  Authentication authentication) throws IOException {
         UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
 
         Long id = usuario.getId();
@@ -56,7 +71,7 @@ public class AgendamentoController {
                 .iterator()
                 .next()
                 .getAuthority();
-        return ResponseEntity.status(201).body(agendamentoService.criar(id, role, request));
+        return ResponseEntity.status(201).body(agendamentoService.criar(id, role, request.getAgendamentos(), pdf));
     }
 
     @PatchMapping("/{idAgendamento}/cancelar")

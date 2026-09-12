@@ -16,10 +16,13 @@ import many.studio.web_backend.repository.*;
 import many.studio.web_backend.service.helper.AgendamentoHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.Optional;
@@ -38,6 +41,7 @@ public class AgendamentoService {
     private final PerfilRepository perfilRepository;
     private final WhatsAppService whatsAppService;
     private final PagamentoRepository pagamentoRepository;
+    private final ComprovantePrvRepository comprovantePrvRepository;
 
     private final AgendamentoHelper agendamentoHelper;
 
@@ -48,7 +52,7 @@ public class AgendamentoService {
             StatusAgendamentoRepository statusAgendamentoRepository, PacoteRepository pacoteRepository,
             ServicoRepository servicoRepository,
             ProfissionalRepository profissionalRepository,
-            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, WhatsAppService whatsAppService, PagamentoRepository pagamentoRepository, AgendamentoHelper agendamentoHelper
+            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, WhatsAppService whatsAppService, PagamentoRepository pagamentoRepository, ComprovantePrvRepository comprovantePrvRepository, AgendamentoHelper agendamentoHelper
     ) {
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoItemRepository = agendamentoItemRepository;
@@ -61,6 +65,7 @@ public class AgendamentoService {
         this.perfilRepository = perfilRepository;
         this.whatsAppService = whatsAppService;
         this.pagamentoRepository = pagamentoRepository;
+        this.comprovantePrvRepository = comprovantePrvRepository;
         this.agendamentoHelper = agendamentoHelper;
     }
 
@@ -186,7 +191,7 @@ public class AgendamentoService {
     }
 
 
-    public List<AgendamentoCriacaoResponse> criar(Long id, String role, List<AgendamentoCriacaoRequest> request) {
+    public List<AgendamentoCriacaoResponse> criar(Long id, String role, List<AgendamentoCriacaoRequest> request, MultipartFile pdf) throws IOException {
         List<Agendamento> agendamentosCriados = new ArrayList<>();
 
         for(AgendamentoCriacaoRequest agendamentoRequest : request) {
@@ -214,6 +219,18 @@ public class AgendamentoService {
             StatusAgendamento status = statusAgendamentoRepository
                     .findByEstado("aguardando sinal")
                     .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
+
+            byte[] bytes = pdf.getBytes();
+
+            String pdfBase64 = Base64.getEncoder()
+                    .encodeToString(bytes);
+
+            ComprovantePrv comprovantePrv = new ComprovantePrv();
+
+            comprovantePrv.setPdf(pdfBase64);
+            comprovantePrv.setUsuario(usuario);
+
+            comprovantePrvRepository.save(comprovantePrv);
 
             Agendamento agendamento = new Agendamento();
             agendamento.setCliente(cliente);
