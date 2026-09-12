@@ -86,6 +86,7 @@ public class AgendamentoService {
                 "solicitar cancelamento",
                 "solicitar reagendamento",
                 "em atendimento",
+                "cancelado",
                 "aguardando sinal"
         );
 
