@@ -32,6 +32,22 @@ public class Pagamento {
     @JoinColumn(name = "tipo_pagamentos_id")
     private TipoPagamento tipoPagamento;
 
+    @OneToOne(mappedBy = "pagamento")
+    private Comprovante comprovante;
+
+    public Pagamento(){}
+
+    public Pagamento(Long id, Double valor, LocalDateTime pagoEm, String comprovanteUrl, Agendamento agendamento, StatusPagamento statusPagamento, TipoPagamento tipoPagamento, Comprovante comprovante) {
+        this.id = id;
+        this.valor = valor;
+        this.pagoEm = pagoEm;
+        this.comprovanteUrl = comprovanteUrl;
+        this.agendamento = agendamento;
+        this.statusPagamento = statusPagamento;
+        this.tipoPagamento = tipoPagamento;
+        this.comprovante = comprovante;
+    }
+
     public Long getId() {
         return id;
     }
@@ -86,5 +102,13 @@ public class Pagamento {
 
     public void setTipoPagamento(TipoPagamento tipoPagamento) {
         this.tipoPagamento = tipoPagamento;
+    }
+
+    public Comprovante getComprovante() {
+        return comprovante;
+    }
+
+    public void setComprovante(Comprovante comprovante) {
+        this.comprovante = comprovante;
     }
 }
