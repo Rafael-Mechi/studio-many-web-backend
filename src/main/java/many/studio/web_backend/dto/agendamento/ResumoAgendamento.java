@@ -18,7 +18,8 @@ public class ResumoAgendamento {
     private Long profissionalId;
     private String profissionalEmail;
     private String profissionalTelefone;
-    private String statusAgendamento; // <- ainda nao esta sendo retornado
+    private String profissionalNome;
+    private String statusAgendamento;
 
     public ResumoAgendamento(
             Long id,
@@ -32,7 +33,7 @@ public class ResumoAgendamento {
             String pacoteNome,
             Long profissionalId,
             String profissionalEmail,
-            String profissionalTelefone, String statusAgendamento
+            String profissionalTelefone, String profissionalNome, String statusAgendamento
     ) {
         this.id = id;
         this.data = inicioAtendimento.toLocalDate();
@@ -47,6 +48,7 @@ public class ResumoAgendamento {
         this.profissionalId = profissionalId;
         this.profissionalEmail = profissionalEmail;
         this.profissionalTelefone = profissionalTelefone;
+        this.profissionalNome = profissionalNome;
         this.statusAgendamento = statusAgendamento;
     }
 
@@ -160,5 +162,13 @@ public class ResumoAgendamento {
 
     public void setStatusAgendamento(String statusAgendamento) {
         this.statusAgendamento = statusAgendamento;
+    }
+
+    public String getProfissionalNome() {
+        return profissionalNome;
+    }
+
+    public void setProfissionalNome(String profissionalNome) {
+        this.profissionalNome = profissionalNome;
     }
 }
