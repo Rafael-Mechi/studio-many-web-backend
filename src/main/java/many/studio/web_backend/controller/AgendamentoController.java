@@ -2,21 +2,26 @@ package many.studio.web_backend.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import many.studio.web_backend.dto.ComprovanteResponse;
 import many.studio.web_backend.dto.agendamento.*;
 import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeRequest;
 import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeResponse;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
+import many.studio.web_backend.entity.Comprovante;
 import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoItemService;
 import many.studio.web_backend.service.AgendamentoService;
 import many.studio.web_backend.service.DisponibilidadeService;
+import many.studio.web_backend.service.PagamentoService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -26,11 +31,13 @@ public class AgendamentoController {
     private final AgendamentoService agendamentoService;
     private final AgendamentoItemService agendamentoItemService;
     private final DisponibilidadeService disponibilidadeService;
+    private final PagamentoService pagamentoService;
 
-    public AgendamentoController(AgendamentoService agendamentoService, AgendamentoItemService agendamentoItemService, DisponibilidadeService disponibilidadeService) {
+    public AgendamentoController(AgendamentoService agendamentoService, AgendamentoItemService agendamentoItemService, DisponibilidadeService disponibilidadeService, PagamentoService pagamentoService) {
         this.agendamentoService = agendamentoService;
         this.agendamentoItemService = agendamentoItemService;
         this.disponibilidadeService = disponibilidadeService;
+        this.pagamentoService = pagamentoService;
     }
 
 
@@ -85,5 +92,20 @@ public class AgendamentoController {
         DisponibilidadeResponse response = disponibilidadeService.calcular(disponibilidadeRequest);
 
         return ResponseEntity.status(200).body(response);
+    }
+
+    @GetMapping("/{id}/comprovante")
+    public ResponseEntity<ComprovanteResponse> buscarComprovante(
+            @PathVariable Long id) {
+
+        Comprovante comprovante =
+                pagamentoService.buscarComprovantePorAgendamento(id);
+
+        ComprovanteResponse response = new ComprovanteResponse(
+                comprovante.getArquivo(),
+                comprovante.getTipoArquivo()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
