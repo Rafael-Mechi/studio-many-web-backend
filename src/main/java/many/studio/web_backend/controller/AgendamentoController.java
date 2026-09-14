@@ -55,7 +55,7 @@ public class AgendamentoController {
 
     @PostMapping
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<AgendamentoCriacaoResponse>> criar(@Valid @RequestBody List<AgendamentoCriacaoRequest> request, Authentication authentication) {
+    public ResponseEntity<List<AgendamentoCriacaoResponse>> criar(@Valid @RequestBody List<AgendamentoCriacaoRequest> request, Authentication authentication, String telefone) {
         UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
 
         Long id = usuario.getId();
@@ -63,7 +63,7 @@ public class AgendamentoController {
                 .iterator()
                 .next()
                 .getAuthority();
-        return ResponseEntity.status(201).body(agendamentoService.criar(id, role, request));
+        return ResponseEntity.status(201).body(agendamentoService.criar(id, role, request, telefone));
     }
 
     @PatchMapping("/{idAgendamento}/cancelar")
