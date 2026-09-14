@@ -162,7 +162,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         s.id, s.nome, s.preco, s.duracaoMinutos,
         cs.categoria,
         p.id, p.nome,
-        prof.id, prof.usuario.email, prof.telefone, prof.nome,
+        prof.id, prof.usuario.email, prof.nome, prof.telefone,
         sa.estado
     )
     FROM Agendamento a

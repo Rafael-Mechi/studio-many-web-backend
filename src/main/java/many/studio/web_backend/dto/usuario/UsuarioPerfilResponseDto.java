@@ -4,12 +4,14 @@ public class UsuarioPerfilResponseDto {
     private Long id;
     private Long clienteId;
     private String nome;
+    private String clienteTelefone;
     private String role;
 
-    public UsuarioPerfilResponseDto(Long id, Long clienteId, String nome, String role) {
+    public UsuarioPerfilResponseDto(Long id, Long clienteId, String nome, String clienteTelefone, String role) {
         this.id = id;
         this.clienteId = clienteId;
         this.nome = nome;
+        this.clienteTelefone = clienteTelefone;
         this.role = role;
     }
 
@@ -43,5 +45,13 @@ public class UsuarioPerfilResponseDto {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getClienteTelefone() {
+        return clienteTelefone;
+    }
+
+    public void setClienteTelefone(String clienteTelefone) {
+        this.clienteTelefone = clienteTelefone;
     }
 }

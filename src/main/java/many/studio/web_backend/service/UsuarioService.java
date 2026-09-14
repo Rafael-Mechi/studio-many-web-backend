@@ -205,6 +205,7 @@ public class UsuarioService {
     public UsuarioPerfilResponseDto buscarUsuarioPerfil(UsuarioDetalhesDto usuarioDetalhesDto){
         String nome = null;
         Long clienteId = null;
+        String telefoneCliente = null;
 
         String role = usuarioDetalhesDto.getAuthorities()
                 .stream()
@@ -235,12 +236,13 @@ public class UsuarioService {
 
             nome = cliente.getNome();
             clienteId = cliente.getId();
+            telefoneCliente = cliente.getTelefone();
         }
 
         Optional<Usuario> u = usuarioRepository.findById(usuarioDetalhesDto.getId());
         Usuario usuario = u.get();
 
-        UsuarioPerfilResponseDto dto = new UsuarioPerfilResponseDto(usuario.getId(), clienteId, nome, role);
+        UsuarioPerfilResponseDto dto = new UsuarioPerfilResponseDto(usuario.getId(), clienteId, nome, telefoneCliente, role);
 
         return dto;
     }
