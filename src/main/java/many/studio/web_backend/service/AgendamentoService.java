@@ -481,6 +481,8 @@ public class AgendamentoService {
             throw new NonAuthorizedException("Não é possível cancelar agendamento com menos de 24 horas");
         }
 
+        //agendamentoItemRepository.deleteByAgendamentoId(idAgendamento);
+
         StatusAgendamento statusCancelado = statusAgendamentoRepository
                 .findByEstado("cancelado")
                 .orElseThrow(() ->
