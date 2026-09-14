@@ -99,7 +99,7 @@ public class AgendamentoController {
     @PatchMapping("/{idAgendamento}/concluido")
     public ResponseEntity<Void> concluir(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
 
-        agendamentoService.confirmar(idAgendamento, usuario);
+        agendamentoService.concluir(idAgendamento, usuario);
 
         return ResponseEntity.ok().build();
     }
