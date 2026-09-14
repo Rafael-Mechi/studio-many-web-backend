@@ -87,6 +87,30 @@ public class AgendamentoController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{idAgendamento}/checkIn")
+    public ResponseEntity<Void> fazerCheckIn(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+
+        agendamentoService.fazerCheckIn(idAgendamento, usuario);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{idAgendamento}/emAtendimento")
+    public ResponseEntity<Void> emAtendimento(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+
+        agendamentoService.emAtendimento(idAgendamento, usuario);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{idAgendamento}/concluido")
+    public ResponseEntity<Void> concluir(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+
+        agendamentoService.concluir(idAgendamento, usuario);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/disponibilidade")
     public ResponseEntity<DisponibilidadeResponse> disponibilidade(@RequestBody DisponibilidadeRequest disponibilidadeRequest){
         DisponibilidadeResponse response = disponibilidadeService.calcular(disponibilidadeRequest);
