@@ -96,4 +96,12 @@ public class PagamentoService {
 
         return pagamentos;
     }
+
+    public Comprovante buscarComprovantePorAgendamento(Long agendamentoId) {
+
+        return comprovanteRepository
+                .findByPagamentoAgendamentoId(agendamentoId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Comprovante não encontrado"));
+    }
 }
