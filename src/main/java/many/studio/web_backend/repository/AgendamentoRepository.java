@@ -173,6 +173,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     JOIN Profissional prof ON prof.id = a.profissional.id
     JOIN a.statusAgendamento sa
     WHERE a.cliente.id = :clienteId
+      AND sa.estado <> 'aguardando sinal'
     ORDER BY ai.inicioAtendimento DESC
 """)
     List<ResumoAgendamento> buscarResumoCliente(
