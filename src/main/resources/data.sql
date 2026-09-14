@@ -50,7 +50,7 @@ INSERT INTO servicos (
 ) VALUES (
     'Limpeza de pele',
     'Procedimento para remover impurezas, células mortas, cravos e miliuns da superfície do rosto.',
-    'https://link_bucket',
+    'https://servicos-studio-essencia.s3.us-east-1.amazonaws.com/limpeza-de-pele-profunda-voce-conhece-todos-os-seus-beneficios-danielle-sales.jpg',
     60,
     150.00,
     50.00,
@@ -72,7 +72,7 @@ INSERT INTO servicos (
 ) VALUES (
     'Remoção de cravos',
     'Procedimento para remoção de cravos.',
-    'https://link_bucket',
+    'https://servicos-studio-essencia.s3.us-east-1.amazonaws.com/images.jfif ',
     60,
     150.00,
     50.00,
