@@ -185,7 +185,7 @@ public class AgendamentoService {
     }
 
 
-    public List<AgendamentoCriacaoResponse> criar(Long id, String role, List<AgendamentoCriacaoRequest> request, String telefone) {
+    public List<AgendamentoCriacaoResponse> criar(Long id, String role, List<AgendamentoCriacaoRequest> request) {
         List<Agendamento> agendamentosCriados = new ArrayList<>();
 
         for(AgendamentoCriacaoRequest agendamentoRequest : request) {
