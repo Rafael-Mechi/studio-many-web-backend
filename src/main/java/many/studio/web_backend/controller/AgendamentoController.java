@@ -83,7 +83,7 @@ public class AgendamentoController {
     @PatchMapping("/{idAgendamento}/checkIn")
     public ResponseEntity<Void> fazerCheckIn(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
 
-        agendamentoService.confirmar(idAgendamento, usuario);
+        agendamentoService.fazerCheckIn(idAgendamento, usuario);
 
         return ResponseEntity.ok().build();
     }
@@ -91,7 +91,7 @@ public class AgendamentoController {
     @PatchMapping("/{idAgendamento}/emAtendimento")
     public ResponseEntity<Void> emAtendimento(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
 
-        agendamentoService.confirmar(idAgendamento, usuario);
+        agendamentoService.emAtendimento(idAgendamento, usuario);
 
         return ResponseEntity.ok().build();
     }
