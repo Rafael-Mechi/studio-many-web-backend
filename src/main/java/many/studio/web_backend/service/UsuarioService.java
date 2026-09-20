@@ -8,11 +8,9 @@ import many.studio.web_backend.entity.Perfil;
 import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.exception.EntityConflictException;
+import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.mapper.UsuarioMapper;
-import many.studio.web_backend.repository.ClienteRepository;
-import many.studio.web_backend.repository.PerfilRepository;
-import many.studio.web_backend.repository.ProfissionalRepository;
-import many.studio.web_backend.repository.UsuarioRepository;
+import many.studio.web_backend.repository.*;
 import many.studio.web_backend.strategy.UsuarioCriacaoStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +24,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,8 +40,9 @@ public class UsuarioService {
     private final List<UsuarioCriacaoStrategy> strategies;
     private final ClienteRepository clienteRepository;
     private final ProfissionalRepository profissionalRepository;
+    private final AgendamentoRepository agendamentoRepository;
 
-    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository) {
+    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository, AgendamentoRepository agendamentoRepository) {
         this.passwordEncoder = passwordEncoder;
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
@@ -50,6 +51,7 @@ public class UsuarioService {
         this.strategies = strategies;
         this.clienteRepository = clienteRepository;
         this.profissionalRepository = profissionalRepository;
+        this.agendamentoRepository = agendamentoRepository;
     }
 
     public void criar(UsuarioCriacaoDto dto) {
@@ -243,5 +245,67 @@ public class UsuarioService {
         UsuarioPerfilResponseDto dto = new UsuarioPerfilResponseDto(usuario.getId(), clienteId, nome, role);
 
         return dto;
+    }
+
+    public List<ClienteResponse> getClientes(Long id, String role) {
+        List<ClienteResponse> clienteResponses = new ArrayList<>();
+
+        List<Cliente> clientesAlvo;
+        Long usuarioIdFiltro;
+
+        if (role.equals("ROLE_CLIENTE")) {
+            throw new ForbiddenException("Você não tem permissão para acessar esse recurso");
+
+        } else if (role.equals("ROLE_ADMIN")) {
+            clientesAlvo = clienteRepository.findAll();
+            usuarioIdFiltro = null;
+
+        } else if (role.equals("ROLE_PROFISSIONAL")) {
+            clientesAlvo = clienteRepository.findClientesByProfissionalUsuarioId(id);
+            usuarioIdFiltro = id;
+
+        } else {
+            throw new IllegalArgumentException("Role inválida: " + role);
+        }
+
+        for (Cliente c : clientesAlvo) {
+            ClienteResponse clienteResponse = new ClienteResponse();
+            Optional<Usuario> u = clienteRepository.findUsuarioByClienteId(c.getId());
+
+            clienteResponse.setId(c.getId());
+            clienteResponse.setNome(c.getNome());
+            clienteResponse.setEmail(u.get().getEmail());
+            clienteResponse.setClienteDesde(u.get().getCriadoEm().toLocalDate());
+            clienteResponse.setCpf(c.getDocumento());
+            clienteResponse.setTelefone(c.getTelefone());
+            clienteResponse.setQtdNoShows(c.getTotalNoShows());
+
+            List<HistoricoAgendamentos> historicoAgendamentos =
+                    agendamentoRepository.buscarHistoricoPorClienteEUsuarioProfissional(c.getId(), usuarioIdFiltro);
+
+            clienteResponse.setHistoricoAgendamentos(historicoAgendamentos);
+
+            Double totalGasto = historicoAgendamentos.stream()
+                    .filter(h -> "concluido".equalsIgnoreCase(h.getStatus()))
+                    .map(HistoricoAgendamentos::getValor)
+                    .filter(Objects::nonNull)
+                    .mapToDouble(Double::doubleValue)
+                    .sum();
+
+            clienteResponse.setTotalGasto(totalGasto);
+
+            Optional<HistoricoAgendamentos> ultimoAtendimentoRealizado = historicoAgendamentos.stream()
+                    .filter(h -> "concluido".equalsIgnoreCase(h.getStatus())
+                            || "em atendimento".equalsIgnoreCase(h.getStatus()))
+                    .findFirst();
+
+            clienteResponse.setUltimaVisita(
+                    ultimoAtendimentoRealizado.map(h -> h.getDataHora().toLocalDate()).orElse(null)
+            );
+
+            clienteResponses.add(clienteResponse);
+        }
+
+        return clienteResponses;
     }
 }
