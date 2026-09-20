@@ -3,6 +3,7 @@ package many.studio.web_backend.repository;
 import many.studio.web_backend.dto.agendamento.ResumoAgendamento;
 import many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto;
 import many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto;
+import many.studio.web_backend.dto.usuario.HistoricoAgendamentos;
 import many.studio.web_backend.entity.Agendamento;
 import many.studio.web_backend.entity.AgendamentoItem;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -190,5 +191,27 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     Long countAgendamentosPendentes(
             @Param("clienteId") Long clienteId,
             @Param("status") List<String> status
+    );
+
+    @Query("""
+    SELECT new many.studio.web_backend.dto.usuario.HistoricoAgendamentos(
+        s.nome,
+        ai.inicioAtendimento,
+        p.nome,
+        sa.estado,
+        s.preco
+    )
+    FROM Agendamento a
+    JOIN a.itens ai
+    JOIN ai.servico s
+    JOIN ai.profissional p
+    JOIN a.statusAgendamento sa
+    WHERE a.cliente.id = :clienteId
+      AND p.usuario.id = :usuarioId
+    ORDER BY ai.inicioAtendimento DESC
+""")
+    List<HistoricoAgendamentos> buscarHistoricoPorClienteEUsuarioProfissional(
+            @Param("clienteId") Long clienteId,
+            @Param("usuarioId") Long usuarioId
     );
 }

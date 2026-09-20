@@ -48,4 +48,23 @@ public class GlobalExceptionHandler {
                 .status(409)
                 .body(error);
     }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleEntityForbidden(
+            EntityConflictException ex,
+            HttpServletRequest request
+    ) {
+
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                403,
+                "Forbidden",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(403)
+                .body(error);
+    }
 }

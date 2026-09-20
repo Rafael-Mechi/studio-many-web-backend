@@ -8,15 +8,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import many.studio.web_backend.dto.agendamento.AgendamentoResponse;
 import many.studio.web_backend.dto.usuario.*;
-import many.studio.web_backend.entity.Cliente;
-import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.mapper.UsuarioMapper;
-import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoService;
-import many.studio.web_backend.service.ProfissionalService;
 import many.studio.web_backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -410,6 +405,20 @@ public class UsuarioController {
                 .getAuthority();
 
         return ResponseEntity.ok(agendamentoService.buscarAgendamentos(id, role));
+    }
+
+    @GetMapping("/clientes")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<ClienteResponse>> getClientes(Authentication authentication) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Long id = usuario.getId();
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        return ResponseEntity.ok(usuarioService.getClientes(id, role));
     }
 
 //    @Operation(summary = "Atualizar perfil do usuário autenticado")
