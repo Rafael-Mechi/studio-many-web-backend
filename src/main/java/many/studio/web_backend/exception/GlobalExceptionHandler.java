@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleEntityForbidden(
-            EntityConflictException ex,
+            ForbiddenException ex,
             HttpServletRequest request
     ) {
 

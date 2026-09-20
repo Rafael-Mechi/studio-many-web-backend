@@ -151,9 +151,18 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
 
     List<Agendamento> findByProfissionalUsuarioId(Long id);
 
+    @Query("""
+    SELECT DISTINCT a
+    FROM Agendamento a
+    JOIN a.itens ai
+    WHERE a.cliente.id = :clienteId
+      AND a.statusAgendamento.estado = :estado
+      AND (:usuarioId IS NULL OR ai.profissional.usuario.id = :usuarioId)
+""")
     List<Agendamento> findByClienteIdAndStatusAgendamentoEstado(
-            Long clienteId,
-            String estado
+            @Param("clienteId") Long clienteId,
+            @Param("estado") String estado,
+            @Param("usuarioId") Long usuarioId
     );
 
     @Query("""
@@ -171,26 +180,30 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     JOIN Servico s ON s.id = ai.servico.id
     JOIN CategoriaServico cs ON cs.id = s.categoriaServico.id
     JOIN Pacote p ON p.id = a.pacote.id
-    JOIN Profissional prof ON prof.id = a.profissional.id
+    JOIN Profissional prof ON prof.id = ai.profissional.id
     JOIN a.statusAgendamento sa
     WHERE a.cliente.id = :clienteId
+      AND (:usuarioId IS NULL OR prof.usuario.id = :usuarioId)
     ORDER BY ai.inicioAtendimento DESC
 """)
     List<ResumoAgendamento> buscarResumoCliente(
-            @Param("clienteId") Long clienteId
+            @Param("clienteId") Long clienteId,
+            @Param("usuarioId") Long usuarioId
     );
 
     @Query("""
-            SELECT COUNT(DISTINCT a)
-            FROM Agendamento a
-            JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
-            WHERE a.cliente.id = :clienteId
-              AND a.statusAgendamento.estado IN :status
-              AND ai.inicioAtendimento >= CURRENT_TIMESTAMP
-        """)
+    SELECT COUNT(DISTINCT a)
+    FROM Agendamento a
+    JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
+    WHERE a.cliente.id = :clienteId
+      AND a.statusAgendamento.estado IN :status
+      AND ai.inicioAtendimento >= CURRENT_TIMESTAMP
+      AND (:usuarioId IS NULL OR ai.profissional.usuario.id = :usuarioId)
+""")
     Long countAgendamentosPendentes(
             @Param("clienteId") Long clienteId,
-            @Param("status") List<String> status
+            @Param("status") List<String> status,
+            @Param("usuarioId") Long usuarioId
     );
 
     @Query("""
@@ -207,7 +220,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     JOIN ai.profissional p
     JOIN a.statusAgendamento sa
     WHERE a.cliente.id = :clienteId
-      AND p.usuario.id = :usuarioId
+      AND (:usuarioId IS NULL OR p.usuario.id = :usuarioId)
     ORDER BY ai.inicioAtendimento DESC
 """)
     List<HistoricoAgendamentos> buscarHistoricoPorClienteEUsuarioProfissional(

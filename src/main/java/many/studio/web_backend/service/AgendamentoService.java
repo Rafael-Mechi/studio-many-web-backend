@@ -120,6 +120,8 @@ public class AgendamentoService {
             );
         }
 
+        Long usuarioIdFiltro = role.equals("ROLE_PROFISSIONAL") ? id : null;
+
         List<VisaoGeralClienteResponse> respostas = new ArrayList<>();
 
         for (Cliente cliente : clientes) {
@@ -130,7 +132,8 @@ public class AgendamentoService {
                     agendamentoRepository
                             .findByClienteIdAndStatusAgendamentoEstado(
                                     clienteId,
-                                    "faltou"
+                                    "faltou",
+                                    usuarioIdFiltro
                             )
                             .size();
 
@@ -138,7 +141,8 @@ public class AgendamentoService {
                     pagamentoRepository
                             .findByAgendamentoClienteIdAndStatusPagamentoEstado(
                                     clienteId,
-                                    "pago"
+                                    "pago",
+                                    usuarioIdFiltro
                             );
 
             Double somaPagamentos = pagamentosPagos
@@ -150,13 +154,14 @@ public class AgendamentoService {
                     agendamentoRepository
                             .countAgendamentosPendentes(
                                     clienteId,
-                                    statusPendentes
+                                    statusPendentes,
+                                    usuarioIdFiltro
                             )
                             .intValue();
 
             List<ResumoAgendamento> resumoAgendamentos =
                     agendamentoRepository
-                            .buscarResumoCliente(clienteId);
+                            .buscarResumoCliente(clienteId, usuarioIdFiltro);
 
             VisaoGeralClienteResponse response =
                     new VisaoGeralClienteResponse();

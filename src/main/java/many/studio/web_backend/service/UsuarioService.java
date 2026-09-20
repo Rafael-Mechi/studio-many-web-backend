@@ -250,51 +250,62 @@ public class UsuarioService {
     public List<ClienteResponse> getClientes(Long id, String role) {
         List<ClienteResponse> clienteResponses = new ArrayList<>();
 
-        if(role.equals("ROLE_CLIENTE")){
-            throw new ForbiddenException("Sem permissão para acessar esse recurso");
+        List<Cliente> clientesAlvo;
+        Long usuarioIdFiltro;
+
+        if (role.equals("ROLE_CLIENTE")) {
+            throw new ForbiddenException("Você não tem permissão para acessar esse recurso");
+
+        } else if (role.equals("ROLE_ADMIN")) {
+            clientesAlvo = clienteRepository.findAll();
+            usuarioIdFiltro = null;
+
+        } else if (role.equals("ROLE_PROFISSIONAL")) {
+            clientesAlvo = clienteRepository.findClientesByProfissionalUsuarioId(id);
+            usuarioIdFiltro = id;
+
+        } else {
+            throw new IllegalArgumentException("Role inválida: " + role);
         }
 
-        else if(role.equals("ROLE_PROFISSIONAL")){
-            List<Cliente> clientesDesteProfissional = clienteRepository.findClientesByProfissionalUsuarioId(id);
-            for(Cliente c : clientesDesteProfissional){
-                ClienteResponse clienteResponse = new ClienteResponse();
-                Optional<Usuario> u = clienteRepository.findUsuarioByClienteId(c.getId());
+        for (Cliente c : clientesAlvo) {
+            ClienteResponse clienteResponse = new ClienteResponse();
+            Optional<Usuario> u = clienteRepository.findUsuarioByClienteId(c.getId());
 
-                clienteResponse.setId(c.getId());
-                clienteResponse.setNome(c.getNome());
-                clienteResponse.setEmail(u.get().getEmail());
-                clienteResponse.setClienteDesde(u.get().getCriadoEm().toLocalDate());
-                clienteResponse.setCpf(c.getDocumento());
-                clienteResponse.setTelefone(c.getTelefone());
-                clienteResponse.setQtdNoShows(c.getTotalNoShows());
+            clienteResponse.setId(c.getId());
+            clienteResponse.setNome(c.getNome());
+            clienteResponse.setEmail(u.get().getEmail());
+            clienteResponse.setClienteDesde(u.get().getCriadoEm().toLocalDate());
+            clienteResponse.setCpf(c.getDocumento());
+            clienteResponse.setTelefone(c.getTelefone());
+            clienteResponse.setQtdNoShows(c.getTotalNoShows());
 
-                List<HistoricoAgendamentos> historicoAgendamentos = agendamentoRepository.buscarHistoricoPorClienteEUsuarioProfissional(c.getId(), id);
+            List<HistoricoAgendamentos> historicoAgendamentos =
+                    agendamentoRepository.buscarHistoricoPorClienteEUsuarioProfissional(c.getId(), usuarioIdFiltro);
 
-                clienteResponse.setHistoricoAgendamentos(historicoAgendamentos);
+            clienteResponse.setHistoricoAgendamentos(historicoAgendamentos);
 
-                Double totalGasto = historicoAgendamentos.stream()
-                        .filter(h -> "concluido".equalsIgnoreCase(h.getStatus()))
-                        .map(HistoricoAgendamentos::getValor)
-                        .filter(Objects::nonNull)
-                        .mapToDouble(Double::doubleValue)
-                        .sum();
+            Double totalGasto = historicoAgendamentos.stream()
+                    .filter(h -> "concluido".equalsIgnoreCase(h.getStatus()))
+                    .map(HistoricoAgendamentos::getValor)
+                    .filter(Objects::nonNull)
+                    .mapToDouble(Double::doubleValue)
+                    .sum();
 
-                clienteResponse.setTotalGasto(totalGasto);
+            clienteResponse.setTotalGasto(totalGasto);
 
-                Optional<HistoricoAgendamentos> ultimoAtendimentoRealizado = historicoAgendamentos.stream()
-                        .filter(h -> "concluido".equalsIgnoreCase(h.getStatus())
-                                || "em_atendimento".equalsIgnoreCase(h.getStatus()))
-                        .findFirst();
+            Optional<HistoricoAgendamentos> ultimoAtendimentoRealizado = historicoAgendamentos.stream()
+                    .filter(h -> "concluido".equalsIgnoreCase(h.getStatus())
+                            || "em atendimento".equalsIgnoreCase(h.getStatus()))
+                    .findFirst();
 
-                clienteResponse.setUltimaVisita(
-                        ultimoAtendimentoRealizado
-                                .map(h -> h.getDataHora().toLocalDate())
-                                .orElse(null)
-                );
+            clienteResponse.setUltimaVisita(
+                    ultimoAtendimentoRealizado.map(h -> h.getDataHora().toLocalDate()).orElse(null)
+            );
 
-                clienteResponses.add(clienteResponse);
-            }
+            clienteResponses.add(clienteResponse);
         }
+
         return clienteResponses;
     }
 }
