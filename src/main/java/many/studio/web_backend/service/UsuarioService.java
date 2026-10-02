@@ -328,7 +328,12 @@ public class UsuarioService {
             profissionalResponse.setTelefone(p.getTelefone());
             profissionalResponse.setEmail(p.getUsuario().getEmail());
 
-//            servicoRepository.findByProfissionalId(profissionalResponse.getId());
+            List<String> categorias = agendamentoRepository.findCategoriasByProfissionalId(p.getId());
+            String especialidade = categorias.isEmpty() ? null : String.join(", ", categorias);
+            profissionalResponse.setEspecialidade(especialidade);
+
+            Long qtdAgendamentos = agendamentoRepository.countAgendamentosConcluidosPorProfissional(p.getId());
+            profissionalResponse.setQtdAgendamentos(qtdAgendamentos != null ? qtdAgendamentos.intValue() : 0);
 
             profissionalResponses.add(profissionalResponse);
         }
