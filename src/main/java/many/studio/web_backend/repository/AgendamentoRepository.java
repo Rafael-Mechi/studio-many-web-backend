@@ -227,4 +227,22 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
             @Param("clienteId") Long clienteId,
             @Param("usuarioId") Long usuarioId
     );
+
+    @Query("""
+    SELECT COUNT(DISTINCT a.id)
+    FROM Agendamento a
+    JOIN a.statusAgendamento sa
+    WHERE a.profissional.id = :profissionalId
+      AND sa.estado = 'concluido'
+""")
+    Long countAgendamentosConcluidosPorProfissional(@Param("profissionalId") Long profissionalId);
+
+    @Query("""
+    SELECT DISTINCT cs.categoria
+    FROM ServicoProfissional sp
+    JOIN sp.servico s
+    JOIN s.categoriaServico cs
+    WHERE sp.profissional.id = :profissionalId
+""")
+    List<String> findCategoriasByProfissionalId(@Param("profissionalId") Long profissionalId);
 }

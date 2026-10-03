@@ -421,6 +421,20 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.getClientes(id, role));
     }
 
+    @GetMapping("/profissionais")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<ProfissionalResponse>> getProfissionais(Authentication authentication) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Long id = usuario.getId();
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        return ResponseEntity.ok(usuarioService.getProfissionais(id, role));
+    }
+
 //    @Operation(summary = "Atualizar perfil do usuário autenticado")
 //    @io.swagger.v3.oas.annotations.parameters.RequestBody(
 //            description = "Dados do perfil (campos opcionais)",
