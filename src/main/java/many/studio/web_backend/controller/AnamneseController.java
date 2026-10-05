@@ -14,11 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/fichas")
@@ -53,22 +49,31 @@ public class AnamneseController {
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Page<AnamneseListResponse>> listarFichas(
             Authentication authentication,
+            @RequestParam(required = false) String busca,
             @ParameterObject
-            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    ){
-        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+            @PageableDefault(
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+    ) {
+        UsuarioDetalhesDto usuario =
+                (UsuarioDetalhesDto) authentication.getPrincipal();
 
         Long id = usuario.getId();
+
         String role = usuario.getAuthorities()
                 .iterator()
                 .next()
                 .getAuthority();
 
-        if(!role.equals("ROLE_ADMIN") && !role.equals("ROLE_PROFISSIONAL")){
+        if (!role.equals("ROLE_ADMIN") && !role.equals("ROLE_PROFISSIONAL")) {
             throw new ForbiddenException("Não foi possível realizar esta ação");
         }
 
-        Page<AnamneseListResponse> response = anamneseService.listarFichas(id, role, pageable);
+        Page<AnamneseListResponse> response =
+                anamneseService.listarFichas(id, role, busca, pageable);
 
         return ResponseEntity.ok(response);
     }

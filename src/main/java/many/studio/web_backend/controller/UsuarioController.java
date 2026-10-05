@@ -8,10 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import many.studio.web_backend.dto.ClienteBuscaResponse;
 import many.studio.web_backend.dto.usuario.*;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.mapper.UsuarioMapper;
 import many.studio.web_backend.service.AgendamentoService;
+import many.studio.web_backend.service.ClienteService;
 import many.studio.web_backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +40,9 @@ public class UsuarioController {
 
     @Autowired
     private AgendamentoService agendamentoService;
+
+    @Autowired
+    private ClienteService clienteService;
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Void> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
@@ -419,6 +424,16 @@ public class UsuarioController {
                 .getAuthority();
 
         return ResponseEntity.ok(usuarioService.getClientes(id, role));
+    }
+
+    @GetMapping("/clientes/busca")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<ClienteBuscaResponse>> buscarClientes(
+            @RequestParam String busca
+    ) {
+        return ResponseEntity.ok(
+                clienteService.buscarClientes(busca)
+        );
     }
 
 //    @Operation(summary = "Atualizar perfil do usuário autenticado")

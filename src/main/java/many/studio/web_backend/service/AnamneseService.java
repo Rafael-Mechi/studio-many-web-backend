@@ -44,19 +44,44 @@ public class AnamneseService {
         return AnamneseMapper.toResponse(anamneseRepository.save(anamnese));
     }
 
-    public Page<AnamneseListResponse> listarFichas(Long usuarioId, String role, Pageable pageable){
-        if(role.equals("ROLE_ADMIN")){
-            return anamneseRepository.findAll(pageable)
-                    .map(AnamneseMapper::toListResponse);
-        } else if(role.equals("ROLE_PROFISSIONAL")){
+    public Page<AnamneseListResponse> listarFichas(
+            Long usuarioId,
+            String role,
+            String busca,
+            Pageable pageable
+    ) {
+        boolean possuiBusca = busca != null && !busca.isBlank();
+
+        if (role.equals("ROLE_ADMIN")) {
+
+            Page<Anamnese> fichas = possuiBusca
+                    ? anamneseRepository.buscarPorNomeOuTelefone(busca, pageable)
+                    : anamneseRepository.findAll(pageable);
+
+            return fichas.map(AnamneseMapper::toListResponse);
+
+        } else if (role.equals("ROLE_PROFISSIONAL")) {
+
             Profissional profissional = profissionalRepository
                     .findByUsuario_Id(usuarioId)
-                    .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
+                    .orElseThrow(() ->
+                            new EntityNotFoundException("Profissional não encontrado")
+                    );
 
-            return anamneseRepository.findByProfissional(profissional, pageable)
-                    .map(AnamneseMapper::toListResponse);
-        } else {
-            throw new EntityNotFoundException("Perfil não autorizado");
+            Page<Anamnese> fichas = possuiBusca
+                    ? anamneseRepository.buscarPorProfissionalNomeOuTelefone(
+                    profissional,
+                    busca,
+                    pageable
+            )
+                    : anamneseRepository.findByProfissional(
+                    profissional,
+                    pageable
+            );
+
+            return fichas.map(AnamneseMapper::toListResponse);
         }
+
+        throw new EntityNotFoundException("Perfil não autorizado");
     }
 }
