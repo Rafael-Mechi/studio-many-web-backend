@@ -10,5 +10,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AnamneseRepository extends JpaRepository<Anamnese, Long> {
     Page<Anamnese> findByProfissional(Profissional profissional, Pageable pageable);
-    Page<Anamnese> findAll(Pageable pageable);
 }

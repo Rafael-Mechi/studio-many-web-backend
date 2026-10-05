@@ -11,7 +11,6 @@ import many.studio.web_backend.mapper.AnamneseMapper;
 import many.studio.web_backend.repository.AnamneseRepository;
 import many.studio.web_backend.repository.ClienteRepository;
 import many.studio.web_backend.repository.ProfissionalRepository;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

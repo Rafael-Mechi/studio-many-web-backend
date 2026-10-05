@@ -7,8 +7,10 @@ import many.studio.web_backend.dto.anamnese.AnamneseResponse;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.service.AnamneseService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -49,7 +51,11 @@ public class AnamneseController {
 
     @GetMapping
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<Page<AnamneseListResponse>> listarFichas(Authentication authentication, @PageableDefault(size = 10) Pageable pageable){
+    public ResponseEntity<Page<AnamneseListResponse>> listarFichas(
+            Authentication authentication,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ){
         UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
 
         Long id = usuario.getId();
@@ -64,7 +70,7 @@ public class AnamneseController {
 
         Page<AnamneseListResponse> response = anamneseService.listarFichas(id, role, pageable);
 
-        return ResponseEntity.status(200).body(response);
+        return ResponseEntity.ok(response);
     }
 
 }
