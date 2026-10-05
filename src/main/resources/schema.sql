@@ -16,12 +16,6 @@ CREATE TABLE IF NOT EXISTS status_clientes_pacotes (
     estado VARCHAR(45)
 );
 
-CREATE TABLE IF NOT EXISTS anamneses (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    informacao VARCHAR(45),
-    arquivo_url VARCHAR(255)
-);
-
 CREATE TABLE IF NOT EXISTS status_agendamentos (
       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
       estado VARCHAR(45)
@@ -98,6 +92,17 @@ CREATE TABLE IF NOT EXISTS clientes (
       usuario_id INT UNIQUE,
 
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
+CREATE TABLE IF NOT EXISTS anamneses (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  cliente_id INT NOT NULL,
+  profissional_id INT NOT NULL,
+
+  informacao TEXT NOT NULL
+
+  FOREIGN KEY (fk_cliente) REFERENCES clientes(id),
+  FOREIGN KEY (fk_profissional) REFERENCES profissionas(id)
 );
 
 CREATE TABLE IF NOT EXISTS anamnese_clientes (
