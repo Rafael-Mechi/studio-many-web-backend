@@ -19,6 +19,9 @@ public class AgendamentoCriacaoRequest {
     @Future
     private LocalDateTime horario;
 
+    @NotBlank
+    String telefone;
+
     public Long getClienteId() {
         return clienteId;
     }
@@ -49,5 +52,13 @@ public class AgendamentoCriacaoRequest {
 
     public void setHorario(LocalDateTime horario) {
         this.horario = horario;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 }

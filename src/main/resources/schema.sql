@@ -169,6 +169,16 @@ CREATE TABLE IF NOT EXISTS pagamentos (
      FOREIGN KEY (tipo_pagamentos_id) REFERENCES tipo_pagamentos(id)
 );
 
+CREATE TABLE IF NOT EXISTS comprovantes (
+     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+     arquivo LONGTEXT NOT NULL,
+     tipo_arquivo VARCHAR(100) NOT NULL,
+
+     pagamento_id INT NOT NULL UNIQUE,
+
+     FOREIGN KEY (pagamento_id) REFERENCES pagamentos(id)
+);
+
 CREATE TABLE IF NOT EXISTS cliente_pacotes (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     sessoes_restantes INT,
