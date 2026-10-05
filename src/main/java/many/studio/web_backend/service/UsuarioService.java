@@ -1,18 +1,13 @@
 package many.studio.web_backend.service;
 
+import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.config.GerenciadorTokenJwt;
 import many.studio.web_backend.dto.usuario.*;
-import many.studio.web_backend.entity.Cliente;
-import many.studio.web_backend.entity.Perfil;
-import many.studio.web_backend.entity.Profissional;
-import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.exception.EntityConflictException;
+import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.mapper.UsuarioMapper;
-import many.studio.web_backend.repository.ClienteRepository;
-import many.studio.web_backend.repository.PerfilRepository;
-import many.studio.web_backend.repository.ProfissionalRepository;
-import many.studio.web_backend.repository.UsuarioRepository;
+import many.studio.web_backend.repository.*;
 import many.studio.web_backend.strategy.UsuarioCriacaoStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +21,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,8 +37,10 @@ public class UsuarioService {
     private final List<UsuarioCriacaoStrategy> strategies;
     private final ClienteRepository clienteRepository;
     private final ProfissionalRepository profissionalRepository;
+    private final AgendamentoRepository agendamentoRepository;
+    private final ServicoRepository servicoRepository;
 
-    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository) {
+    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository, AgendamentoRepository agendamentoRepository, ServicoRepository servicoRepository) {
         this.passwordEncoder = passwordEncoder;
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
@@ -50,6 +49,8 @@ public class UsuarioService {
         this.strategies = strategies;
         this.clienteRepository = clienteRepository;
         this.profissionalRepository = profissionalRepository;
+        this.agendamentoRepository = agendamentoRepository;
+        this.servicoRepository = servicoRepository;
     }
 
     public void criar(UsuarioCriacaoDto dto) {
@@ -245,5 +246,100 @@ public class UsuarioService {
         UsuarioPerfilResponseDto dto = new UsuarioPerfilResponseDto(usuario.getId(), clienteId, nome, telefoneCliente, role);
 
         return dto;
+    }
+
+    public List<ClienteResponse> getClientes(Long id, String role) {
+        List<ClienteResponse> clienteResponses = new ArrayList<>();
+
+        List<Cliente> clientesAlvo;
+        Long usuarioIdFiltro;
+
+        if (role.equals("ROLE_CLIENTE")) {
+            throw new ForbiddenException("Você não tem permissão para acessar esse recurso");
+
+        } else if (role.equals("ROLE_ADMIN")) {
+            clientesAlvo = clienteRepository.findAll();
+            usuarioIdFiltro = null;
+
+        } else if (role.equals("ROLE_PROFISSIONAL")) {
+            clientesAlvo = clienteRepository.findClientesByProfissionalUsuarioId(id);
+            usuarioIdFiltro = id;
+
+        } else {
+            throw new IllegalArgumentException("Role inválida: " + role);
+        }
+
+        for (Cliente c : clientesAlvo) {
+            ClienteResponse clienteResponse = new ClienteResponse();
+            Optional<Usuario> u = clienteRepository.findUsuarioByClienteId(c.getId());
+
+            clienteResponse.setId(c.getId());
+            clienteResponse.setNome(c.getNome());
+            clienteResponse.setEmail(u.get().getEmail());
+            clienteResponse.setClienteDesde(u.get().getCriadoEm().toLocalDate());
+            clienteResponse.setCpf(c.getDocumento());
+            clienteResponse.setTelefone(c.getTelefone());
+            clienteResponse.setQtdNoShows(c.getTotalNoShows());
+
+            List<HistoricoAgendamentos> historicoAgendamentos =
+                    agendamentoRepository.buscarHistoricoPorClienteEUsuarioProfissional(c.getId(), usuarioIdFiltro);
+
+            clienteResponse.setHistoricoAgendamentos(historicoAgendamentos);
+
+            Double totalGasto = historicoAgendamentos.stream()
+                    .filter(h -> "concluido".equalsIgnoreCase(h.getStatus()))
+                    .map(HistoricoAgendamentos::getValor)
+                    .filter(Objects::nonNull)
+                    .mapToDouble(Double::doubleValue)
+                    .sum();
+
+            clienteResponse.setTotalGasto(totalGasto);
+
+            Optional<HistoricoAgendamentos> ultimoAtendimentoRealizado = historicoAgendamentos.stream()
+                    .filter(h -> "concluido".equalsIgnoreCase(h.getStatus())
+                            || "em atendimento".equalsIgnoreCase(h.getStatus()))
+                    .findFirst();
+
+            clienteResponse.setUltimaVisita(
+                    ultimoAtendimentoRealizado.map(h -> h.getDataHora().toLocalDate()).orElse(null)
+            );
+
+            clienteResponses.add(clienteResponse);
+        }
+
+        return clienteResponses;
+    }
+
+    public List<ProfissionalResponse> getProfissionais(Long id, String role) {
+        List<ProfissionalResponse> profissionalResponses = new ArrayList<>();
+        List<Profissional> profissionais;
+
+        if (role.equals("ROLE_CLIENTE") || role.equals("ROLE_PROFISSIONAL")) {
+            throw new ForbiddenException("Você não tem permissão para acessar esse recurso");
+        } else if (role.equals("ROLE_ADMIN")){
+            profissionais = profissionalRepository.findAll();
+        } else {
+            throw new IllegalArgumentException("Role inválida: " + role);
+        }
+
+        for (Profissional p : profissionais){
+            ProfissionalResponse profissionalResponse = new ProfissionalResponse();
+
+            profissionalResponse.setId(p.getId());
+            profissionalResponse.setNome(p.getNome());
+            profissionalResponse.setTelefone(p.getTelefone());
+            profissionalResponse.setEmail(p.getUsuario().getEmail());
+
+            List<String> categorias = agendamentoRepository.findCategoriasByProfissionalId(p.getId());
+            String especialidade = categorias.isEmpty() ? null : String.join(", ", categorias);
+            profissionalResponse.setEspecialidade(especialidade);
+
+            Long qtdAgendamentos = agendamentoRepository.countAgendamentosConcluidosPorProfissional(p.getId());
+            profissionalResponse.setQtdAgendamentos(qtdAgendamentos != null ? qtdAgendamentos.intValue() : 0);
+
+            profissionalResponses.add(profissionalResponse);
+        }
+
+        return profissionalResponses;
     }
 }

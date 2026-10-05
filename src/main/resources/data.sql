@@ -194,7 +194,7 @@ INSERT INTO agendamentos (
     1,
     2,
     1,
-    2
+    9
 );
 
 INSERT INTO agendamento_itens (
@@ -230,7 +230,7 @@ INSERT INTO agendamentos (
     1,
     2,
     2,
-    2
+    3
 );
 
 INSERT INTO agendamento_itens (
@@ -246,3 +246,39 @@ INSERT INTO agendamento_itens (
     1,
     2
 );
+
+-- Segundo cliente, pra testar isolamento entre clientes também
+INSERT INTO usuarios (email, senha, perfil_id, criado_em)
+VALUES ('maria.cliente@gmail.com', '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS', 3, CURRENT_TIMESTAMP);
+
+INSERT INTO clientes (nome, telefone, documento, usuario_id)
+VALUES ('Maria Cliente', '11988885555', '98765432100', 4);
+
+-- Agendamento 3: Cliente Teste com Isabelly, CONCLUIDO, mais antigo
+INSERT INTO agendamentos (criado_em, preco, desconto_porcentagem, preco_final, criado_por_usuario_id, cliente_id, pacote_id, profissional_id, status_agendamento_id)
+VALUES ('2026-08-10 09:00:00', 150.00, 0.00, 150.00, 3, 1, 3, 2, 9);
+
+INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
+VALUES ('2026-08-15 09:00:00', '2026-08-15 10:00:00', 3, 2, 2);
+
+-- Agendamento 4: Cliente Teste com Isabelly, CANCELADO, mais recente que o concluído
+INSERT INTO agendamentos (criado_em, preco, desconto_porcentagem, preco_final, criado_por_usuario_id, cliente_id, pacote_id, profissional_id, status_agendamento_id)
+VALUES ('2026-08-25 09:00:00', 150.00, 0.00, 150.00, 3, 1, 2, 2, 5);
+
+INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
+VALUES ('2026-08-29 09:00:00', '2026-08-29 10:00:00', 4, 1, 2);
+
+-- Agendamento 5: Maria Cliente com Beatriz, AGENDADO (futuro, não deve contar como visita)
+INSERT INTO agendamentos (criado_em, preco, desconto_porcentagem, preco_final, criado_por_usuario_id, cliente_id, pacote_id, profissional_id, status_agendamento_id)
+VALUES ('2026-08-30 09:00:00', 150.00, 0.00, 150.00, 3, 2, 2, 1, 2);
+
+INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
+VALUES ('2026-09-01 09:00:00', '2026-09-01 10:00:00', 5, 1, 1);
+
+-- Agendamento 6: Maria Cliente, cabeçalho diz Beatriz (profissional_id=1),
+-- mas quem realmente atendeu (no item) foi a Isabelly (profissional_id=2). CONCLUIDO.
+INSERT INTO agendamentos (criado_em, preco, desconto_porcentagem, preco_final, criado_por_usuario_id, cliente_id, pacote_id, profissional_id, status_agendamento_id)
+VALUES ('2026-08-05 09:00:00', 150.00, 0.00, 150.00, 3, 2, 3, 1, 9);
+
+INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
+VALUES ('2026-08-10 09:00:00', '2026-08-10 10:00:00', 6, 2, 2);
