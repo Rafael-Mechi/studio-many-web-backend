@@ -8,10 +8,23 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import many.studio.web_backend.dto.config.BloqueioCriacaoResponse;
+import many.studio.web_backend.dto.config.BloqueioRequest;
+import many.studio.web_backend.dto.config.BloqueioResponse;
+import many.studio.web_backend.dto.config.HorariosConfigRequest;
+import many.studio.web_backend.dto.config.MeuPerfilUpdateRequest;
+import many.studio.web_backend.dto.servico.ServicoListarDto;
 import many.studio.web_backend.dto.usuario.*;
 import many.studio.web_backend.entity.Usuario;
+import many.studio.web_backend.exception.ForbiddenException;
+import many.studio.web_backend.mapper.ServicoMapper;
 import many.studio.web_backend.mapper.UsuarioMapper;
 import many.studio.web_backend.service.AgendamentoService;
+import many.studio.web_backend.service.BloqueioService;
+import many.studio.web_backend.service.ContaService;
+import many.studio.web_backend.service.HorarioTrabalhoService;
+import many.studio.web_backend.service.ProfissionalService;
+import many.studio.web_backend.service.ServicoService;
 import many.studio.web_backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -38,6 +52,21 @@ public class UsuarioController {
 
     @Autowired
     private AgendamentoService agendamentoService;
+
+    @Autowired
+    private HorarioTrabalhoService horarioTrabalhoService;
+
+    @Autowired
+    private BloqueioService bloqueioService;
+
+    @Autowired
+    private ContaService contaService;
+
+    @Autowired
+    private ServicoService servicoService;
+
+    @Autowired
+    private ProfissionalService profissionalService;
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Void> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
@@ -385,10 +414,10 @@ public class UsuarioController {
 
     @GetMapping("/me")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<UsuarioPerfilResponseDto> meuPerfil(Authentication authentication){
+    public ResponseEntity<Object> meuPerfil(Authentication authentication){
         UsuarioDetalhesDto detalhes = (UsuarioDetalhesDto) authentication.getPrincipal();
 
-        UsuarioPerfilResponseDto dto = usuarioService.buscarUsuarioPerfil(detalhes);
+        Object dto = usuarioService.buscarMeuPerfil(detalhes);
 
         return ResponseEntity.status(200).body(dto);
     }
@@ -433,6 +462,106 @@ public class UsuarioController {
                 .getAuthority();
 
         return ResponseEntity.ok(usuarioService.getProfissionais(id, role));
+    }
+
+    @Operation(summary = "Atualizar nome e telefone do usuário autenticado")
+    @PatchMapping("/me")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Object> atualizarMeuPerfil(
+            @AuthenticationPrincipal UsuarioDetalhesDto usuario,
+            @Valid @RequestBody MeuPerfilUpdateRequest dto) {
+        usuarioService.atualizarMeuPerfil(usuario.getId(), dto);
+        return ResponseEntity.ok(usuarioService.buscarMeuPerfil(usuario));
+    }
+
+    @Operation(summary = "Ver jornada semanal do profissional autenticado")
+    @GetMapping("/me/horarios")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<HorariosConfigRequest> meusHorarios(
+            @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+        exigirProfissional(usuario);
+        return ResponseEntity.ok(horarioTrabalhoService.listar(usuario.getId()));
+    }
+
+    @Operation(summary = "Atualizar jornada semanal do profissional autenticado")
+    @PatchMapping("/me/horarios")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<HorariosConfigRequest> atualizarMeusHorarios(
+            @AuthenticationPrincipal UsuarioDetalhesDto usuario,
+            @Valid @RequestBody HorariosConfigRequest dto) {
+        exigirProfissional(usuario);
+        return ResponseEntity.ok(horarioTrabalhoService.salvar(usuario.getId(), dto));
+    }
+
+    @Operation(summary = "Listar bloqueios de horário do profissional autenticado")
+    @GetMapping("/me/bloqueios")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<BloqueioResponse>> meusBloqueios(
+            @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+        exigirProfissional(usuario);
+        return ResponseEntity.ok(bloqueioService.listar(usuario.getId()));
+    }
+
+    @Operation(summary = "Criar bloqueio de horário do profissional autenticado")
+    @PostMapping("/me/bloqueios")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<BloqueioCriacaoResponse> criarBloqueio(
+            @AuthenticationPrincipal UsuarioDetalhesDto usuario,
+            @Valid @RequestBody BloqueioRequest dto) {
+        exigirProfissional(usuario);
+        return ResponseEntity.status(201).body(bloqueioService.criar(usuario.getId(), dto));
+    }
+
+    @Operation(summary = "Excluir bloqueio de horário do profissional autenticado")
+    @DeleteMapping("/me/bloqueios/{bloqueioId}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> excluirBloqueio(
+            @AuthenticationPrincipal UsuarioDetalhesDto usuario,
+            @PathVariable Long bloqueioId) {
+        exigirProfissional(usuario);
+        bloqueioService.excluir(usuario.getId(), bloqueioId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Listar serviços vinculados ao profissional autenticado")
+    @GetMapping("/me/servicos")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<ServicoListarDto>> meusServicos(
+            @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+        exigirProfissional(usuario);
+        Long profissionalId = profissionalService.findByUsuarioId(usuario.getId()).getId();
+        return ResponseEntity.ok(ServicoMapper.toResponse(
+                servicoService.listarServicosPorProfissional(profissionalId)));
+    }
+
+    @Operation(summary = "Apagar conta (soft delete) e cancelar agendamentos futuros")
+    @PatchMapping("/me/desativar")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> desativarMinhaConta(
+            @AuthenticationPrincipal UsuarioDetalhesDto usuario,
+            HttpServletResponse response) {
+        contaService.desativarMinhaConta(usuario.getId());
+
+        ResponseCookie cookie = ResponseCookie.from(COOKIE_NOME, "")
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Strict")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private void exigirProfissional(UsuarioDetalhesDto usuario) {
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+        if (!"ROLE_PROFISSIONAL".equalsIgnoreCase(role) && !"ROLE_ADMIN".equalsIgnoreCase(role)) {
+            throw new ForbiddenException("Você não tem permissão para acessar esse recurso");
+        }
     }
 
 //    @Operation(summary = "Atualizar perfil do usuário autenticado")
