@@ -15,6 +15,16 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
 
     List<Agendamento> findByProfissionalId(@Param("profissionalId") Long profissionalId);
 
+    @Query("""
+        SELECT DISTINCT a
+        FROM Agendamento a
+        JOIN a.itens ai
+        WHERE a.profissional.id = :profissionalId
+          AND ai.inicioAtendimento > CURRENT_TIMESTAMP
+          AND a.statusAgendamento.estado NOT IN ('cancelado', 'concluido', 'recusado', 'faltou')
+    """)
+    List<Agendamento> findFuturosAtivosByProfissionalId(@Param("profissionalId") Long profissionalId);
+
     //    @Query("SELECT s.nome FROM AgendamentoItem ai " +
 //        "JOIN ai.agendamento a " +
 //        "JOIN ai.servico s " +

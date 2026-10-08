@@ -9,4 +9,8 @@ import java.util.List;
 public interface DiasDeTrabalhoRepository extends JpaRepository<DiasDeTrabalho, Long> {
 
     List<DiasDeTrabalho> findByProfissionalId(Long id);
+
+    List<DiasDeTrabalho> findByProfissionalIdOrderByDiaDaSemanaAscHoraInicioAsc(Long id);
+
+    void deleteByProfissionalId(Long id);
 }

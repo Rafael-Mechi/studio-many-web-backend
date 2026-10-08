@@ -54,6 +54,8 @@ CREATE TABLE IF NOT EXISTS profissionais (
         nome VARCHAR(75),
         telefone VARCHAR(30),
         documento VARCHAR(75),
+        almoco_inicio TIME,
+        almoco_fim TIME,
         usuario_id INT UNIQUE,
 
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
@@ -214,9 +216,12 @@ CREATE TABLE IF NOT EXISTS agendamento_itens (
 CREATE TABLE IF NOT EXISTS dias_de_trabalho (
                                                 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                                                 dia_da_semana VARCHAR(20),
-                                                hora_inicio TIMESTAMP,
-                                                hora_fim TIMESTAMP,
+                                                hora_inicio TIME,
+                                                hora_fim TIME,
                                                 profissional_id INT,
+                                                servico_id INT,
 
-                                                FOREIGN KEY (profissional_id) REFERENCES profissionais(id)
+                                                FOREIGN KEY (profissional_id) REFERENCES profissionais(id),
+                                                FOREIGN KEY (servico_id) REFERENCES servicos(id),
+                                                UNIQUE KEY uq_dia_servico (profissional_id, dia_da_semana, servico_id)
 );
