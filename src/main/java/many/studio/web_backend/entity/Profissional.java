@@ -2,6 +2,7 @@ package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "profissionais")
@@ -18,6 +19,12 @@ public class Profissional {
 
     @Column(name = "documento")
     private String documento;
+
+    @Column(name = "almoco_inicio")
+    private LocalTime almocoInicio;
+
+    @Column(name = "almoco_fim")
+    private LocalTime almocoFim;
 
     @OneToOne
     @JoinColumn(name = "usuario_id")
@@ -56,6 +63,18 @@ public class Profissional {
     }
     public void setDocumento(String documento) {
         this.documento = documento;
+    }
+    public LocalTime getAlmocoInicio() {
+        return almocoInicio;
+    }
+    public void setAlmocoInicio(LocalTime almocoInicio) {
+        this.almocoInicio = almocoInicio;
+    }
+    public LocalTime getAlmocoFim() {
+        return almocoFim;
+    }
+    public void setAlmocoFim(LocalTime almocoFim) {
+        this.almocoFim = almocoFim;
     }
     public Usuario getUsuario() {
         return usuario;

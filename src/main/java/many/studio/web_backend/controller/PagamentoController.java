@@ -32,6 +32,6 @@ public class PagamentoController {
             throw new ResponseStatusException(HttpStatusCode.valueOf(400));
         }
 
-        return ResponseEntity.status(201).body(PagamentoMapper.toResponseList(pagamentoService.criarSinal(idAgendamentos)));
+        return ResponseEntity.status(201).body(PagamentoMapper.toResponseList(pagamentoService.criarSinal(idAgendamentos, comprovante)));
     }
 }

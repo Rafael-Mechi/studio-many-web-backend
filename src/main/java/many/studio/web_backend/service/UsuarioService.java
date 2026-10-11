@@ -1,12 +1,11 @@
 package many.studio.web_backend.service;
 
+import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.config.GerenciadorTokenJwt;
+import many.studio.web_backend.dto.config.MeuPerfilUpdateRequest;
 import many.studio.web_backend.dto.usuario.*;
-import many.studio.web_backend.entity.Cliente;
-import many.studio.web_backend.entity.Perfil;
-import many.studio.web_backend.entity.Profissional;
-import many.studio.web_backend.entity.Usuario;
+import many.studio.web_backend.mapper.config.MeuPerfilMapper;
 import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.mapper.UsuarioMapper;
@@ -41,8 +40,10 @@ public class UsuarioService {
     private final ClienteRepository clienteRepository;
     private final ProfissionalRepository profissionalRepository;
     private final AgendamentoRepository agendamentoRepository;
+    private final ServicoRepository servicoRepository;
+    private final AnamneseClienteRepository anamneseClienteRepository;
 
-    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository, AgendamentoRepository agendamentoRepository) {
+    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository, AgendamentoRepository agendamentoRepository, ServicoRepository servicoRepository, AnamneseClienteRepository anamneseClienteRepository) {
         this.passwordEncoder = passwordEncoder;
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
@@ -52,6 +53,8 @@ public class UsuarioService {
         this.clienteRepository = clienteRepository;
         this.profissionalRepository = profissionalRepository;
         this.agendamentoRepository = agendamentoRepository;
+        this.servicoRepository = servicoRepository;
+        this.anamneseClienteRepository = anamneseClienteRepository;
     }
 
     public void criar(UsuarioCriacaoDto dto) {
@@ -152,6 +155,35 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    public void atualizarMeuPerfil(Long usuarioId, MeuPerfilUpdateRequest dto) {
+        String nome = dto.getNome() != null ? dto.getNome().trim() : "";
+        if (nome.length() < 3 || nome.length() > 75) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome deve ter entre 3 e 75 caracteres");
+        }
+        String telefone = dto.getTelefone() != null ? dto.getTelefone().replaceAll("\\D", "") : "";
+        if (telefone.length() < 10 || telefone.length() > 11) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Telefone inválido");
+        }
+
+        usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        Optional<Profissional> profissionalOpt = profissionalRepository.findByUsuario_Id(usuarioId);
+        if (profissionalOpt.isPresent()) {
+            Profissional profissional = profissionalOpt.get();
+            profissional.setNome(nome);
+            profissional.setTelefone(telefone);
+            profissionalRepository.save(profissional);
+            return;
+        }
+
+        Cliente cliente = clienteRepository.findByUsuario_Id(usuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Dados de perfil não encontrados"));
+        cliente.setNome(nome);
+        cliente.setTelefone(telefone);
+        clienteRepository.save(cliente);
+    }
+
     public void atualizarPerfil(UsuarioAtualizarPerfilDto dto) {
         if (dto.getEmail() == null && dto.getNome() == null
                 && dto.getTelefone() == null && dto.getDocumento() == null) {
@@ -185,8 +217,7 @@ public class UsuarioService {
         }
     }
 
-    private Usuario obterUsuarioAutenticado() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    private Usuario obterUsuarioAutenticado() {        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Não autenticado");
         }
@@ -204,47 +235,44 @@ public class UsuarioService {
         return usuario;
     }
 
-    public UsuarioPerfilResponseDto buscarUsuarioPerfil(UsuarioDetalhesDto usuarioDetalhesDto){
-        String nome = null;
-        Long clienteId = null;
-
+    /**
+     * Perfil do usuário logado (tela de configurações). Retorna
+     * {@link MeuPerfilProfissionalResponse} para ADMIN/PROFISSIONAL e
+     * {@link MeuPerfilClienteResponse} para CLIENTE. Os campos
+     * {@code role}, {@code clienteId} e {@code clienteTelefone} são mantidos
+     * porque o front os usa na sessão (navegação e fluxo de agendamento).
+     */
+    public Object buscarMeuPerfil(UsuarioDetalhesDto usuarioDetalhesDto){
         String role = usuarioDetalhesDto.getAuthorities()
                 .stream()
                 .findFirst()
                 .map(authority -> authority.getAuthority())
                 .orElse(null);
 
-        if(role.equalsIgnoreCase("ROLE_ADMIN") || role.equalsIgnoreCase("ROLE_PROFISSIONAL")){
-            Optional<Profissional> profissionalOpt = profissionalRepository.findByUsuario_Id(usuarioDetalhesDto.getId());
+        Usuario usuario = usuarioRepository.findById(usuarioDetalhesDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-            if(profissionalOpt.isEmpty()){
-                throw new EntityNotFoundException("Profissional não encontrado");
-            }
+        if (role != null && (role.equalsIgnoreCase("ROLE_ADMIN") || role.equalsIgnoreCase("ROLE_PROFISSIONAL"))) {
+            Profissional profissional = profissionalRepository.findByUsuario_Id(usuarioDetalhesDto.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
 
-            Profissional profissional = profissionalOpt.get();
-
-            nome = profissional.getNome();
+            return MeuPerfilMapper.toProfissionalResponse(
+                    usuario,
+                    profissional,
+                    role,
+                    agendamentoRepository.findByProfissionalId(profissional.getId()).size(),
+                    clienteRepository.findClientesByProfissionalUsuarioId(usuarioDetalhesDto.getId()).size());
         }
 
-        else{
-            Optional<Cliente> clienteOpt = clienteRepository.findByUsuario_Id(usuarioDetalhesDto.getId());
+        Cliente cliente = clienteRepository.findByUsuario_Id(usuarioDetalhesDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
-            if(clienteOpt.isEmpty()){
-                throw new EntityNotFoundException("Profissional não encontrado");
-            }
-
-            Cliente cliente = clienteOpt.get();
-
-            nome = cliente.getNome();
-            clienteId = cliente.getId();
-        }
-
-        Optional<Usuario> u = usuarioRepository.findById(usuarioDetalhesDto.getId());
-        Usuario usuario = u.get();
-
-        UsuarioPerfilResponseDto dto = new UsuarioPerfilResponseDto(usuario.getId(), clienteId, nome, role);
-
-        return dto;
+        return MeuPerfilMapper.toClienteResponse(
+                usuario,
+                cliente,
+                role,
+                agendamentoRepository.findByClienteUsuarioId(usuarioDetalhesDto.getId()).size(),
+                (int) anamneseClienteRepository.countByClienteId(cliente.getId()));
     }
 
     public List<ClienteResponse> getClientes(Long id, String role) {
@@ -307,5 +335,38 @@ public class UsuarioService {
         }
 
         return clienteResponses;
+    }
+
+    public List<ProfissionalResponse> getProfissionais(Long id, String role) {
+        List<ProfissionalResponse> profissionalResponses = new ArrayList<>();
+        List<Profissional> profissionais;
+
+        if (role.equals("ROLE_CLIENTE") || role.equals("ROLE_PROFISSIONAL")) {
+            throw new ForbiddenException("Você não tem permissão para acessar esse recurso");
+        } else if (role.equals("ROLE_ADMIN")){
+            profissionais = profissionalRepository.findAll();
+        } else {
+            throw new IllegalArgumentException("Role inválida: " + role);
+        }
+
+        for (Profissional p : profissionais){
+            ProfissionalResponse profissionalResponse = new ProfissionalResponse();
+
+            profissionalResponse.setId(p.getId());
+            profissionalResponse.setNome(p.getNome());
+            profissionalResponse.setTelefone(p.getTelefone());
+            profissionalResponse.setEmail(p.getUsuario().getEmail());
+
+            List<String> categorias = agendamentoRepository.findCategoriasByProfissionalId(p.getId());
+            String especialidade = categorias.isEmpty() ? null : String.join(", ", categorias);
+            profissionalResponse.setEspecialidade(especialidade);
+
+            Long qtdAgendamentos = agendamentoRepository.countAgendamentosConcluidosPorProfissional(p.getId());
+            profissionalResponse.setQtdAgendamentos(qtdAgendamentos != null ? qtdAgendamentos.intValue() : 0);
+
+            profissionalResponses.add(profissionalResponse);
+        }
+
+        return profissionalResponses;
     }
 }

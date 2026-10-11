@@ -75,6 +75,10 @@ public class SecurityConfiguracao {
 
                         .requestMatchers(URLS_PERMITIDAS).permitAll()
 
+                        // Exceção à regra de DELETE abaixo: o profissional gerencia os próprios bloqueios.
+                        .requestMatchers(HttpMethod.DELETE, "/usuarios/me/bloqueios/**")
+                        .hasAnyRole("PROFISSIONAL", "ADMIN")
+
                         .requestMatchers(HttpMethod.DELETE, "/usuarios/**")
                         .hasRole("ADMIN")
 

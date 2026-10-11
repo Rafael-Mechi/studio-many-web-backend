@@ -13,4 +13,6 @@ public interface ServicoProfissionalRepository extends JpaRepository<ServicoProf
     List<ServicoProfissional> findAllByProfissionalId(Long profissionalId);
 
     List<ServicoProfissional> findByServicoId(Long id);
+
+    boolean existsByProfissionalIdAndServicoId(Long profissionalId, Long servicoId);
 }

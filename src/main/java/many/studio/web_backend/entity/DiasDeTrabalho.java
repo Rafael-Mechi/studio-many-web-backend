@@ -28,6 +28,10 @@ public class DiasDeTrabalho {
     @JoinColumn(name = "profissional_id")
     private Profissional profissional;
 
+    @ManyToOne
+    @JoinColumn(name = "servico_id")
+    private Servico servico;
+
     public Long getId() {
         return id;
     }
@@ -66,5 +70,13 @@ public class DiasDeTrabalho {
 
     public void setProfissional(Profissional profissional) {
         this.profissional = profissional;
+    }
+
+    public Servico getServico() {
+        return servico;
+    }
+
+    public void setServico(Servico servico) {
+        this.servico = servico;
     }
 }

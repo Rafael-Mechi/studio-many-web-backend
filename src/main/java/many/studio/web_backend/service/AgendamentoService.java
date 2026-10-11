@@ -86,8 +86,7 @@ public class AgendamentoService {
                 "solicitar cancelamento",
                 "solicitar reagendamento",
                 "em atendimento",
-                "cancelado",
-                "aguardando sinal"
+                "cancelado"
         );
 
         List<Cliente> clientes;
@@ -324,6 +323,147 @@ public class AgendamentoService {
         agendamentoRepository.save(agendamento);
     }
 
+    public void fazerCheckIn(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
+
+        Agendamento agendamento = buscarPorId(idAgendamento);
+
+        boolean admin = usuarioLogado.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!admin) {
+
+            boolean funcionario = usuarioLogado.getAuthorities()
+                    .stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
+
+            if (!funcionario) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Apenas administradores e funcionários podem fazer check-in nos agendamentos"
+                );
+            }
+
+            Long usuarioDoProfissional =
+                    agendamento.getProfissional()
+                            .getUsuario()
+                            .getId();
+
+            if (!usuarioDoProfissional.equals(usuarioLogado.getId())) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Você não pode fazer check-in nos agendamentos de outro profissional"
+                );
+            }
+        }
+
+        StatusAgendamento statusCheckIn =
+                statusAgendamentoRepository
+                        .findByEstado("check-in")
+                        .orElseThrow(() ->
+                                new EntityNotFoundException(
+                                        "Status CHECK-IN não encontrado"
+                                ));
+
+        agendamento.setStatusAgendamento(statusCheckIn);
+
+        agendamentoRepository.save(agendamento);
+    }
+
+    public void concluir(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
+
+        Agendamento agendamento = buscarPorId(idAgendamento);
+
+        boolean admin = usuarioLogado.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!admin) {
+
+            boolean funcionario = usuarioLogado.getAuthorities()
+                    .stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
+
+            if (!funcionario) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Apenas administradores e funcionários podem concluir agendamentos"
+                );
+            }
+
+            Long usuarioDoProfissional =
+                    agendamento.getProfissional()
+                            .getUsuario()
+                            .getId();
+
+            if (!usuarioDoProfissional.equals(usuarioLogado.getId())) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Você não pode concluir agendamentos de outro profissional"
+                );
+            }
+        }
+
+        StatusAgendamento statusConcluido =
+                statusAgendamentoRepository
+                        .findByEstado("concluido")
+                        .orElseThrow(() ->
+                                new EntityNotFoundException(
+                                        "Status CONCLUIDO não encontrado"
+                                ));
+
+        agendamento.setStatusAgendamento(statusConcluido);
+
+        agendamentoRepository.save(agendamento);
+    }
+
+    public void emAtendimento(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
+
+        Agendamento agendamento = buscarPorId(idAgendamento);
+
+        boolean admin = usuarioLogado.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!admin) {
+
+            boolean funcionario = usuarioLogado.getAuthorities()
+                    .stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
+
+            if (!funcionario) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Apenas administradores e funcionários podem deixar agendamentos em atendimento"
+                );
+            }
+
+            Long usuarioDoProfissional =
+                    agendamento.getProfissional()
+                            .getUsuario()
+                            .getId();
+
+            if (!usuarioDoProfissional.equals(usuarioLogado.getId())) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Você não pode deixar agendamentos de outro profissional em atendimento"
+                );
+            }
+        }
+
+        StatusAgendamento statusEmAtendimento =
+                statusAgendamentoRepository
+                        .findByEstado("em atendimento")
+                        .orElseThrow(() ->
+                                new EntityNotFoundException(
+                                        "Status EM ATENDIMENTO não encontrado"
+                                ));
+
+        agendamento.setStatusAgendamento(statusEmAtendimento);
+
+        agendamentoRepository.save(agendamento);
+    }
+
 
     @Transactional
     public void cancelarAgendamento(Long idAgendamento, CancelarAgendamentoRequest requestDto, Long idUsuario){
@@ -346,7 +486,7 @@ public class AgendamentoService {
             throw new NonAuthorizedException("Não é possível cancelar agendamento com menos de 24 horas");
         }
 
-        agendamentoItemRepository.deleteByAgendamentoId(idAgendamento);
+        //agendamentoItemRepository.deleteByAgendamentoId(idAgendamento);
 
         StatusAgendamento statusCancelado = statusAgendamentoRepository
                 .findByEstado("cancelado")

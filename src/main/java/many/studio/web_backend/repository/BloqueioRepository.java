@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface BloqueioRepository extends JpaRepository<Bloqueio, Long> {
     List<Bloqueio> findByProfissionalId(Long profissionalId);
+
+    List<Bloqueio> findByProfissionalIdOrderByInicioDesc(Long profissionalId);
 }

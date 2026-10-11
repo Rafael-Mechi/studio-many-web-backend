@@ -79,25 +79,45 @@ public class DisponibilidadeService {
             while (!dataAtual.isAfter(limite)) {
 
                 LocalDate finalDataAtual = dataAtual;
-                DiasDeTrabalho diaDeTrabalho =
-                        diasDeTrabalho.stream()
-                                .filter(dia ->
-                                        dia.getDiaDaSemana()
-                                                .equals(finalDataAtual.getDayOfWeek())
-                                )
-                                .findFirst()
-                                .orElse(null);
 
-                if (diaDeTrabalho != null) {
+                List<DiasDeTrabalho> linhasDoDia = diasDeTrabalho.stream()
+                        .filter(dia -> dia.getDiaDaSemana()
+                                .equals(finalDataAtual.getDayOfWeek()))
+                        .toList();
 
-                    // 1. GERA TODOS OS SLOTS POSSÍVEIS
-                    List<LocalTime> horarios =
-                            gerarSlots(
+                List<DiasDeTrabalho> linhasExplicitas = linhasDoDia.stream()
+                        .filter(dia -> dia.getServico() != null
+                                && dia.getServico().getId() != null
+                                && dia.getServico().getId().equals(servico.getId()))
+                        .toList();
+
+                List<DiasDeTrabalho> linhasBase = !linhasExplicitas.isEmpty()
+                        ? linhasExplicitas
+                        : linhasDoDia.stream()
+                                .filter(dia -> dia.getServico() == null)
+                                .toList();
+
+                if (!linhasBase.isEmpty()) {
+
+                    // 1. GERA TODOS OS SLOTS POSSÍVEIS (união das linhas do dia)
+                    List<LocalTime> horarios = linhasBase.stream()
+                            .flatMap(diaDeTrabalho -> gerarSlots(
                                     diaDeTrabalho.getHoraInicio(),
                                     diaDeTrabalho.getHoraFim(),
-                                    servico.getDuracaoMinutos()
-                            );
+                                    servico.getDuracaoMinutos()).stream())
+                            .distinct()
+                            .sorted()
+                            .toList();
 
+                    List<Bloqueio> bloqueiosDoDia = new ArrayList<>(bloqueios);
+                    if (profissional.getAlmocoInicio() != null && profissional.getAlmocoFim() != null) {
+                        bloqueiosDoDia.add(new Bloqueio(
+                                null,
+                                LocalDateTime.of(finalDataAtual, profissional.getAlmocoInicio()),
+                                LocalDateTime.of(finalDataAtual, profissional.getAlmocoFim()),
+                                "Almoço",
+                                profissional));
+                    }
 
                     // 2. REMOVE HORÁRIOS QUE CONFLITAM COM BLOQUEIOS
                     List<LocalTime> horariosDisponiveis =
@@ -118,7 +138,7 @@ public class DisponibilidadeService {
                                         return !estaBloqueado(
                                                 inicioSlot,
                                                 fimSlot,
-                                                bloqueios
+                                                bloqueiosDoDia
                                         );
                                     })
                                     .toList();

@@ -15,7 +15,17 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
 
     List<Agendamento> findByProfissionalId(@Param("profissionalId") Long profissionalId);
 
-//    @Query("SELECT s.nome FROM AgendamentoItem ai " +
+    @Query("""
+        SELECT DISTINCT a
+        FROM Agendamento a
+        JOIN a.itens ai
+        WHERE a.profissional.id = :profissionalId
+          AND ai.inicioAtendimento > CURRENT_TIMESTAMP
+          AND a.statusAgendamento.estado NOT IN ('cancelado', 'concluido', 'recusado', 'faltou')
+    """)
+    List<Agendamento> findFuturosAtivosByProfissionalId(@Param("profissionalId") Long profissionalId);
+
+    //    @Query("SELECT s.nome FROM AgendamentoItem ai " +
 //        "JOIN ai.agendamento a " +
 //        "JOIN ai.servico s " +
 //        "WHERE a.cliente.id = :clienteId " +
@@ -173,7 +183,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         s.id, s.nome, s.preco, s.duracaoMinutos,
         cs.categoria,
         p.id, p.nome,
-        prof.id, prof.usuario.email, prof.telefone,
+        prof.id, prof.usuario.email, prof.nome, prof.telefone,
         sa.estado
     )
     FROM Agendamento a
@@ -228,4 +238,22 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
             @Param("clienteId") Long clienteId,
             @Param("usuarioId") Long usuarioId
     );
+
+    @Query("""
+    SELECT COUNT(DISTINCT a.id)
+    FROM Agendamento a
+    JOIN a.statusAgendamento sa
+    WHERE a.profissional.id = :profissionalId
+      AND sa.estado = 'concluido'
+""")
+    Long countAgendamentosConcluidosPorProfissional(@Param("profissionalId") Long profissionalId);
+
+    @Query("""
+    SELECT DISTINCT cs.categoria
+    FROM ServicoProfissional sp
+    JOIN sp.servico s
+    JOIN s.categoriaServico cs
+    WHERE sp.profissional.id = :profissionalId
+""")
+    List<String> findCategoriasByProfissionalId(@Param("profissionalId") Long profissionalId);
 }
