@@ -78,4 +78,97 @@ public class AnamneseController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<AnamneseResponse> buscarFichaPorId(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Long usuarioId = usuario.getId();
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        if (!role.equals("ROLE_ADMIN") && !role.equals("ROLE_PROFISSIONAL")) {
+            throw new ForbiddenException("Não foi possível realizar esta ação");
+        }
+
+        AnamneseResponse response = anamneseService.buscarFichaPorId(id, usuarioId, role);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<AnamneseResponse> atualizarFicha(
+            @PathVariable Long id,
+            @RequestBody AnamneseRequest anamneseRequest,
+            Authentication authentication
+    ) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Long usuarioId = usuario.getId();
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        if (!role.equals("ROLE_ADMIN") && !role.equals("ROLE_PROFISSIONAL")) {
+            throw new ForbiddenException("Não foi possível realizar esta ação");
+        }
+
+        AnamneseResponse response = anamneseService.atualizarFicha(id, anamneseRequest, usuarioId, role);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> excluirFicha(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Long usuarioId = usuario.getId();
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        if (!role.equals("ROLE_ADMIN") && !role.equals("ROLE_PROFISSIONAL")) {
+            throw new ForbiddenException("Não foi possível realizar esta ação");
+        }
+
+        anamneseService.excluirFicha(id, usuarioId, role);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/cliente/{clienteId}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<AnamneseResponse> buscarFichaPorCliente(
+            @PathVariable Long clienteId,
+            Authentication authentication
+    ) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Long usuarioId = usuario.getId();
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        if (!role.equals("ROLE_ADMIN") && !role.equals("ROLE_PROFISSIONAL")) {
+            throw new ForbiddenException("Não foi possível realizar esta ação");
+        }
+
+        AnamneseResponse response = anamneseService.buscarFichaPorCliente(clienteId, usuarioId, role);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

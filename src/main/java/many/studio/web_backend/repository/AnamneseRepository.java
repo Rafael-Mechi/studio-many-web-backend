@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface AnamneseRepository extends JpaRepository<Anamnese, Long> {
 
@@ -44,4 +46,10 @@ public interface AnamneseRepository extends JpaRepository<Anamnese, Long> {
             @Param("busca") String busca,
             Pageable pageable
     );
-}
+
+    Optional<Anamnese> findTopByClienteIdOrderByIdDesc(Long clienteId);
+
+    Optional<Anamnese> findTopByClienteIdAndProfissionalOrderByIdDesc(
+            Long clienteId,
+            Profissional profissional
+    );}

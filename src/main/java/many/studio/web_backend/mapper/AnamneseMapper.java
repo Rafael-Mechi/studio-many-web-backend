@@ -10,6 +10,7 @@ public class AnamneseMapper {
         AnamneseResponse anamneseResponse = new AnamneseResponse();
 
         anamneseResponse.setId(anamnese.getId());
+        anamneseResponse.setClienteId(anamnese.getCliente().getId());
         anamneseResponse.setNomeCliente(anamnese.getCliente().getNome());
         anamneseResponse.setInformacao(anamnese.getInformacao());
 
