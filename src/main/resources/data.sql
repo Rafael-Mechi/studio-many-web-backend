@@ -312,7 +312,15 @@ INSERT INTO agendamentos (criado_em, preco, desconto_porcentagem, preco_final, c
 VALUES (DATEADD('DAY', -23, CURRENT_TIMESTAMP), 150.00, 0.00, 150.00, 3, 2, 3, 1, 9);
 
 INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
-VALUES (
-    CAST(CONCAT(CAST(DATEADD('DAY', -18, CURRENT_DATE) AS VARCHAR), ' 09:00:00') AS TIMESTAMP),
-    CAST(CONCAT(CAST(DATEADD('DAY', -18, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
-    6, 2, 2);
+VALUES ('2026-08-10 09:00:00', '2026-08-10 10:00:00', 6, 2, 2);
+
+-- Ficha para Maria Cliente
+INSERT INTO anamneses (informacao, cliente_id, profissional_id)
+VALUES ('Paciente Maria Cliente - Histórico: Paciente com pele oleosa, propensa a cravos e acne leve. Tratamento iniciado em agosto de 2026. Sensível a produtos com ácido salicílico. Preferência por procedimentos suaves.', 2, 2);
+
+-- Agendamento futuro para Maria Cliente (para teste do painel)
+INSERT INTO agendamentos (criado_em, preco, desconto_porcentagem, preco_final, criado_por_usuario_id, cliente_id, pacote_id, profissional_id, status_agendamento_id)
+VALUES ('2026-10-11 09:00:00', 150.00, 0.00, 150.00, 3, 2, 2, 2, 2);
+
+INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
+VALUES ('2026-10-15 14:00:00', '2026-10-15 15:00:00', 7, 1, 2);

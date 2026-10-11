@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import many.studio.web_backend.dto.ClienteBuscaResponse;
 import many.studio.web_backend.dto.config.BloqueioCriacaoResponse;
 import many.studio.web_backend.dto.config.BloqueioRequest;
 import many.studio.web_backend.dto.config.BloqueioResponse;
@@ -20,6 +21,7 @@ import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.mapper.ServicoMapper;
 import many.studio.web_backend.mapper.UsuarioMapper;
 import many.studio.web_backend.service.AgendamentoService;
+import many.studio.web_backend.service.ClienteService;
 import many.studio.web_backend.service.BloqueioService;
 import many.studio.web_backend.service.ContaService;
 import many.studio.web_backend.service.HorarioTrabalhoService;
@@ -54,6 +56,7 @@ public class UsuarioController {
     private AgendamentoService agendamentoService;
 
     @Autowired
+    private ClienteService clienteService;
     private HorarioTrabalhoService horarioTrabalhoService;
 
     @Autowired
@@ -450,6 +453,14 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.getClientes(id, role));
     }
 
+    @GetMapping("/clientes/busca")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<ClienteBuscaResponse>> buscarClientes(
+            @RequestParam String busca
+    ) {
+        return ResponseEntity.ok(
+                clienteService.buscarClientes(busca)
+        );
     @GetMapping("/profissionais")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<ProfissionalResponse>> getProfissionais(Authentication authentication) {

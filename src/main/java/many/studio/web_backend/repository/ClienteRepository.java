@@ -55,4 +55,14 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     List<Cliente> findClientesByProfissionalUsuarioId(
             @Param("usuarioId") Long usuarioId
     );
+
+    @Query("""
+        SELECT c
+        FROM Cliente c
+        WHERE LOWER(c.nome) LIKE LOWER(CONCAT('%', :busca, '%'))
+           OR c.telefone LIKE CONCAT('%', :busca, '%')
+        """)
+    List<Cliente> buscarPorNomeOuTelefone(
+            @Param("busca") String busca
+    );
 }
