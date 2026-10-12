@@ -57,6 +57,8 @@ public class UsuarioController {
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired
     private HorarioTrabalhoService horarioTrabalhoService;
 
     @Autowired
@@ -456,15 +458,18 @@ public class UsuarioController {
     @GetMapping("/clientes/busca")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<ClienteBuscaResponse>> buscarClientes(
-            @RequestParam String busca
-    ) {
+            @RequestParam String busca) {
         return ResponseEntity.ok(
                 clienteService.buscarClientes(busca)
         );
+    }
+
     @GetMapping("/profissionais")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<ProfissionalResponse>> getProfissionais(Authentication authentication) {
-        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+    public ResponseEntity<List<ProfissionalResponse>> getProfissionais(
+            Authentication authentication) {
+        UsuarioDetalhesDto usuario =
+                (UsuarioDetalhesDto) authentication.getPrincipal();
 
         Long id = usuario.getId();
         String role = usuario.getAuthorities()
@@ -520,7 +525,9 @@ public class UsuarioController {
             @AuthenticationPrincipal UsuarioDetalhesDto usuario,
             @Valid @RequestBody BloqueioRequest dto) {
         exigirProfissional(usuario);
-        return ResponseEntity.status(201).body(bloqueioService.criar(usuario.getId(), dto));
+        return ResponseEntity.status(201).body(
+                bloqueioService.criar(usuario.getId(), dto)
+        );
     }
 
     @Operation(summary = "Excluir bloqueio de horário do profissional autenticado")
@@ -541,8 +548,12 @@ public class UsuarioController {
             @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
         exigirProfissional(usuario);
         Long profissionalId = profissionalService.findByUsuarioId(usuario.getId()).getId();
-        return ResponseEntity.ok(ServicoMapper.toResponse(
-                servicoService.listarServicosPorProfissional(profissionalId)));
+
+        return ResponseEntity.ok(
+                ServicoMapper.toResponse(
+                        servicoService.listarServicosPorProfissional(profissionalId)
+                )
+        );
     }
 
     @Operation(summary = "Apagar conta (soft delete) e cancelar agendamentos futuros")
@@ -560,6 +571,7 @@ public class UsuarioController {
                 .path("/")
                 .maxAge(0)
                 .build();
+
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         return ResponseEntity.noContent().build();
@@ -570,8 +582,12 @@ public class UsuarioController {
                 .iterator()
                 .next()
                 .getAuthority();
-        if (!"ROLE_PROFISSIONAL".equalsIgnoreCase(role) && !"ROLE_ADMIN".equalsIgnoreCase(role)) {
-            throw new ForbiddenException("Você não tem permissão para acessar esse recurso");
+
+        if (!"ROLE_PROFISSIONAL".equalsIgnoreCase(role)
+                && !"ROLE_ADMIN".equalsIgnoreCase(role)) {
+            throw new ForbiddenException(
+                    "Você não tem permissão para acessar esse recurso"
+            );
         }
     }
 
