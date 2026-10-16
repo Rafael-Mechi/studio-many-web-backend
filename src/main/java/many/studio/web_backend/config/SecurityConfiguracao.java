@@ -62,7 +62,8 @@ public class SecurityConfiguracao {
             "/servicos",
             "/agenda/*",
             "/agendamentos/disponibilidade",
-            "/servicos/*/pacotes"
+            "/servicos/*/pacotes",
+            "/uploads/**"
     };
 
     @Bean
@@ -73,19 +74,19 @@ public class SecurityConfiguracao {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
 
-                        .requestMatchers(URLS_PERMITIDAS).permitAll()
+                                .requestMatchers(URLS_PERMITIDAS).permitAll()
 
-                        // Exceção à regra de DELETE abaixo: o profissional gerencia os próprios bloqueios.
-                        .requestMatchers(HttpMethod.DELETE, "/usuarios/me/bloqueios/**")
-                        .hasAnyRole("PROFISSIONAL", "ADMIN")
+                                // Exceção à regra de DELETE abaixo: o profissional gerencia os próprios bloqueios.
+                                .requestMatchers(HttpMethod.DELETE, "/usuarios/me/bloqueios/**")
+                                .hasAnyRole("PROFISSIONAL", "ADMIN")
 
-                        .requestMatchers(HttpMethod.DELETE, "/usuarios/**")
-                        .hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/usuarios/**")
+                                .hasRole("ADMIN")
 
 //                        .requestMatchers(HttpMethod.GET, "/usuarios/**")
 //                        .hasRole("ADMIN")
 
-                        .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(autenticacaoJwtEntryPoint))

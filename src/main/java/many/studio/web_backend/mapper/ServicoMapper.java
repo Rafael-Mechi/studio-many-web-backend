@@ -11,6 +11,12 @@ public class ServicoMapper {
 
     public static Servico toEntity(ServicoCadastroDto cadastroDto){
         Servico entity = new Servico();
+        atualizarEntity(entity, cadastroDto);
+        return entity;
+    }
+
+    /** Copia os campos editáveis do DTO para uma entidade já existente (categoria e criadoEm ficam com o service). */
+    public static void atualizarEntity(Servico entity, ServicoCadastroDto cadastroDto){
         entity.setDescricao(cadastroDto.getDescricao());
         entity.setAtivo(cadastroDto.getAtivo());
         entity.setNome(cadastroDto.getNome());
@@ -18,7 +24,6 @@ public class ServicoMapper {
         entity.setFotoUrl(cadastroDto.getFotoUrl());
         entity.setDuracaoMinutos(cadastroDto.getDuracaoMinutos());
         entity.setSinalValor(cadastroDto.getSinalValor());
-        return entity;
     }
 
     public static List<Servico> toEntity(List<ServicoCadastroDto> cadastroDto){
@@ -37,7 +42,11 @@ public class ServicoMapper {
         response.setPreco(servico.getPreco());
         response.setFotoUrl(servico.getFotoUrl());
         response.setSinalValor(servico.getSinalValor());
-        response.setCategoria(servico.getCategoriaServico().getCategoria());
+
+        if (servico.getCategoriaServico() != null) {
+            response.setCategoriaId(servico.getCategoriaServico().getId());
+            response.setCategoria(servico.getCategoriaServico().getCategoria());
+        }
 
         return response;
     }
