@@ -35,7 +35,7 @@ public interface AgendamentoItemRepository extends JpaRepository<AgendamentoItem
         SELECT ai
         FROM AgendamentoItem ai
         WHERE ai.profissional.id = :profissionalId
-        AND ai.agendamento.statusAgendamento.estado NOT IN ('cancelado', 'recusado')
+        AND LOWER(ai.agendamento.statusAgendamento.estado) NOT IN ('cancelado', 'recusado', 'aguardando sinal')
     """)
         List<AgendamentoItem> findAgendamentosQueOcupamHorario(
                 @Param("profissionalId") Long profissionalId

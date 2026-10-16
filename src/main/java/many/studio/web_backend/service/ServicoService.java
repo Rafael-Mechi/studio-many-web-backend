@@ -52,8 +52,10 @@ public class ServicoService {
     }
 
 
-    public List<ServicoListarDto> listar(){
-        List<Servico> servicos = servicoRepository.findAll();
+    public List<ServicoListarDto> listar(Boolean ativo){
+        List<Servico> servicos = (ativo != null)
+                ? servicoRepository.findByAtivo(ativo)
+                : servicoRepository.findAll();
         List<ServicoListarDto> lista = new ArrayList<>();
 
         for(Servico s : servicos){
@@ -61,6 +63,10 @@ public class ServicoService {
         }
 
         return lista;
+    }
+
+    public List<ServicoListarDto> listar(){
+        return listar(null);
     }
 
     public List<Servico> listarServicosPorProfissional(Long id){
@@ -242,6 +248,9 @@ public class ServicoService {
     }
 
     private CategoriaServico buscarCategoria(Long categoriaId) {
+        if (categoriaId == null) {
+            return null;
+        }
         return categoriaServicoRepository.findById(categoriaId.intValue())
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
     }
