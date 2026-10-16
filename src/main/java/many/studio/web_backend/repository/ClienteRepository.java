@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     Optional<Cliente> findByUsuario_Id(Long usuarioId);
 
+    Optional<Cliente> findFirstByTelefone(String telefone);
+
     @Query("""
     SELECT c.usuario
     FROM Cliente c

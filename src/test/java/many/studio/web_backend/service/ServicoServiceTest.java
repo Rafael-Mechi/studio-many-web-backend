@@ -201,7 +201,6 @@ class ServicoServiceTest {
          dto.setDuracaoMinutos(40);
          dto.setPreco(120.00);
          dto.setAtivo(true);
-         dto.setCriadoEm(LocalDateTime.now());
 
          Mockito.when(servicoRepository.existsByNome(servico.getNome())).thenReturn(false);
          Mockito.when(servicoRepository.save(any(Servico.class))).thenReturn(servico);
@@ -231,7 +230,6 @@ class ServicoServiceTest {
          dto.setDuracaoMinutos(40);
          dto.setPreco(120.00);
          dto.setAtivo(true);
-         dto.setCriadoEm(LocalDateTime.now());
 
 
 
