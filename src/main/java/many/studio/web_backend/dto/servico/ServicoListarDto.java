@@ -35,6 +35,9 @@ public class ServicoListarDto {
     @Schema(description = "Data de criação do serviço", example = "15/09/2026")
     private LocalDateTime criadoEm;
 
+    @Schema(description = "Id da categoria do serviço", example = "1")
+    private Integer categoriaId;
+
     @Schema(description = "Categoria do serviço", example = "Facial")
     private String categoria;
 
@@ -129,6 +132,14 @@ public class ServicoListarDto {
         this.sinalValor = sinalValor;
     }
 
+    public Integer getCategoriaId() {
+        return categoriaId;
+    }
+
+    public void setCategoriaId(Integer categoriaId) {
+        this.categoriaId = categoriaId;
+    }
+
     public String getCategoria() {
         return categoria;
     }
@@ -144,4 +155,4 @@ public class ServicoListarDto {
     public void setProfissionais(List<ProfissionaisPorServicoDto> profissionais) {
         this.profissionais = profissionais;
     }
-}
+}

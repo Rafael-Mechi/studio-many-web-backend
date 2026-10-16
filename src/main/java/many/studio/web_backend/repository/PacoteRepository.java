@@ -9,4 +9,9 @@ public interface PacoteRepository extends JpaRepository<Pacote, Long> {
 
     List<Pacote> findByServicoId(Long id);
 
+    List<Pacote> findByServicoIdAndAtivoTrue(Long id);
+
+    boolean existsByServicoIdAndNomeIgnoreCase(Long servicoId, String nome);
+
+    boolean existsByServicoIdAndNomeIgnoreCaseAndIdNot(Long servicoId, String nome, Long id);
 }
