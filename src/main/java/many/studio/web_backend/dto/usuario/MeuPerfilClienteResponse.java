@@ -11,6 +11,7 @@ public class MeuPerfilClienteResponse {
     private String telefone;
     private String clienteTelefone;
     private String cpf;
+    private String fotoUrl;
     private Boolean ativo;
     private LocalDate membroDesde;
     private String role;
@@ -99,6 +100,14 @@ public class MeuPerfilClienteResponse {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 
     public Boolean getAtivo() {

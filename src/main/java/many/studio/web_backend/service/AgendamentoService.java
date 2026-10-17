@@ -171,6 +171,8 @@ public class AgendamentoService {
                     cliente.getUsuario().getEmail()
             );
 
+            response.setTelefoneUsuario(cliente.getTelefone());
+
             response.setNoShow(qtdNoShows);
 
             response.setTotalGasto(somaPagamentos);

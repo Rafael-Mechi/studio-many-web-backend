@@ -21,24 +21,32 @@ import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.mapper.ServicoMapper;
 import many.studio.web_backend.mapper.UsuarioMapper;
 import many.studio.web_backend.service.AgendamentoService;
+import many.studio.web_backend.service.ArmazenamentoImagemService;
 import many.studio.web_backend.service.ClienteService;
 import many.studio.web_backend.service.BloqueioService;
 import many.studio.web_backend.service.ContaService;
 import many.studio.web_backend.service.HorarioTrabalhoService;
+import many.studio.web_backend.service.ProfissionalCadastroService;
 import many.studio.web_backend.service.ProfissionalService;
 import many.studio.web_backend.service.ServicoService;
 import many.studio.web_backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -73,12 +81,44 @@ public class UsuarioController {
     @Autowired
     private ProfissionalService profissionalService;
 
+    @Autowired
+    private ProfissionalCadastroService profissionalCadastroService;
+
+    @Autowired
+    private ArmazenamentoImagemService armazenamentoImagemService;
+
     @PostMapping("/cadastrar")
     public ResponseEntity<Void> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
 
         this.usuarioService.criar(usuarioCriacaoDto);
 
         return ResponseEntity.status(201).build();
+    }
+
+    @PostMapping("/cadastrar/profissional")
+    @SecurityRequirement(name = "Bearer")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Cadastrar profissional com jornada inicial (admin)")
+    public ResponseEntity<ProfissionalCadastroResponse> cadastrarProfissional(
+            @RequestBody @Valid ProfissionalCadastroDto dto) {
+
+        return ResponseEntity.status(201).body(profissionalCadastroService.cadastrar(dto));
+    }
+
+    @PostMapping(value = "/imagem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Enviar foto de perfil (JPG ou PNG de até 2 MB)")
+    public ResponseEntity<Map<String, String>> enviarImagemUsuario(
+            @RequestParam("arquivo") MultipartFile arquivo) {
+
+        String nomeArquivo = armazenamentoImagemService.salvarImagemUsuario(arquivo);
+
+        String url = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/uploads/usuarios/")
+                .path(nomeArquivo)
+                .toUriString();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("url", url));
     }
 
     @PostMapping("/login")

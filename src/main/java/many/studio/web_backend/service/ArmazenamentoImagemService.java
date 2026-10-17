@@ -20,15 +20,18 @@ public class ArmazenamentoImagemService {
 
     private final Path raiz;
     private final Path pastaServicos;
+    private final Path pastaUsuarios;
 
     public ArmazenamentoImagemService(@Value("${app.upload-dir:uploads}") String diretorio) {
         this.raiz = Paths.get(diretorio).toAbsolutePath().normalize();
         this.pastaServicos = raiz.resolve("servicos");
+        this.pastaUsuarios = raiz.resolve("usuarios");
 
         try {
             Files.createDirectories(pastaServicos);
+            Files.createDirectories(pastaUsuarios);
         } catch (IOException e) {
-            throw new IllegalStateException("Não foi possível criar a pasta de uploads: " + pastaServicos, e);
+            throw new IllegalStateException("Não foi possível criar a pasta de uploads: " + raiz, e);
         }
     }
 
@@ -37,6 +40,14 @@ public class ArmazenamentoImagemService {
     }
 
     public String salvarImagemServico(MultipartFile arquivo) {
+        return salvarImagem(pastaServicos, arquivo);
+    }
+
+    public String salvarImagemUsuario(MultipartFile arquivo) {
+        return salvarImagem(pastaUsuarios, arquivo);
+    }
+
+    private String salvarImagem(Path pasta, MultipartFile arquivo) {
         if (arquivo == null || arquivo.isEmpty()) {
             throw new BadRequestException("Selecione uma imagem");
         }
@@ -50,7 +61,7 @@ public class ArmazenamentoImagemService {
             String extensao = detectarExtensao(inicio);
 
             String nomeArquivo = UUID.randomUUID() + "." + extensao;
-            Path destino = pastaServicos.resolve(nomeArquivo).normalize();
+            Path destino = pasta.resolve(nomeArquivo).normalize();
 
             try (InputStream completa = arquivo.getInputStream()) {
                 Files.copy(completa, destino, StandardCopyOption.REPLACE_EXISTING);

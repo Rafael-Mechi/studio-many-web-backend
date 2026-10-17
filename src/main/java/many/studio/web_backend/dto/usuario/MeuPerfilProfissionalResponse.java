@@ -9,6 +9,7 @@ public class MeuPerfilProfissionalResponse {
     private String email;
     private String telefone;
     private String cpf;
+    private String fotoUrl;
     private Boolean ativo;
     private LocalDate membroDesde;
     private String role;
@@ -81,6 +82,14 @@ public class MeuPerfilProfissionalResponse {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 
     public Boolean getAtivo() {

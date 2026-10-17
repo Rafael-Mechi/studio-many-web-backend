@@ -8,6 +8,7 @@ public class ClienteResponse {
     private String nome;
     private String telefone;
     private String email;
+    private String fotoUrl;
     private LocalDate ultimaVisita;
     private String cpf;
     private Integer qtdNoShows;
@@ -17,11 +18,12 @@ public class ClienteResponse {
 
     public ClienteResponse() {}
 
-    public ClienteResponse(Long id, String nome, String telefone, String email, LocalDate ultimaVisita, String cpf, Integer qtdNoShows, Double totalGasto, LocalDate clienteDesde, List<HistoricoAgendamentos> historicoAgendamentos) {
+    public ClienteResponse(Long id, String nome, String telefone, String email, String fotoUrl, LocalDate ultimaVisita, String cpf, Integer qtdNoShows, Double totalGasto, LocalDate clienteDesde, List<HistoricoAgendamentos> historicoAgendamentos) {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
         this.email = email;
+        this.fotoUrl = fotoUrl;
         this.ultimaVisita = ultimaVisita;
         this.cpf = cpf;
         this.qtdNoShows = qtdNoShows;
@@ -60,6 +62,14 @@ public class ClienteResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 
     public LocalDate getUltimaVisita() {
