@@ -65,7 +65,11 @@ public class AgendamentoService {
     }
 
     public List<Agendamento> buscarTodos() {
-        return agendamentoRepository.findAll();
+        return agendamentoRepository.findAll().stream()
+                .filter(a -> a.getStatusAgendamento() == null ||
+                        (!a.getStatusAgendamento().getEstado().equalsIgnoreCase("aguardando sinal") &&
+                         !a.getStatusAgendamento().getEstado().equalsIgnoreCase("aguardando pagamento")))
+                .toList();
     }
 
     public Agendamento buscarPorId(Long id) {

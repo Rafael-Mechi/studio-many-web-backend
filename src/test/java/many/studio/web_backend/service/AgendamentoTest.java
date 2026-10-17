@@ -93,13 +93,7 @@ public class AgendamentoTest {
             when(statusAgendamentoRepository.findByEstado("cancelado"))
                     .thenReturn(Optional.of(statusCancelado));
 
-            doNothing().when(agendamentoItemRepository)
-                    .deleteByAgendamentoId(idAgendamento);
-
             service.cancelarAgendamento(idAgendamento, request, idUsuario);
-
-            verify(agendamentoItemRepository)
-                    .deleteByAgendamentoId(idAgendamento);
 
             verify(statusAgendamentoRepository)
                     .findByEstado("cancelado");
@@ -162,9 +156,6 @@ public class AgendamentoTest {
 
             service.cancelarAgendamento(idAgendamento, request, idUsuario);
 
-            verify(agendamentoItemRepository)
-                    .deleteByAgendamentoId(idAgendamento);
-
             verify(agendamentoRepository)
                     .save(agendamento);
 
@@ -220,9 +211,6 @@ public class AgendamentoTest {
                     .thenReturn(Optional.of(statusCancelado));
 
             service.cancelarAgendamento(idAgendamento, request, idUsuario);
-
-            verify(agendamentoItemRepository)
-                    .deleteByAgendamentoId(idAgendamento);
 
             verify(agendamentoRepository)
                     .save(agendamento);

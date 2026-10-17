@@ -194,6 +194,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     JOIN Profissional prof ON prof.id = ai.profissional.id
     JOIN a.statusAgendamento sa
     WHERE a.cliente.id = :clienteId
+      AND LOWER(sa.estado) NOT IN ('aguardando sinal', 'aguardando pagamento')
       AND (:usuarioId IS NULL OR prof.usuario.id = :usuarioId)
     ORDER BY ai.inicioAtendimento DESC
 """)
@@ -231,6 +232,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     JOIN ai.profissional p
     JOIN a.statusAgendamento sa
     WHERE a.cliente.id = :clienteId
+      AND LOWER(sa.estado) NOT IN ('aguardando sinal', 'aguardando pagamento')
       AND (:usuarioId IS NULL OR p.usuario.id = :usuarioId)
     ORDER BY ai.inicioAtendimento DESC
 """)
