@@ -86,4 +86,23 @@ public class GlobalExceptionHandler {
                 .status(400)
                 .body(error);
     }
+
+    @ExceptionHandler(OtpInvalidoException.class)
+    public ResponseEntity<ErrorResponse> handleOtpInvalido(
+            OtpInvalidoException ex,
+            HttpServletRequest request
+    ) {
+
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                422,
+                "Unprocessable Entity",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(422)
+                .body(error);
+    }
 }

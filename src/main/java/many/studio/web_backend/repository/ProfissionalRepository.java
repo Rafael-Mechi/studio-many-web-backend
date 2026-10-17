@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ProfissionalRepository extends JpaRepository<Profissional, Long> {
     Optional<Profissional> findByUsuario_Id(Long usuarioId);
+
+    Optional<Profissional> findFirstByTelefone(String telefone);
 }
