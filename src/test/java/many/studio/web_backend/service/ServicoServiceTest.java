@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
-@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class ServicoServiceTest {
 
    @Mock
@@ -40,12 +39,6 @@ class ServicoServiceTest {
 
    @Mock
    private ServicoProfissionalRepository servicoProfissionalRepository;
-
-   @Mock
-   private many.studio.web_backend.repository.CategoriaServicoRepository categoriaServicoRepository;
-
-   @Mock
-   private many.studio.web_backend.repository.ProfissionalRepository profissionalRepository;
 
    @InjectMocks
     private ServicoService servicoService;
@@ -60,37 +53,35 @@ class ServicoServiceTest {
           Servico servico = new Servico();
           servico.setId(1L);
           servico.setNome("Limpeza de pele");
-          servico.setDescricao("Procedimento de remover impurezas.");
-          servico.setFotoUrl("https://example.com/foto.jpg");
+          servico.setDescricao("Procedimento de remover impurezas, células mortas, cravos e miliuns da superfície do rosto.");
+          servico.setFotoUrl("https://[NOME_DO_BUCKET].s3.[REGIÃO]://[CAMINHO/DA/IMAGEM.jpg]");
           servico.setDuracaoMinutos(40);
           servico.setPreco(120.00);
           servico.setAtivo(true);
           servico.setCriadoEm(LocalDateTime.now());
 
-          List<Servico> list = List.of(servico);
+          List<Servico> list = new ArrayList<>();
+          list.add(servico);
 
           Mockito.when(servicoRepository.findAll()).thenReturn(list);
 
-          List<ServicoListarDto> resultado = servicoService.listar();
-          assertEquals(1, resultado.size());
-          assertEquals(servico.getNome(), resultado.getFirst().getNome());
+          assertIterableEquals(list, servicoService.listar());
        }
 
       @Test
-      @DisplayName("Deve filtrar servicos por ativo")
-      void DeveFiltrarServicosPorAtivo(){
-          Servico servico = new Servico();
-          servico.setId(1L);
-          servico.setNome("Limpeza de pele");
-          servico.setAtivo(true);
+      @DisplayName("Deve retornar uma exception se lista vazia")
+      void DeveRetornarUmaExceptionSeListaVazia(){
+         List<Servico> list = new ArrayList<>();
 
-          Mockito.when(servicoRepository.findByAtivo(true)).thenReturn(List.of(servico));
+         Mockito.when(servicoRepository.findAll()).thenReturn(list);
 
-          List<ServicoListarDto> resultado = servicoService.listar(true);
-          assertEquals(1, resultado.size());
-          assertEquals(servico.getNome(), resultado.getFirst().getNome());
-          Mockito.verify(servicoRepository).findByAtivo(true);
+         Assertions.assertThrows(
+                 EntityNotFoundException.class,
+                 () -> servicoService.listar());
+
       }
+
+
    }
 
    @Nested
@@ -123,8 +114,7 @@ class ServicoServiceTest {
          List<Pacote> list = new ArrayList <>();
          list.add(pacote);
 
-         Mockito.when(servicoRepository.existsById(1L)).thenReturn(true);
-         Mockito.when(pacoteRepository.findByServicoIdAndAtivoTrue(1L)).thenReturn(list);
+         Mockito.when(pacoteRepository.findByServicoId(1L)).thenReturn(list);
 
          assertIterableEquals(list, servicoService.listarPacotesPorServico(1L));
       }
@@ -132,7 +122,9 @@ class ServicoServiceTest {
       @Test
       @DisplayName("Deve retornar exception se nenhum pacote encontrado para o serviço")
       void deveRetornarExceptionSeListaVazia() {
-         Mockito.when(servicoRepository.existsById(1L)).thenReturn(false);
+         List<Pacote> list = new ArrayList<>();
+
+         Mockito.when(pacoteRepository.findByServicoId(1L)).thenReturn(list);
 
          Assertions.assertThrows(
                  EntityNotFoundException.class,
@@ -165,7 +157,6 @@ class ServicoServiceTest {
 
          List<Servico> listServicos = List.of(servico);
 
-         Mockito.when(profissionalRepository.existsById(1L)).thenReturn(true);
          Mockito.when(servicoProfissionalRepository.findAllByProfissionalId(1L))
                  .thenReturn(listServicoProfissional);
 
@@ -175,7 +166,9 @@ class ServicoServiceTest {
       @Test
       @DisplayName("Deve retornar exception se nenhum serviço encontrado para o profissional")
       void deveRetornarExceptionSeListaVazia() {
-         Mockito.when(profissionalRepository.existsById(1L)).thenReturn(false);
+         List<ServicoProfissional> list = new ArrayList<>();
+
+         Mockito.when(servicoProfissionalRepository.findAllByProfissionalId(1L)).thenReturn(list);
 
          Assertions.assertThrows(
                  EntityNotFoundException.class,
@@ -204,32 +197,45 @@ class ServicoServiceTest {
          ServicoCadastroDto dto = new ServicoCadastroDto();
          dto.setNome("Limpeza de pele");
          dto.setDescricao("Procedimento de remover impurezas, células mortas, cravos e miliuns da superfície do rosto.");
-         dto.setFotoUrl("https://example.com/foto.jpg");
+         dto.setFotoUrl("https://[NOME_DO_BUCKET].s3.[REGIÃO]://[CAMINHO/DA/IMAGEM.jpg]");
          dto.setDuracaoMinutos(40);
          dto.setPreco(120.00);
          dto.setAtivo(true);
-         dto.setProfissionaisIds(List.of());
+         dto.setCriadoEm(LocalDateTime.now());
 
          Mockito.when(servicoRepository.existsByNome(servico.getNome())).thenReturn(false);
          Mockito.when(servicoRepository.save(any(Servico.class))).thenReturn(servico);
 
-         ServicoListarDto criado = servicoService.criar(dto);
-         assertEquals(servico.getNome(), criado.getNome());
+         assertEquals(servico,servicoService.criar(dto));
       }
 
 
       @Test
       @DisplayName("Deve retornar uma exception se serviço existe por nome")
       void deveRetornarUmaExceptionSeServicoExistePorNome(){
+         Servico servico = new Servico();
+         servico.setId(1L);
+         servico.setNome("Limpeza de pele");
+         servico.setDescricao("Procedimento de remover impurezas, células mortas, cravos e miliuns da superfície do rosto.");
+         servico.setFotoUrl("https://[NOME_DO_BUCKET].s3.[REGIÃO]://[CAMINHO/DA/IMAGEM.jpg]");
+         servico.setDuracaoMinutos(40);
+         servico.setPreco(120.00);
+         servico.setAtivo(true);
+         servico.setCriadoEm(LocalDateTime.now());
+
+
          ServicoCadastroDto dto = new ServicoCadastroDto();
          dto.setNome("Limpeza de pele");
          dto.setDescricao("Procedimento de remover impurezas, células mortas, cravos e miliuns da superfície do rosto.");
-         dto.setFotoUrl("https://example.com/foto.jpg");
+         dto.setFotoUrl("https://[NOME_DO_BUCKET].s3.[REGIÃO]://[CAMINHO/DA/IMAGEM.jpg]");
          dto.setDuracaoMinutos(40);
          dto.setPreco(120.00);
          dto.setAtivo(true);
+         dto.setCriadoEm(LocalDateTime.now());
 
-         Mockito.when(servicoRepository.existsByNome(dto.getNome())).thenReturn(true);
+
+
+         Mockito.when(servicoRepository.existsByNome(servico.getNome())).thenReturn(true);
 
          Assertions.assertThrows(
                  EntityConflictException.class,

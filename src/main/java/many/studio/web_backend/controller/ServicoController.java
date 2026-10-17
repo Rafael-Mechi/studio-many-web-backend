@@ -39,8 +39,8 @@ public class ServicoController {
 
 
     @GetMapping
-    public ResponseEntity<List<ServicoListarDto>> listar(@RequestParam(required = false) Boolean ativo){
-        return ResponseEntity.ok(servicoService.listar(ativo));
+    public ResponseEntity<List<ServicoListarDto>> listar(){
+        return ResponseEntity.ok(servicoService.listar());
     }
 
     @PostMapping

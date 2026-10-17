@@ -87,9 +87,6 @@ public class AgendamentoHelper {
         for (Agendamento a : agendamentos) {
 
             List<AgendamentoItem> itens = agendamentoItemRepository.findByAgendamentoId(a.getId());
-            if (itens == null || itens.isEmpty()) {
-                continue;
-            }
             AgendamentoItem item = itens.getFirst();
 
             LocalDateTime inicioExistente = item.getInicioAtendimento();
@@ -97,15 +94,7 @@ public class AgendamentoHelper {
 
             boolean conflita = novoInicio.isBefore(fimExistente) && novoFim.isAfter(inicioExistente);
 
-            String estado = (a.getStatusAgendamento() != null && a.getStatusAgendamento().getEstado() != null)
-                    ? a.getStatusAgendamento().getEstado()
-                    : "";
-
-            boolean isLivre = estado.equalsIgnoreCase("cancelado")
-                    || estado.equalsIgnoreCase("recusado")
-                    || estado.equalsIgnoreCase("aguardando sinal");
-
-            if (conflita && !isLivre) {
+            if (conflita && !a.getStatusAgendamento().equals("cancelado")) {
                 throw new EntityConflictException("O profissional já possui um agendamento nesse horário");
             }
         }
