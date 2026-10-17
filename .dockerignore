@@ -4,3 +4,4 @@ target/
 *.md
 .idea/
 .vscode/
+.env*

@@ -22,7 +22,7 @@ RUN JAR=$(ls target/web-backend-*.jar | head -n 1 || ls target/*.jar | head -n 1
 
 FROM alpine:3.20
 RUN addgroup -S app && adduser -S app -G app \
-    && mkdir -p /app && chown -R app:app /app
+    && mkdir -p /app/uploads && chown -R app:app /app
 WORKDIR /app
 COPY --chown=app:app --from=build /jre /opt/jre
 COPY --chown=app:app --from=build /app/target/*.jar /app/app.jar
