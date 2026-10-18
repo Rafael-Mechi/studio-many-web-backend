@@ -64,7 +64,8 @@ public class SecurityConfiguracao {
             "/agenda/*",
             "/agendamentos/disponibilidade",
             "/servicos/*/pacotes",
-            "/uploads/**"
+            "/uploads/**",
+            "/analise/**"
     };
 
     @Bean
