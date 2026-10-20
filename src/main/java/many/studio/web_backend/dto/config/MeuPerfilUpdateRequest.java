@@ -13,6 +13,9 @@ public class MeuPerfilUpdateRequest {
     @Size(min = 10, max = 20, message = "Telefone inválido")
     private String telefone;
 
+    @Size(max = 255, message = "URL da foto inválida")
+    private String fotoUrl;
+
     public String getNome() {
         return nome;
     }
@@ -27,5 +30,13 @@ public class MeuPerfilUpdateRequest {
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 }

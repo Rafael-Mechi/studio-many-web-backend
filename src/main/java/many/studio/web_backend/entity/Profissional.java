@@ -20,6 +20,9 @@ public class Profissional {
     @Column(name = "documento")
     private String documento;
 
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
     @Column(name = "almoco_inicio")
     private LocalTime almocoInicio;
 
@@ -63,6 +66,12 @@ public class Profissional {
     }
     public void setDocumento(String documento) {
         this.documento = documento;
+    }
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
     public LocalTime getAlmocoInicio() {
         return almocoInicio;

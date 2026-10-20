@@ -19,6 +19,9 @@ public class Cliente {
     @Column(name = "documento")
     private String documento;
 
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
     @Column(name = "total_no_shows")
     private Integer totalNoShows;
 
@@ -53,6 +56,8 @@ public class Cliente {
     public void setTelefone(String telefone) { this.telefone = telefone; }
     public String getDocumento() { return documento; }
     public void setDocumento(String documento) { this.documento = documento; }
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
     public Integer getTotalNoShows() { return totalNoShows; }
     public void setTotalNoShows(Integer totalNoShows) { this.totalNoShows = totalNoShows; }
     public String getBloqueadoMotivo() { return bloqueadoMotivo; }

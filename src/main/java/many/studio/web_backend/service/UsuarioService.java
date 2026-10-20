@@ -173,6 +173,9 @@ public class UsuarioService {
             Profissional profissional = profissionalOpt.get();
             profissional.setNome(nome);
             profissional.setTelefone(telefone);
+            if (dto.getFotoUrl() != null) {
+                profissional.setFotoUrl(dto.getFotoUrl().trim().isEmpty() ? null : dto.getFotoUrl().trim());
+            }
             profissionalRepository.save(profissional);
             return;
         }
@@ -181,6 +184,9 @@ public class UsuarioService {
                 .orElseThrow(() -> new EntityNotFoundException("Dados de perfil não encontrados"));
         cliente.setNome(nome);
         cliente.setTelefone(telefone);
+        if (dto.getFotoUrl() != null) {
+            cliente.setFotoUrl(dto.getFotoUrl().trim().isEmpty() ? null : dto.getFotoUrl().trim());
+        }
         clienteRepository.save(cliente);
     }
 
@@ -303,6 +309,7 @@ public class UsuarioService {
             clienteResponse.setId(c.getId());
             clienteResponse.setNome(c.getNome());
             clienteResponse.setEmail(u.get().getEmail());
+            clienteResponse.setFotoUrl(c.getFotoUrl());
             clienteResponse.setClienteDesde(u.get().getCriadoEm().toLocalDate());
             clienteResponse.setCpf(c.getDocumento());
             clienteResponse.setTelefone(c.getTelefone());
@@ -356,6 +363,7 @@ public class UsuarioService {
             profissionalResponse.setNome(p.getNome());
             profissionalResponse.setTelefone(p.getTelefone());
             profissionalResponse.setEmail(p.getUsuario().getEmail());
+            profissionalResponse.setFotoUrl(p.getFotoUrl());
 
             List<String> categorias = agendamentoRepository.findCategoriasByProfissionalId(p.getId());
             String especialidade = categorias.isEmpty() ? null : String.join(", ", categorias);

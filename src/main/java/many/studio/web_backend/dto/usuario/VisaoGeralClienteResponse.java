@@ -7,14 +7,16 @@ import java.util.List;
 public class VisaoGeralClienteResponse {
     private String nomeUsuario;
     private String emailUsuario;
+    private String telefoneUsuario;
     private Integer noShow;
     private Double totalGasto;
     private Integer atendimentosPendentes;
     private List<ResumoAgendamento> resumoAgendamentos;
 
-    public VisaoGeralClienteResponse(String nomeUsuario, String emailUsuario, Integer noShow, Double totalGasto, Integer atendimentosPendentes, List<ResumoAgendamento> resumoAgendamentos) {
+    public VisaoGeralClienteResponse(String nomeUsuario, String emailUsuario, String telefoneUsuario, Integer noShow, Double totalGasto, Integer atendimentosPendentes, List<ResumoAgendamento> resumoAgendamentos) {
         this.nomeUsuario = nomeUsuario;
         this.emailUsuario = emailUsuario;
+        this.telefoneUsuario = telefoneUsuario;
         this.noShow = noShow;
         this.totalGasto = totalGasto;
         this.atendimentosPendentes = atendimentosPendentes;
@@ -38,6 +40,14 @@ public class VisaoGeralClienteResponse {
 
     public void setEmailUsuario(String emailUsuario) {
         this.emailUsuario = emailUsuario;
+    }
+
+    public String getTelefoneUsuario() {
+        return telefoneUsuario;
+    }
+
+    public void setTelefoneUsuario(String telefoneUsuario) {
+        this.telefoneUsuario = telefoneUsuario;
     }
 
     public Integer getNoShow() {

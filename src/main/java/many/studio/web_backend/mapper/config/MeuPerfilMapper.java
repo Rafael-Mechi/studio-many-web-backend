@@ -19,6 +19,7 @@ public class MeuPerfilMapper {
         dto.setEmail(usuario.getEmail());
         dto.setTelefone(profissional.getTelefone());
         dto.setCpf(profissional.getDocumento());
+        dto.setFotoUrl(profissional.getFotoUrl());
         dto.setAtivo(usuario.getAtivo());
         if (usuario.getCriadoEm() != null) {
             dto.setMembroDesde(usuario.getCriadoEm().toLocalDate());
@@ -41,6 +42,7 @@ public class MeuPerfilMapper {
         dto.setTelefone(cliente.getTelefone());
         dto.setClienteTelefone(cliente.getTelefone());
         dto.setCpf(cliente.getDocumento());
+        dto.setFotoUrl(cliente.getFotoUrl());
         dto.setAtivo(usuario.getAtivo());
         if (usuario.getCriadoEm() != null) {
             dto.setMembroDesde(usuario.getCriadoEm().toLocalDate());

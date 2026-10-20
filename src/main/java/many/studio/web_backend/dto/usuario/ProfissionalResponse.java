@@ -5,16 +5,18 @@ public class ProfissionalResponse {
     private String nome;
     private String telefone;
     private String email;
+    private String fotoUrl;
     private String especialidade;
     private Integer qtdAgendamentos;
 
     public ProfissionalResponse() {}
 
-    public ProfissionalResponse(Long id, String nome, String telefone, String email, String especialidade, Integer qtdAgendamentos) {
+    public ProfissionalResponse(Long id, String nome, String telefone, String email, String fotoUrl, String especialidade, Integer qtdAgendamentos) {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
         this.email = email;
+        this.fotoUrl = fotoUrl;
         this.especialidade = especialidade;
         this.qtdAgendamentos = qtdAgendamentos;
     }
@@ -49,6 +51,14 @@ public class ProfissionalResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 
     public String getEspecialidade() {
