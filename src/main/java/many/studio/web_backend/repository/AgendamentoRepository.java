@@ -1,5 +1,6 @@
 package many.studio.web_backend.repository;
 
+import many.studio.web_backend.dto.agendamento.AgendamentoAnaliseResponse;
 import many.studio.web_backend.dto.agendamento.ResumoAgendamento;
 import many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto;
 import many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto;
@@ -9,6 +10,8 @@ import many.studio.web_backend.entity.AgendamentoItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
@@ -256,4 +259,43 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     WHERE sp.profissional.id = :profissionalId
 """)
     List<String> findCategoriasByProfissionalId(@Param("profissionalId") Long profissionalId);
+
+    @Query("""
+        SELECT new many.studio.web_backend.dto.agendamento.AgendamentoAnaliseResponse(
+            a.id,
+            c.id,
+            c.nome,
+            MIN(ai.inicioAtendimento),
+            COALESCE(c.totalNoShows, 0),
+
+            (
+                SELECT COUNT(DISTINCT a2.id)
+                FROM Agendamento a2
+                JOIN a2.statusAgendamento s2
+                WHERE a2.cliente.id = c.id
+                  AND LOWER(TRIM(s2.estado))
+                      NOT IN ('concluido', 'concluído', 'faltou')
+            ),
+
+            (
+                SELECT COUNT(DISTINCT a3.id)
+                FROM Agendamento a3
+                JOIN a3.statusAgendamento s3
+                WHERE a3.cliente.id = c.id
+                  AND LOWER(TRIM(s3.estado))
+                      IN ('concluido', 'concluído')
+            )
+        )
+        FROM Agendamento a
+        JOIN a.cliente c
+        JOIN a.itens ai
+        WHERE ai.inicioAtendimento >= :inicio
+          AND ai.inicioAtendimento < :fim
+        GROUP BY a.id, c.id, c.nome, c.totalNoShows
+        ORDER BY MIN(ai.inicioAtendimento)
+        """)
+    List<AgendamentoAnaliseResponse> buscarDadosParaAnalise(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
 }
