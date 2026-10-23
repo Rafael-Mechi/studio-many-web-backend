@@ -1,14 +1,18 @@
 package many.studio.web_backend.service;
 
+import many.studio.web_backend.dto.ComprovanteResponse;
 import many.studio.web_backend.dto.pagamento.PagamentoRequest;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -142,12 +146,46 @@ public class PagamentoService {
         return keyName;
     }
 
-    public Comprovante buscarComprovantePorAgendamento(Long agendamentoId) {
+    public ComprovanteResponse buscarComprovantePorAgendamento(
+            Long agendamentoId) {
 
-        return comprovanteRepository
-                .findByPagamentoAgendamentoId(agendamentoId)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Comprovante não encontrado"));
+        Pagamento pagamento = pagamentoRepository
+                .findByAgendamentoId(agendamentoId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Comprovante não encontrado"
+                ));
+
+        String keyName = pagamento.getComprovanteUrl();
+
+        if (keyName == null || keyName.isBlank()) {
+            throw new EntityNotFoundException(
+                    "Comprovante não encontrado no pagamento"
+            );
+        }
+
+        try (S3Client s3Client = S3Client.builder()
+                .region(Region.US_EAST_1)
+                .build()) {
+
+            GetObjectRequest request = GetObjectRequest.builder()
+                    .bucket("studio-essencia-comprovantes2")
+                    .key(keyName)
+                    .build();
+
+            ResponseBytes<GetObjectResponse> arquivo =
+                    s3Client.getObjectAsBytes(request);
+
+            String arquivoBase64 = Base64.getEncoder()
+                    .encodeToString(arquivo.asByteArray());
+
+            String tipoArquivo = arquivo.response().contentType();
+
+            return new ComprovanteResponse(
+                    arquivoBase64,
+                    tipoArquivo
+            );
+
+        }
     }
 
     private String gerarNomeComprovante(
