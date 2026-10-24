@@ -1,6 +1,7 @@
 package many.studio.web_backend.dto.profissional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class ProfissionalDetalhesDto {
@@ -17,10 +18,10 @@ public class ProfissionalDetalhesDto {
     public ProfissionalDetalhesDto() {}
 
 
-    private static class DiasDeTrabalhoDto{
+    public static class DiasDeTrabalhoDto{
         private String diaSemana;
-        private LocalDate inicio;
-        private LocalDate fim;
+        private LocalTime inicio;
+        private LocalTime fim;
 
         public DiasDeTrabalhoDto() {}
 
@@ -32,19 +33,19 @@ public class ProfissionalDetalhesDto {
             this.diaSemana = diaSemana;
         }
 
-        public LocalDate getInicio() {
+        public LocalTime getInicio() {
             return inicio;
         }
 
-        public void setInicio(LocalDate inicio) {
+        public void setInicio(LocalTime inicio) {
             this.inicio = inicio;
         }
 
-        public LocalDate getFim() {
+        public LocalTime getFim() {
             return fim;
         }
 
-        public void setFim(LocalDate fim) {
+        public void setFim(LocalTime fim) {
             this.fim = fim;
         }
     }

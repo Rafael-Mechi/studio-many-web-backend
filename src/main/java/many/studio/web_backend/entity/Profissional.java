@@ -3,6 +3,7 @@ package many.studio.web_backend.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Table(name = "profissionais")
@@ -33,14 +34,18 @@ public class Profissional {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
+    @OneToMany(mappedBy = "profissional")
+    private List<DiasDeTrabalho> diasDeTrabalho;
+
     public Profissional() {}
 
-    public Profissional(Long id, String nome, String telefone, String documento, Usuario usuario) {
+    public Profissional(Long id, String nome, String telefone, String documento, Usuario usuario, List<DiasDeTrabalho> diasDeTrabalho) {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
         this.documento = documento;
         this.usuario = usuario;
+        this.diasDeTrabalho = diasDeTrabalho;
     }
 
     public Long getId() {
@@ -91,4 +96,6 @@ public class Profissional {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+    public List<DiasDeTrabalho> getDiasDeTrabalho() {return diasDeTrabalho;}
+    public void setDiasDeTrabalho(List<DiasDeTrabalho> diasDeTrabalho) {this.diasDeTrabalho = diasDeTrabalho;}
 }
