@@ -9,6 +9,7 @@ import many.studio.web_backend.entity.AgendamentoItem;
 import many.studio.web_backend.entity.DiasDeTrabalho;
 import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.exception.EntityNotFoundException;
+import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.repository.AgendamentoItemRepository;
 import many.studio.web_backend.repository.AgendamentoRepository;
 import many.studio.web_backend.repository.DiasDeTrabalhoRepository;
@@ -144,7 +145,16 @@ public class DiasDeTrabalhoService {
                 fimSlot.isAfter(agendamentoItem.getInicioAtendimento());
     }
 
+    public List<DiasDeTrabalho> findByProfissionalId(Long id, String role) {
+        if(!profissionalRepository.existsById(id)) {
+            throw new EntityNotFoundException("Profissional não encontrado");
+        }
 
+        if (!role.equals("ROLE_ADMIN")) {
+            throw new ForbiddenException("Você não tem permissão para acessar esse recurso");
+        }
 
+        return diasDeTrabalhoRepository.findByProfissionalId(id);
+    }
 
 }
