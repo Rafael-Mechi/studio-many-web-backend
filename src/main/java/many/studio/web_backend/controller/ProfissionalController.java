@@ -4,17 +4,15 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import many.studio.web_backend.dto.calendario.DiasDeTrabalhoCriacaoResponse;
 import many.studio.web_backend.dto.calendario.DiasDeTrabalhoRequest;
-import many.studio.web_backend.dto.calendario.DiasDeTrabalhoResponse;
 import many.studio.web_backend.dto.calendario.SlotsResponse;
-import many.studio.web_backend.dto.profissional.ClienteDetalheDto;
-import many.studio.web_backend.dto.profissional.ClientePorProfissionalDto;
-import many.studio.web_backend.dto.profissional.ProfissionalResponseDto;
-import many.studio.web_backend.dto.profissional.ProfissionalUpdateDto;
+import many.studio.web_backend.dto.profissional.*;
+import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.mapper.calendario.DiasDeTrabalhoMapper;
 import many.studio.web_backend.service.DiasDeTrabalhoService;
 import many.studio.web_backend.service.ProfissionalService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
@@ -63,6 +61,19 @@ public class ProfissionalController {
                                                                                    @RequestParam String mes) {
         return ResponseEntity.ok()
                 .body(diasDeTrabalhoService.gerarDiasDisponiveisPorProfissional(profissionalId, YearMonth.parse(mes)));
+    }
+
+    @GetMapping("/{profissionalId}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<ProfissionalDetalhesDto> getDetalhesProfissional(@PathVariable Long profissionalId, Authentication authentication) {
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        String role = usuario.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        return ResponseEntity.ok().body(profissionalService.getDetalhesProfissionais(profissionalId, role));
     }
 
     @PutMapping("/{profissionalId}")

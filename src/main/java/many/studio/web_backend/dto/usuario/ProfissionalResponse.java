@@ -9,16 +9,7 @@ public class ProfissionalResponse {
     private String especialidade;
     private Integer qtdAgendamentos;
 
-    public ProfissionalResponse() {}
-
-    public ProfissionalResponse(Long id, String nome, String telefone, String email, String fotoUrl, String especialidade, Integer qtdAgendamentos) {
-        this.id = id;
-        this.nome = nome;
-        this.telefone = telefone;
-        this.email = email;
-        this.fotoUrl = fotoUrl;
-        this.especialidade = especialidade;
-        this.qtdAgendamentos = qtdAgendamentos;
+    public ProfissionalResponse() {
     }
 
     public Long getId() {
