@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import many.studio.web_backend.dto.ComprovanteResponse;
 import many.studio.web_backend.dto.pagamento.PagamentoRequest;
 import many.studio.web_backend.entity.*;
+import many.studio.web_backend.exception.BadRequestException;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.repository.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -262,7 +263,7 @@ public class PagamentoService {
             return "pdf";
         }
 
-        throw new IllegalArgumentException(
+        throw new BadRequestException(
                 "Formato inválido. Envie PNG, JPEG ou PDF."
         );
     }

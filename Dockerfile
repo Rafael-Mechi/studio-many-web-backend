@@ -21,7 +21,8 @@ RUN JAR=$(ls target/web-backend-*.jar | head -n 1 || ls target/*.jar | head -n 1
     && (rm -f /jre/lib/libawt*.so /jre/lib/libfontmanager.so /jre/lib/libjavajpeg.so /jre/lib/libsplashscreen.so /jre/lib/libawt_xawt.so /jre/lib/libawt_lwawt.so 2>/dev/null || true)
 
 FROM alpine:3.20
-RUN addgroup -S app && adduser -S app -G app \
+RUN apk add --no-cache wget \
+    && addgroup -S app && adduser -S app -G app \
     && mkdir -p /app/uploads && chown -R app:app /app
 WORKDIR /app
 COPY --chown=app:app --from=build /jre /opt/jre
