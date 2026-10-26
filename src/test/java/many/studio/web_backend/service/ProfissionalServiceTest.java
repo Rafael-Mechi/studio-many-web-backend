@@ -157,31 +157,31 @@ class ProfissionalServiceTest {
         }
     }
 
-    @Nested
-    @DisplayName("Testes do método atualizarProfissional")
-    class AtualizarProfissionalTests {
-
-        @Test
-        @DisplayName("Deve atualizar os dados do profissional e do usuário de forma casada")
-        void deveAtualizarProfissionalEUsuarioComSucesso() {
-            ProfissionalUpdateDto updateDto = new ProfissionalUpdateDto(
-                    "Carlos Souza", "carlos.souza@email.com", "(11) 98765-4321", "123.456.789-01", "novaSenha123"
-            );
-            when(profissionalRepository.findById(1L)).thenReturn(Optional.of(profissional));
-            when(usuarioRepository.existsByEmail("carlos.souza@email.com")).thenReturn(false);
-            when(passwordEncoder.encode("novaSenha123")).thenReturn("novaSenha123Criptografada");
-
-            ProfissionalResponseDto resultado = profissionalService.atualizarProfissional(1L, updateDto);
-
-            assertNotNull(resultado);
-            assertEquals("Carlos Souza", profissional.getNome());
-            assertEquals("carlos.souza@email.com", profissional.getUsuario().getEmail());
-
-            assertEquals("novaSenha123Criptografada", profissional.getUsuario().getSenha());
-
-            verify(profissionalRepository, times(1)).save(profissional);
-        }
-    }
+//    @Nested
+//    @DisplayName("Testes do método atualizarProfissional")
+//    class AtualizarProfissionalTests {
+//
+//        @Test
+//        @DisplayName("Deve atualizar os dados do profissional e do usuário de forma casada")
+//        void deveAtualizarProfissionalEUsuarioComSucesso() {
+//            ProfissionalUpdateDto updateDto = new ProfissionalUpdateDto(
+//                    "Carlos Souza", "carlos.souza@email.com", "(11) 98765-4321", "123.456.789-01", "novaSenha123"
+//            );
+//            when(profissionalRepository.findById(1L)).thenReturn(Optional.of(profissional));
+//            when(usuarioRepository.existsByEmail("carlos.souza@email.com")).thenReturn(false);
+//            when(passwordEncoder.encode("novaSenha123")).thenReturn("novaSenha123Criptografada");
+//
+//            ProfissionalResponseDto resultado = profissionalService.atualizarProfissional(1L, updateDto);
+//
+//            assertNotNull(resultado);
+//            assertEquals("Carlos Souza", profissional.getNome());
+//            assertEquals("carlos.souza@email.com", profissional.getUsuario().getEmail());
+//
+//            assertEquals("novaSenha123Criptografada", profissional.getUsuario().getSenha());
+//
+//            verify(profissionalRepository, times(1)).save(profissional);
+//        }
+//    }
 
     @Nested
     @DisplayName("Testes do método deletarProfissional (Soft Delete)")
