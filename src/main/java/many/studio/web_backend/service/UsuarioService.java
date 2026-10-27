@@ -86,21 +86,25 @@ public class UsuarioService {
     }
 
     public UsuarioTokenDto autenticar(Usuario usuario) {
+        try {
+            final UsernamePasswordAuthenticationToken credentials =
+                    new UsernamePasswordAuthenticationToken(usuario.getEmail(), usuario.getSenha());
 
-        final UsernamePasswordAuthenticationToken credentials =
-                new UsernamePasswordAuthenticationToken(usuario.getEmail(), usuario.getSenha());
+            final Authentication authentication = this.authenticationManager.authenticate(credentials);
 
-        final Authentication authentication = this.authenticationManager.authenticate(credentials);
+            Usuario usuarioAutenticado = usuarioRepository.findByEmail(usuario.getEmail())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou senha inválidos"));
 
-        Usuario usuarioAutenticado = usuarioRepository.findByEmail(usuario.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou senha inválidos"));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            final String token = gerenciadorTokenJwt.generateToken(authentication);
 
-        final String token = gerenciadorTokenJwt.generateToken(authentication);
-
-        // Retorna id + email + token — sem nome, pois não existe em 'usuarios'
-        return UsuarioMapper.of(usuarioAutenticado, token);
+            // Retorna id + email + token — sem nome, pois não existe em 'usuarios'
+            return UsuarioMapper.of(usuarioAutenticado, token);
+        } catch (Exception ex) {
+            System.err.println("[AUTENTICAR] Falha para " + usuario.getEmail() + ": " + ex);
+            throw ex;
+        }
     }
 
     public List<UsuarioListarDto> listarTodos() {

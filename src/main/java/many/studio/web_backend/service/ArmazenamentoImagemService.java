@@ -4,13 +4,11 @@ import many.studio.web_backend.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
@@ -18,36 +16,34 @@ public class ArmazenamentoImagemService {
 
     private static final long TAMANHO_MAXIMO_BYTES = 2L * 1024 * 1024;
 
-    private final Path raiz;
-    private final Path pastaServicos;
-    private final Path pastaUsuarios;
+    private final S3Client s3Client;
 
-    public ArmazenamentoImagemService(@Value("${app.upload-dir:uploads}") String diretorio) {
-        this.raiz = Paths.get(diretorio).toAbsolutePath().normalize();
-        this.pastaServicos = raiz.resolve("servicos");
-        this.pastaUsuarios = raiz.resolve("usuarios");
 
-        try {
-            Files.createDirectories(pastaServicos);
-            Files.createDirectories(pastaUsuarios);
-        } catch (IOException e) {
-            throw new IllegalStateException("Não foi possível criar a pasta de uploads: " + raiz, e);
-        }
-    }
+    @Value("${aws.s3.bucket.imagens:${aws.s3.bucket.comprovantes}}")
+    private String bucketImagens;
 
-    public Path getRaiz() {
-        return raiz;
+    @Value("${aws.s3.region}")
+    private String region;
+
+    @Value("${aws.s3.prefix.servicos:servicos/}")
+    private String prefixServicos;
+
+    @Value("${aws.s3.prefix.usuarios:usuarios/}")
+    private String prefixUsuarios;
+
+    public ArmazenamentoImagemService(S3Client s3Client) {
+        this.s3Client = s3Client;
     }
 
     public String salvarImagemServico(MultipartFile arquivo) {
-        return salvarImagem(pastaServicos, arquivo);
+        return salvarImagem(prefixServicos, arquivo);
     }
 
     public String salvarImagemUsuario(MultipartFile arquivo) {
-        return salvarImagem(pastaUsuarios, arquivo);
+        return salvarImagem(prefixUsuarios, arquivo);
     }
 
-    private String salvarImagem(Path pasta, MultipartFile arquivo) {
+    private String salvarImagem(String prefix, MultipartFile arquivo) {
         if (arquivo == null || arquivo.isEmpty()) {
             throw new BadRequestException("Selecione uma imagem");
         }
@@ -56,21 +52,39 @@ public class ArmazenamentoImagemService {
             throw new BadRequestException("A imagem deve ter no máximo 2 MB");
         }
 
-        try (InputStream entrada = arquivo.getInputStream()) {
-            byte[] inicio = entrada.readNBytes(8);
-            String extensao = detectarExtensao(inicio);
+        try {
+            byte[] conteudo = arquivo.getBytes();
+            String extensao = detectarExtensao(conteudo);
 
-            String nomeArquivo = UUID.randomUUID() + "." + extensao;
-            Path destino = pasta.resolve(nomeArquivo).normalize();
+            String keyName = normalizarPrefixo(prefix) + UUID.randomUUID() + "." + extensao;
 
-            try (InputStream completa = arquivo.getInputStream()) {
-                Files.copy(completa, destino, StandardCopyOption.REPLACE_EXISTING);
-            }
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(bucketImagens)
+                    .key(keyName)
+                    .contentType(contentTypePorExtensao(extensao))
+                    .build();
 
-            return nomeArquivo;
+            s3Client.putObject(request, RequestBody.fromBytes(conteudo));
+
+            return montarUrl(keyName);
         } catch (IOException e) {
-            throw new IllegalStateException("Falha ao salvar a imagem", e);
+            throw new IllegalStateException("Falha ao ler a imagem", e);
         }
+    }
+
+    private String montarUrl(String keyName) {
+        return "https://" + bucketImagens + ".s3." + region + ".amazonaws.com/" + keyName;
+    }
+
+    private String normalizarPrefixo(String prefix) {
+        if (prefix == null || prefix.isBlank()) {
+            return "";
+        }
+        return prefix.endsWith("/") ? prefix : prefix + "/";
+    }
+
+    private String contentTypePorExtensao(String extensao) {
+        return "png".equals(extensao) ? "image/png" : "image/jpeg";
     }
 
     private String detectarExtensao(byte[] b) {

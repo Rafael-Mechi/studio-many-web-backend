@@ -122,13 +122,8 @@ public class AgendamentoController {
     public ResponseEntity<ComprovanteResponse> buscarComprovante(
             @PathVariable Long id) {
 
-        Comprovante comprovante =
+        ComprovanteResponse response =
                 pagamentoService.buscarComprovantePorAgendamento(id);
-
-        ComprovanteResponse response = new ComprovanteResponse(
-                comprovante.getArquivo(),
-                comprovante.getTipoArquivo()
-        );
 
         return ResponseEntity.ok(response);
     }

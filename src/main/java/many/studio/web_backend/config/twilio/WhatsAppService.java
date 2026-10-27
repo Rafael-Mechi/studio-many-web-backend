@@ -21,10 +21,20 @@ public class WhatsAppService {
 
     @PostConstruct
     public void init() {
+        if (accountSid == null || accountSid.isBlank()
+                || authToken == null || authToken.isBlank()) {
+            // Credenciais Twilio nao configuradas: servico fica inativo.
+            return;
+        }
         Twilio.init(accountSid, authToken);
     }
 
     public void enviarMensagem(String telefoneDestino, String mensagem) {
+        if (accountSid == null || accountSid.isBlank()
+                || authToken == null || authToken.isBlank()
+                || fromNumber == null || fromNumber.isBlank()) {
+            return;
+        }
 
         Message.creator(
                 new PhoneNumber("whatsapp:" + telefoneDestino),

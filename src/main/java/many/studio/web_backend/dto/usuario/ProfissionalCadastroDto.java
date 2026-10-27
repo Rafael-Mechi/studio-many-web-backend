@@ -32,7 +32,7 @@ public class ProfissionalCadastroDto {
     private String documento;
 
     @Size(max = 255)
-    @Schema(description = "URL da foto do profissional (POST /usuarios/imagem antes)", example = "http://localhost:8080/uploads/usuarios/uuid.jpg")
+    @Schema(description = "URL da foto do profissional (POST /usuarios/imagem antes)", example = "https://[NOME_DO_BUCKET].s3.[REGIAO].amazonaws.com/usuarios/uuid.jpg")
     private String fotoUrl;
 
     @Valid

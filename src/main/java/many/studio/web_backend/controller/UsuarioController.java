@@ -42,7 +42,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.Duration;
 import java.util.List;
@@ -111,12 +110,7 @@ public class UsuarioController {
     public ResponseEntity<Map<String, String>> enviarImagemUsuario(
             @RequestParam("arquivo") MultipartFile arquivo) {
 
-        String nomeArquivo = armazenamentoImagemService.salvarImagemUsuario(arquivo);
-
-        String url = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/uploads/usuarios/")
-                .path(nomeArquivo)
-                .toUriString();
+        String url = armazenamentoImagemService.salvarImagemUsuario(arquivo);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("url", url));
     }
