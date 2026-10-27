@@ -119,7 +119,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 502,
                 "Bad Gateway",
-                "Falha no armazenamento do comprovante (S3): " + detalheAws,
+                "Falha no armazenamento do arquivo (S3): " + detalheAws,
                 request.getRequestURI()
         );
 
