@@ -1,50 +1,50 @@
 SET NAMES utf8mb4;
 
 CREATE TABLE IF NOT EXISTS perfis (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    perfil VARCHAR(45) NOT NULL,
+                                      id BIGINT NOT NULL AUTO_INCREMENT,
+                                      perfil VARCHAR(45) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_perfis_perfil (perfil)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS status_agendamentos (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    estado VARCHAR(60) NOT NULL,
+                                                   id BIGINT NOT NULL AUTO_INCREMENT,
+                                                   estado VARCHAR(60) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_status_agendamentos_estado (estado)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS status_pagamentos (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    estado VARCHAR(45) NOT NULL,
+                                                 id BIGINT NOT NULL AUTO_INCREMENT,
+                                                 estado VARCHAR(45) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_status_pagamentos_estado (estado)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS tipo_pagamentos (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    tipo VARCHAR(45) NOT NULL,
+                                               id BIGINT NOT NULL AUTO_INCREMENT,
+                                               tipo VARCHAR(45) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_tipo_pagamentos_tipo (tipo)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS status_clientes_pacotes (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    estado VARCHAR(45) NOT NULL,
+                                                       id BIGINT NOT NULL AUTO_INCREMENT,
+                                                       estado VARCHAR(45) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_status_clientes_pacotes_estado (estado)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS categoria_servicos (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    categoria VARCHAR(45) NOT NULL,
+                                                  id BIGINT NOT NULL AUTO_INCREMENT,
+                                                  categoria VARCHAR(45) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_categoria_servicos_categoria (categoria)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS usuarios (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    email VARCHAR(255) NOT NULL,
+                                        id BIGINT NOT NULL AUTO_INCREMENT,
+                                        email VARCHAR(255) NOT NULL,
     senha VARCHAR(255) NOT NULL,
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -53,11 +53,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
     UNIQUE KEY uk_usuarios_email (email),
     KEY idx_usuarios_perfil (perfil_id),
     CONSTRAINT fk_usuarios_perfil FOREIGN KEY (perfil_id) REFERENCES perfis (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS profissionais (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    nome VARCHAR(75) NOT NULL,
+                                             id BIGINT NOT NULL AUTO_INCREMENT,
+                                             nome VARCHAR(75) NOT NULL,
     telefone VARCHAR(30),
     documento VARCHAR(75),
     foto_url VARCHAR(255),
@@ -67,11 +67,11 @@ CREATE TABLE IF NOT EXISTS profissionais (
     PRIMARY KEY (id),
     UNIQUE KEY uk_profissionais_usuario (usuario_id),
     CONSTRAINT fk_profissionais_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS clientes (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    nome VARCHAR(75) NOT NULL,
+                                        id BIGINT NOT NULL AUTO_INCREMENT,
+                                        nome VARCHAR(75) NOT NULL,
     telefone VARCHAR(30) NOT NULL,
     documento VARCHAR(75),
     foto_url VARCHAR(255),
@@ -81,11 +81,11 @@ CREATE TABLE IF NOT EXISTS clientes (
     PRIMARY KEY (id),
     UNIQUE KEY uk_clientes_usuario (usuario_id),
     CONSTRAINT fk_clientes_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS servicos (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
+                                        id BIGINT NOT NULL AUTO_INCREMENT,
+                                        nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(255),
     foto_url VARCHAR(255),
     duracao_minutos INT NOT NULL DEFAULT 60,
@@ -97,11 +97,11 @@ CREATE TABLE IF NOT EXISTS servicos (
     PRIMARY KEY (id),
     KEY idx_servicos_categoria (fk_categoria_servico),
     CONSTRAINT fk_servicos_categoria FOREIGN KEY (fk_categoria_servico) REFERENCES categoria_servicos (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS pacotes (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
+                                       id BIGINT NOT NULL AUTO_INCREMENT,
+                                       nome VARCHAR(100) NOT NULL,
     total_sessoes INT NOT NULL DEFAULT 1,
     preco_total DOUBLE NOT NULL DEFAULT 0.00,
     validade_dias INT NOT NULL DEFAULT 30,
@@ -111,21 +111,21 @@ CREATE TABLE IF NOT EXISTS pacotes (
     PRIMARY KEY (id),
     KEY idx_pacotes_servico (servicos_id),
     CONSTRAINT fk_pacotes_servico FOREIGN KEY (servicos_id) REFERENCES servicos (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS servicos_profissionais (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    servicos_id BIGINT NOT NULL,
-    profissionais_id BIGINT NOT NULL,
-    PRIMARY KEY (id),
+                                                      id BIGINT NOT NULL AUTO_INCREMENT,
+                                                      servicos_id BIGINT NOT NULL,
+                                                      profissionais_id BIGINT NOT NULL,
+                                                      PRIMARY KEY (id),
     UNIQUE KEY uk_servico_profissional (servicos_id, profissionais_id),
     CONSTRAINT fk_servicos_profissionais_servico FOREIGN KEY (servicos_id) REFERENCES servicos (id),
     CONSTRAINT fk_servicos_profissionais_profissional FOREIGN KEY (profissionais_id) REFERENCES profissionais (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS dias_de_trabalho (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    dia_da_semana VARCHAR(20) NOT NULL,
+                                                id BIGINT NOT NULL AUTO_INCREMENT,
+                                                dia_da_semana VARCHAR(20) NOT NULL,
     hora_inicio TIME NOT NULL,
     hora_fim TIME NOT NULL,
     profissional_id BIGINT NOT NULL,
@@ -134,43 +134,43 @@ CREATE TABLE IF NOT EXISTS dias_de_trabalho (
     UNIQUE KEY uq_dia_servico (profissional_id, dia_da_semana, servico_id),
     CONSTRAINT fk_dias_trabalho_profissional FOREIGN KEY (profissional_id) REFERENCES profissionais (id),
     CONSTRAINT fk_dias_trabalho_servico FOREIGN KEY (servico_id) REFERENCES servicos (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS bloqueios (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    inicio TIMESTAMP NOT NULL,
-    fim TIMESTAMP NOT NULL,
-    motivo VARCHAR(255),
+                                         id BIGINT NOT NULL AUTO_INCREMENT,
+                                         inicio TIMESTAMP NOT NULL,
+                                         fim TIMESTAMP NOT NULL,
+                                         motivo VARCHAR(255),
     profissional_id BIGINT NOT NULL,
     PRIMARY KEY (id),
     KEY idx_bloqueios_periodo (profissional_id, inicio, fim),
     CONSTRAINT fk_bloqueios_profissional FOREIGN KEY (profissional_id) REFERENCES profissionais (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS anamneses (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    cliente_id BIGINT NOT NULL,
-    profissional_id BIGINT NOT NULL,
-    informacao TEXT NOT NULL,
-    PRIMARY KEY (id),
+                                         id BIGINT NOT NULL AUTO_INCREMENT,
+                                         cliente_id BIGINT NOT NULL,
+                                         profissional_id BIGINT NOT NULL,
+                                         informacao TEXT NOT NULL,
+                                         PRIMARY KEY (id),
     KEY idx_anamneses_cliente (cliente_id),
     CONSTRAINT fk_anamneses_cliente FOREIGN KEY (cliente_id) REFERENCES clientes (id),
     CONSTRAINT fk_anamneses_profissional FOREIGN KEY (profissional_id) REFERENCES profissionais (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS anamnese_clientes (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    anamneses_id BIGINT NOT NULL,
-    clientes_id BIGINT NOT NULL,
-    PRIMARY KEY (id),
+                                                 id BIGINT NOT NULL AUTO_INCREMENT,
+                                                 anamneses_id BIGINT NOT NULL,
+                                                 clientes_id BIGINT NOT NULL,
+                                                 PRIMARY KEY (id),
     KEY idx_anamnese_clientes_cliente (clientes_id),
     CONSTRAINT fk_anamnese_clientes_anamnese FOREIGN KEY (anamneses_id) REFERENCES anamneses (id),
     CONSTRAINT fk_anamnese_clientes_cliente FOREIGN KEY (clientes_id) REFERENCES clientes (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS agendamentos (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    cancelamento_motivo VARCHAR(255),
+                                            id BIGINT NOT NULL AUTO_INCREMENT,
+                                            cancelamento_motivo VARCHAR(255),
     cancelado_em TIMESTAMP NULL,
     qtd_remarcacoes INT DEFAULT 0,
     criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -191,29 +191,29 @@ CREATE TABLE IF NOT EXISTS agendamentos (
     CONSTRAINT fk_agendamentos_profissional FOREIGN KEY (profissional_id) REFERENCES profissionais (id),
     CONSTRAINT fk_agendamentos_status FOREIGN KEY (status_agendamento_id) REFERENCES status_agendamentos (id),
     CONSTRAINT fk_agendamentos_criado_por FOREIGN KEY (criado_por_usuario_id) REFERENCES usuarios (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS agendamento_itens (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    inicio_atendimento TIMESTAMP NOT NULL,
-    fim_atendimento TIMESTAMP NOT NULL,
-    checkin_em TIMESTAMP NULL,
-    agendamento_id BIGINT NOT NULL,
-    servico_id BIGINT NOT NULL,
-    profissional_id BIGINT NOT NULL,
-    PRIMARY KEY (id),
+                                                 id BIGINT NOT NULL AUTO_INCREMENT,
+                                                 inicio_atendimento TIMESTAMP NOT NULL,
+                                                 fim_atendimento TIMESTAMP NOT NULL,
+                                                 checkin_em TIMESTAMP NULL,
+                                                 agendamento_id BIGINT NOT NULL,
+                                                 servico_id BIGINT NOT NULL,
+                                                 profissional_id BIGINT NOT NULL,
+                                                 PRIMARY KEY (id),
     KEY idx_itens_agendamento (agendamento_id),
     KEY idx_itens_profissional_inicio (profissional_id, inicio_atendimento),
     CONSTRAINT fk_itens_agendamento FOREIGN KEY (agendamento_id) REFERENCES agendamentos (id),
     CONSTRAINT fk_itens_servico FOREIGN KEY (servico_id) REFERENCES servicos (id),
     CONSTRAINT fk_itens_profissional FOREIGN KEY (profissional_id) REFERENCES profissionais (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS pagamentos (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    valor DOUBLE NOT NULL DEFAULT 0.00,
-    pago_em TIMESTAMP NULL,
-    comprovante_url VARCHAR(255),
+                                          id BIGINT NOT NULL AUTO_INCREMENT,
+                                          valor DOUBLE NOT NULL DEFAULT 0.00,
+                                          pago_em TIMESTAMP NULL,
+                                          comprovante_url VARCHAR(255),
     agendamento_id BIGINT NOT NULL,
     status_pagamento_id BIGINT NOT NULL,
     tipo_pagamentos_id BIGINT NOT NULL,
@@ -222,38 +222,38 @@ CREATE TABLE IF NOT EXISTS pagamentos (
     CONSTRAINT fk_pagamentos_agendamento FOREIGN KEY (agendamento_id) REFERENCES agendamentos (id),
     CONSTRAINT fk_pagamentos_status FOREIGN KEY (status_pagamento_id) REFERENCES status_pagamentos (id),
     CONSTRAINT fk_pagamentos_tipo FOREIGN KEY (tipo_pagamentos_id) REFERENCES tipo_pagamentos (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS comprovantes (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    arquivo LONGTEXT NOT NULL,
-    tipo_arquivo VARCHAR(100) NOT NULL,
+                                            id BIGINT NOT NULL AUTO_INCREMENT,
+                                            arquivo LONGTEXT NOT NULL,
+                                            tipo_arquivo VARCHAR(100) NOT NULL,
     pagamento_id BIGINT NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_comprovantes_pagamento (pagamento_id),
     CONSTRAINT fk_comprovantes_pagamento FOREIGN KEY (pagamento_id) REFERENCES pagamentos (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS cliente_pacotes (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    sessoes_restantes INT NOT NULL DEFAULT 0,
-    valido_ate TIMESTAMP NULL,
-    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    cliente_id BIGINT NOT NULL,
-    pacote_id BIGINT NOT NULL,
-    pagamento_id BIGINT,
-    status_cliente_pacote_id BIGINT,
-    PRIMARY KEY (id),
+                                               id BIGINT NOT NULL AUTO_INCREMENT,
+                                               sessoes_restantes INT NOT NULL DEFAULT 0,
+                                               valido_ate TIMESTAMP NULL,
+                                               criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                               cliente_id BIGINT NOT NULL,
+                                               pacote_id BIGINT NOT NULL,
+                                               pagamento_id BIGINT,
+                                               status_cliente_pacote_id BIGINT,
+                                               PRIMARY KEY (id),
     KEY idx_cliente_pacotes_cliente (cliente_id),
     CONSTRAINT fk_cliente_pacotes_cliente FOREIGN KEY (cliente_id) REFERENCES clientes (id),
     CONSTRAINT fk_cliente_pacotes_pacote FOREIGN KEY (pacote_id) REFERENCES pacotes (id),
     CONSTRAINT fk_cliente_pacotes_pagamento FOREIGN KEY (pagamento_id) REFERENCES pagamentos (id),
     CONSTRAINT fk_cliente_pacotes_status FOREIGN KEY (status_cliente_pacote_id) REFERENCES status_clientes_pacotes (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS otp_codigos (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    destino VARCHAR(255) NOT NULL,
+                                           id BIGINT NOT NULL AUTO_INCREMENT,
+                                           destino VARCHAR(255) NOT NULL,
     codigo_hash VARCHAR(255) NOT NULL,
     expira_em TIMESTAMP NOT NULL,
     tentativas INT NOT NULL DEFAULT 0,
@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS otp_codigos (
     PRIMARY KEY (id),
     KEY idx_otp_destino (destino),
     KEY idx_otp_reset_token (reset_token)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
 -- Dados de referencia
@@ -294,9 +294,9 @@ INSERT IGNORE INTO status_agendamentos (id, estado) VALUES
 INSERT IGNORE INTO status_agendamentos (estado) VALUES ('no-show');
 
 UPDATE agendamentos a
-JOIN status_agendamentos antigo ON antigo.estado = 'faltou'
-JOIN status_agendamentos novo ON novo.estado = 'no-show'
-SET a.status_agendamento_id = novo.id;
+    JOIN status_agendamentos antigo ON antigo.estado = 'faltou'
+    JOIN status_agendamentos novo ON novo.estado = 'no-show'
+    SET a.status_agendamento_id = novo.id;
 
 DELETE FROM status_agendamentos
 WHERE estado = 'faltou';
@@ -362,10 +362,11 @@ INSERT IGNORE INTO usuarios (id, email, senha, perfil_id, criado_em, ativo) VALU
     (4, 'maria@studioessencia.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 3, CURRENT_TIMESTAMP, TRUE);
 
 INSERT IGNORE INTO profissionais (
-    id, nome, telefone, documento, almoco_inicio, almoco_fim, usuario_id
+    id, nome, telefone, documento, foto_url ,almoco_inicio, almoco_fim, usuario_id
 ) VALUES
-    (1, 'Beatriz Administradora', '11988887777', '11111111111', '12:00:00', '13:00:00', 1),
-    (2, 'Isabelly Profissional', '11977776666', NULL, NULL, NULL, 2);
+    (1, 'Beatriz Administradora', '11988887777', '11111111111','https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/usuarios/pngtree-avatar-icon-of-a-female-employee-wearing-suit-going-to-work-png-image_6133929.png',
+       '12:00:00', '13:00:00', 1),
+    (2, 'Isabelly Profissional', '11977776666', 'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/usuarios/pngtree-avatar-the-icon-of-a-female-employee-wearing-suit-png-image_6133908.png', NULL, NULL, NULL, 2);
 
 INSERT IGNORE INTO clientes (
     id, nome, telefone, documento, bloqueado_motivo, lgpd_consentimento, usuario_id
