@@ -252,7 +252,9 @@ public class ServicoService {
         List<ProfissionaisPorServicoDto> profissionais = new ArrayList<>();
         for (ServicoProfissional sp : servicoProfissionalRepository.findByServicoId(s.getId())) {
             profissionais.add(new ProfissionaisPorServicoDto(
-                    sp.getProfissional().getId(), sp.getProfissional().getNome()));
+                    sp.getProfissional().getId(),
+                    sp.getProfissional().getNome(),
+                    sp.getProfissional().getFotoUrl()));
         }
         dto.setProfissionais(profissionais);
 

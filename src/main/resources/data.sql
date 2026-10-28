@@ -1,27 +1,27 @@
 INSERT INTO perfis (perfil) VALUES
-    ('ROLE_ADMIN'),
-    ('ROLE_PROFISSIONAL'),
-    ('ROLE_CLIENTE');
+                                ('ROLE_ADMIN'),
+                                ('ROLE_PROFISSIONAL'),
+                                ('ROLE_CLIENTE');
 
 INSERT INTO status_agendamentos (estado) VALUES
-    ('solicitar confirmacao agendamento'),
-    ('agendado'),
-    ('confirmado'),
-    ('solicitar cancelamento'),
-    ('cancelado'),
-    ('solicitar reagendamento'),
-    ('reagendado'),
-    ('recusado'),
-    ('concluido'),
-    ('faltou'),
-    ('aguardando sinal'),
-    ('check-in'),
-    ('em atendimento');
+                                             ('solicitar confirmacao agendamento'),
+                                             ('agendado'),
+                                             ('confirmado'),
+                                             ('solicitar cancelamento'),
+                                             ('cancelado'),
+                                             ('solicitar reagendamento'),
+                                             ('reagendado'),
+                                             ('recusado'),
+                                             ('concluido'),
+                                             ('faltou'),
+                                             ('aguardando sinal'),
+                                             ('check-in'),
+                                             ('em atendimento');
 
 INSERT INTO status_pagamentos (estado) VALUES
-    ('cancelado'),
-    ('pendente'),
-    ('pago');
+                                           ('cancelado'),
+                                           ('pendente'),
+                                           ('pago');
 
 INSERT INTO tipo_pagamentos (tipo) VALUES ('sinal');
 
@@ -48,16 +48,16 @@ INSERT INTO servicos (
     criado_em,
     fk_categoria_servico
 ) VALUES (
-    'Limpeza de pele',
-    'Procedimento para remover impurezas, células mortas, cravos e miliuns da superfície do rosto.',
-    'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/servicos/limpeza-de-pele.jpg',
-    60,
-    150.00,
-    50.00,
-    TRUE,
-    CURRENT_TIMESTAMP,
-    1
-);
+             'Limpeza de pele',
+             'Procedimento para remover impurezas, células mortas, cravos e miliuns da superfície do rosto.',
+             'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/servicos/limpeza-de-pele.jpg',
+             60,
+             150.00,
+             50.00,
+             TRUE,
+             CURRENT_TIMESTAMP,
+             1
+         );
 
 INSERT INTO servicos (
     nome,
@@ -70,29 +70,29 @@ INSERT INTO servicos (
     criado_em,
     fk_categoria_servico
 ) VALUES (
-    'Remoção de cravos',
-    'Procedimento para remoção de cravos.',
-    'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/servicos/remocao-de-cravos.jfif',
-    60,
-    150.00,
-    50.00,
-    TRUE,
-    CURRENT_TIMESTAMP,
-    2
-);
+             'Remoção de cravos',
+             'Procedimento para remoção de cravos.',
+             'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/servicos/remocao-de-cravos.jfif',
+             60,
+             150.00,
+             50.00,
+             TRUE,
+             CURRENT_TIMESTAMP,
+             2
+         );
 
 
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, 1);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Limpeza de Pele Avulsa', 1, 150.00, 30, TRUE, 1);
-INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Remoção de cravos avulsa', 1, 700.00, 30, TRUE, 2);
+INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Remoção de cravos avulsa', 1, 150.00, 30, TRUE, 2);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Kit remoção de cravos 5x', 5, 700.00, 30, TRUE, 2);
 INSERT INTO pacotes (nome, total_sessoes, preco_total, validade_dias, ativo, servicos_id) VALUES ('Kit remoção de cravos 10x', 10, 1500.00, 30, TRUE, 2);
 -- Usuarios e Profissionais
 INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('noa@gmail.com', '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS', 1, CURRENT_TIMESTAMP);
 INSERT INTO usuarios (email, senha, perfil_id, criado_em) VALUES ('noa2@gmail.com', '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS', 2, CURRENT_TIMESTAMP);
 
-INSERT INTO profissionais (nome, telefone, documento, almoco_inicio, almoco_fim, usuario_id) VALUES ('Beatriz Administradora', '11988887777', '11111111111', '12:00:00', '13:00:00', 1);
-INSERT INTO profissionais (nome, telefone, usuario_id) VALUES ('Isabelly Profissional', '11977776666', 2);
+INSERT INTO profissionais (nome, telefone, documento, foto_url, almoco_inicio, almoco_fim, usuario_id) VALUES ('Beatriz Administradora', '11988887777', '11111111111', 'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/usuarios/pngtree-avatar-icon-of-a-female-employee-wearing-suit-going-to-work-png-image_6133929.png', '12:00:00', '13:00:00', 1);
+INSERT INTO profissionais (nome, telefone, foto_url, usuario_id) VALUES ('Isabelly Profissional', '11977776666', 'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/usuarios/pngtree-avatar-the-icon-of-a-female-employee-wearing-suit-png-image_6133908.png', 2);
 
 -- Servicos dos Profissionais
 -- Ambos profissionais fazem Limpeza de pele (servico 1)
@@ -153,11 +153,11 @@ VALUES ('SATURDAY', '08:00:00', '14:00:00', 2, 2);
 -- INSERCOES PARA TESTAR A DISPONIBILIDADE DO AGENDAMENTO
 INSERT INTO usuarios (email, senha, perfil_id, criado_em)
 VALUES (
-    'noa3@gmail.com',
-    '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS',
-    3,
-    CURRENT_TIMESTAMP
-);
+           'noa3@gmail.com',
+           '$2b$10$6hiVYtvxrE2A4WEnY1aBkO3bdjA0vftjHYCEg8v93GbfVoNjiutjS',
+           3,
+           CURRENT_TIMESTAMP
+       );
 
 INSERT INTO clientes (
     nome,
@@ -165,11 +165,11 @@ INSERT INTO clientes (
     documento,
     usuario_id
 ) VALUES (
-    'Cliente Teste',
-    '11999999999',
-    '12345678900',
-    3
-);
+             'Cliente Teste',
+             '11999999999',
+             '12345678900',
+             3
+         );
 
 -- Datas relativas a hoje (H2): os seeds nunca ficam obsoletos.
 -- Agendamentos/itens usam dias relativos + horários fixos para continuar legíveis.
@@ -179,11 +179,11 @@ INSERT INTO bloqueios (
     motivo,
     profissional_id
 ) VALUES (
-    CAST(CONCAT(CAST(DATEADD('DAY', 2, CURRENT_DATE) AS VARCHAR), ' 12:00:00') AS TIMESTAMP),
-    CAST(CONCAT(CAST(DATEADD('DAY', 2, CURRENT_DATE) AS VARCHAR), ' 14:00:00') AS TIMESTAMP),
-    'Almoço/reunião',
-    1
-);
+             CAST(CONCAT(CAST(DATEADD('DAY', 2, CURRENT_DATE) AS VARCHAR), ' 12:00:00') AS TIMESTAMP),
+             CAST(CONCAT(CAST(DATEADD('DAY', 2, CURRENT_DATE) AS VARCHAR), ' 14:00:00') AS TIMESTAMP),
+             'Almoço/reunião',
+             1
+         );
 
 INSERT INTO bloqueios (
     inicio,
@@ -191,11 +191,11 @@ INSERT INTO bloqueios (
     motivo,
     profissional_id
 ) VALUES (
-    CAST(CONCAT(CAST(DATEADD('DAY', 3, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
-    CAST(CONCAT(CAST(DATEADD('DAY', 3, CURRENT_DATE) AS VARCHAR), ' 11:30:00') AS TIMESTAMP),
-    'Compromisso pessoal',
-    2
-);
+             CAST(CONCAT(CAST(DATEADD('DAY', 3, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
+             CAST(CONCAT(CAST(DATEADD('DAY', 3, CURRENT_DATE) AS VARCHAR), ' 11:30:00') AS TIMESTAMP),
+             'Compromisso pessoal',
+             2
+         );
 
 INSERT INTO agendamentos (
     criado_em,
@@ -208,16 +208,16 @@ INSERT INTO agendamentos (
     profissional_id,
     status_agendamento_id
 ) VALUES (
-    DATEADD('DAY', -8, CURRENT_TIMESTAMP),
-    150.00,
-    0.00,
-    150.00,
-    3,
-    1,
-    2,
-    1,
-    9
-);
+             DATEADD('DAY', -8, CURRENT_TIMESTAMP),
+             150.00,
+             0.00,
+             150.00,
+             3,
+             1,
+             2,
+             1,
+             9
+         );
 
 INSERT INTO agendamento_itens (
     inicio_atendimento,
@@ -226,12 +226,12 @@ INSERT INTO agendamento_itens (
     servico_id,
     profissional_id
 ) VALUES (
-    CAST(CONCAT(CAST(DATEADD('DAY', 1, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
-    CAST(CONCAT(CAST(DATEADD('DAY', 1, CURRENT_DATE) AS VARCHAR), ' 11:00:00') AS TIMESTAMP),
-    1,
-    1,
-    1
-);
+             CAST(CONCAT(CAST(DATEADD('DAY', 1, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
+             CAST(CONCAT(CAST(DATEADD('DAY', 1, CURRENT_DATE) AS VARCHAR), ' 11:00:00') AS TIMESTAMP),
+             1,
+             1,
+             1
+         );
 
 INSERT INTO agendamentos (
     criado_em,
@@ -244,16 +244,16 @@ INSERT INTO agendamentos (
     profissional_id,
     status_agendamento_id
 ) VALUES (
-    DATEADD('DAY', -8, CURRENT_TIMESTAMP),
-    150.00,
-    0.00,
-    150.00,
-    3,
-    1,
-    2,
-    2,
-    3
-);
+             DATEADD('DAY', -8, CURRENT_TIMESTAMP),
+             150.00,
+             0.00,
+             150.00,
+             3,
+             1,
+             2,
+             2,
+             3
+         );
 
 INSERT INTO agendamento_itens (
     inicio_atendimento,
@@ -262,12 +262,12 @@ INSERT INTO agendamento_itens (
     servico_id,
     profissional_id
 ) VALUES (
-    CAST(CONCAT(CAST(DATEADD('DAY', 2, CURRENT_DATE) AS VARCHAR), ' 14:00:00') AS TIMESTAMP),
-    CAST(CONCAT(CAST(DATEADD('DAY', 2, CURRENT_DATE) AS VARCHAR), ' 15:00:00') AS TIMESTAMP),
-    2,
-    1,
-    2
-);
+             CAST(CONCAT(CAST(DATEADD('DAY', 2, CURRENT_DATE) AS VARCHAR), ' 14:00:00') AS TIMESTAMP),
+             CAST(CONCAT(CAST(DATEADD('DAY', 2, CURRENT_DATE) AS VARCHAR), ' 15:00:00') AS TIMESTAMP),
+             2,
+             1,
+             2
+         );
 
 -- Segundo cliente, pra testar isolamento entre clientes também
 INSERT INTO usuarios (email, senha, perfil_id, criado_em)
@@ -282,9 +282,9 @@ VALUES (DATEADD('DAY', -18, CURRENT_TIMESTAMP), 150.00, 0.00, 150.00, 3, 1, 3, 2
 
 INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
 VALUES (
-    CAST(CONCAT(CAST(DATEADD('DAY', -13, CURRENT_DATE) AS VARCHAR), ' 09:00:00') AS TIMESTAMP),
-    CAST(CONCAT(CAST(DATEADD('DAY', -13, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
-    3, 2, 2);
+           CAST(CONCAT(CAST(DATEADD('DAY', -13, CURRENT_DATE) AS VARCHAR), ' 09:00:00') AS TIMESTAMP),
+           CAST(CONCAT(CAST(DATEADD('DAY', -13, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
+           3, 2, 2);
 
 -- Agendamento 4: Cliente Teste com Isabelly, CANCELADO, mais recente que o concluído
 INSERT INTO agendamentos (criado_em, preco, desconto_porcentagem, preco_final, criado_por_usuario_id, cliente_id, pacote_id, profissional_id, status_agendamento_id)
@@ -292,9 +292,9 @@ VALUES (DATEADD('DAY', -3, CURRENT_TIMESTAMP), 150.00, 0.00, 150.00, 3, 1, 2, 2,
 
 INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
 VALUES (
-    CAST(CONCAT(CAST(DATEADD('DAY', 1, CURRENT_DATE) AS VARCHAR), ' 09:00:00') AS TIMESTAMP),
-    CAST(CONCAT(CAST(DATEADD('DAY', 1, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
-    4, 1, 2);
+           CAST(CONCAT(CAST(DATEADD('DAY', 1, CURRENT_DATE) AS VARCHAR), ' 09:00:00') AS TIMESTAMP),
+           CAST(CONCAT(CAST(DATEADD('DAY', 1, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
+           4, 1, 2);
 
 -- Agendamento 5: Maria Cliente com Beatriz, AGENDADO (futuro, não deve contar como visita)
 INSERT INTO agendamentos (criado_em, preco, desconto_porcentagem, preco_final, criado_por_usuario_id, cliente_id, pacote_id, profissional_id, status_agendamento_id)
@@ -302,9 +302,9 @@ VALUES (DATEADD('DAY', -1, CURRENT_TIMESTAMP), 150.00, 0.00, 150.00, 3, 2, 2, 1,
 
 INSERT INTO agendamento_itens (inicio_atendimento, fim_atendimento, agendamento_id, servico_id, profissional_id)
 VALUES (
-    CAST(CONCAT(CAST(DATEADD('DAY', 3, CURRENT_DATE) AS VARCHAR), ' 09:00:00') AS TIMESTAMP),
-    CAST(CONCAT(CAST(DATEADD('DAY', 3, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
-    5, 1, 1);
+           CAST(CONCAT(CAST(DATEADD('DAY', 3, CURRENT_DATE) AS VARCHAR), ' 09:00:00') AS TIMESTAMP),
+           CAST(CONCAT(CAST(DATEADD('DAY', 3, CURRENT_DATE) AS VARCHAR), ' 10:00:00') AS TIMESTAMP),
+           5, 1, 1);
 
 -- Agendamento 6: Maria Cliente, cabeçalho diz Beatriz (profissional_id=1),
 -- mas quem realmente atendeu (no item) foi a Isabelly (profissional_id=2). CONCLUIDO.
