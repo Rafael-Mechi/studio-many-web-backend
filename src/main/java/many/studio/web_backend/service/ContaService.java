@@ -25,17 +25,20 @@ public class ContaService {
     private final ClienteRepository clienteRepository;
     private final AgendamentoRepository agendamentoRepository;
     private final StatusAgendamentoRepository statusAgendamentoRepository;
+    private final NotificacaoAgendamentoService notificacaoAgendamentoService;
 
     public ContaService(UsuarioRepository usuarioRepository,
                         ProfissionalRepository profissionalRepository,
                         ClienteRepository clienteRepository,
                         AgendamentoRepository agendamentoRepository,
-                        StatusAgendamentoRepository statusAgendamentoRepository) {
+                        StatusAgendamentoRepository statusAgendamentoRepository,
+                        NotificacaoAgendamentoService notificacaoAgendamentoService) {
         this.usuarioRepository = usuarioRepository;
         this.profissionalRepository = profissionalRepository;
         this.clienteRepository = clienteRepository;
         this.agendamentoRepository = agendamentoRepository;
         this.statusAgendamentoRepository = statusAgendamentoRepository;
+        this.notificacaoAgendamentoService = notificacaoAgendamentoService;
     }
 
     @Transactional
@@ -50,7 +53,7 @@ public class ContaService {
         usuarioRepository.save(usuario);
 
         StatusAgendamento cancelado = statusAgendamentoRepository
-                .findByEstado("cancelado")
+                .findByEstado(StatusAgendamento.CANCELADO)
                 .orElseThrow(() -> new EntityNotFoundException("Status cancelado não encontrado"));
 
         LocalDateTime agora = LocalDateTime.now();
@@ -77,11 +80,11 @@ public class ContaService {
                 || agendamento.getStatusAgendamento().getEstado() == null) {
             return false;
         }
-        String estado = agendamento.getStatusAgendamento().getEstado();
-        return estado.equalsIgnoreCase("cancelado")
-                || estado.equalsIgnoreCase("concluido")
-                || estado.equalsIgnoreCase("recusado")
-                || estado.equalsIgnoreCase("faltou");
+        String estado = agendamento.getStatusAgendamento().getEstado().trim().toLowerCase();
+        return estado.equals(StatusAgendamento.CANCELADO)
+                || estado.equals(StatusAgendamento.CONCLUIDO)
+                || estado.equals(StatusAgendamento.RECUSADO)
+                || estado.equals(StatusAgendamento.NO_SHOW);
     }
 
     private void cancelarFuturos(List<Agendamento> agendamentos, StatusAgendamento cancelado, LocalDateTime agora) {
@@ -91,5 +94,6 @@ public class ContaService {
             agendamento.setCancelamentoMotivo(MOTIVO_DESATIVACAO);
         }
         agendamentoRepository.saveAll(agendamentos);
+        agendamentos.forEach(notificacaoAgendamentoService::notificarStatus);
     }
 }

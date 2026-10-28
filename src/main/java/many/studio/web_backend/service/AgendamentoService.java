@@ -1,7 +1,5 @@
 package many.studio.web_backend.service;
 
-import jakarta.transaction.Transactional;
-import many.studio.web_backend.config.twilio.WhatsAppService;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
@@ -9,6 +7,7 @@ import many.studio.web_backend.dto.agendamento.ResumoAgendamento;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.dto.usuario.VisaoGeralClienteResponse;
 import many.studio.web_backend.entity.*;
+import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.exception.NonAuthorizedException;
@@ -16,13 +15,14 @@ import many.studio.web_backend.repository.*;
 import many.studio.web_backend.service.helper.AgendamentoHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
-import java.util.Optional;
 
 @Service
 public class AgendamentoService {
@@ -36,7 +36,7 @@ public class AgendamentoService {
     private final ProfissionalRepository profissionalRepository;
     private final UsuarioRepository usuarioRepository;
     private final PerfilRepository perfilRepository;
-    private final WhatsAppService whatsAppService;
+    private final NotificacaoAgendamentoService notificacaoAgendamentoService;
     private final PagamentoRepository pagamentoRepository;
 
     private final AgendamentoHelper agendamentoHelper;
@@ -48,7 +48,9 @@ public class AgendamentoService {
             StatusAgendamentoRepository statusAgendamentoRepository, PacoteRepository pacoteRepository,
             ServicoRepository servicoRepository,
             ProfissionalRepository profissionalRepository,
-            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, WhatsAppService whatsAppService, PagamentoRepository pagamentoRepository, AgendamentoHelper agendamentoHelper
+            UsuarioRepository usuarioRepository, PerfilRepository perfilRepository,
+            NotificacaoAgendamentoService notificacaoAgendamentoService,
+            PagamentoRepository pagamentoRepository, AgendamentoHelper agendamentoHelper
     ) {
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoItemRepository = agendamentoItemRepository;
@@ -59,7 +61,7 @@ public class AgendamentoService {
         this.profissionalRepository = profissionalRepository;
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
-        this.whatsAppService = whatsAppService;
+        this.notificacaoAgendamentoService = notificacaoAgendamentoService;
         this.pagamentoRepository = pagamentoRepository;
         this.agendamentoHelper = agendamentoHelper;
     }
@@ -79,14 +81,11 @@ public class AgendamentoService {
     ) {
 
         List<String> statusPendentes = List.of(
-                "agendado",
-                "solicitar confirmacao agendamento",
-                "confirmado",
-                "reagendado",
-                "solicitar cancelamento",
-                "solicitar reagendamento",
-                "em atendimento",
-                "cancelado"
+                StatusAgendamento.AGENDADO,
+                StatusAgendamento.SOLICITAR_CONFIRMACAO,
+                StatusAgendamento.REAGENDADO,
+                StatusAgendamento.CHECK_IN,
+                StatusAgendamento.EM_ATENDIMENTO
         );
 
         List<Cliente> clientes;
@@ -131,7 +130,7 @@ public class AgendamentoService {
                     agendamentoRepository
                             .findByClienteIdAndStatusAgendamentoEstado(
                                     clienteId,
-                                    "faltou",
+                                    StatusAgendamento.NO_SHOW,
                                     usuarioIdFiltro
                             )
                             .size();
@@ -192,6 +191,7 @@ public class AgendamentoService {
     }
 
 
+    @Transactional
     public List<AgendamentoCriacaoResponse> criar(Long id, String role, List<AgendamentoCriacaoRequest> request) {
         List<Agendamento> agendamentosCriados = new ArrayList<>();
 
@@ -218,7 +218,7 @@ public class AgendamentoService {
                     .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
             StatusAgendamento status = statusAgendamentoRepository
-                    .findByEstado("aguardando sinal")
+                    .findByEstado(StatusAgendamento.AGUARDANDO_SINAL)
                     .orElseThrow(() -> new EntityNotFoundException("Status não existe"));
 
             Agendamento agendamento = new Agendamento();
@@ -236,234 +236,160 @@ public class AgendamentoService {
             saved.setItens(savedList);
             agendamentosCriados.add(saved);
 
-
-            try {
-
-                String mensagem = """
-                    NOVA SOLICITAÇÃO DE AGENDAMENTO
-                    
-                    Cliente: %s
-                    
-                    Pacote: %s
-                    Serviço: %s
-                    Sessões: %d
-
-                    Valor Final: R$ %.2f
-                    
-                    Data/Hora: %s
-                    
-                    Responda:
-                    1 - Confirmar
-                    2 - Recusar
-                    """
-                        .formatted(
-                                cliente.getNome(),
-                                pacote.getNome(),
-                                pacote.getServico().getNome(),
-                                pacote.getTotalSessoes(),
-                                saved.getPrecoFinal(),
-                                agendamentoRequest.getHorario()
-                        );
-
-                whatsAppService.enviarMensagem(
-                        profissional.getTelefone(),
-                        mensagem
-                );
-
-            } catch (Exception e) {
-                System.out.println("Erro ao enviar mensagem: " + e.fillInStackTrace());
-            }
+            notificacaoAgendamentoService.notificarNovaSolicitacao(saved);
         }
 
         return AgendamentoMapper.toResponseList(agendamentosCriados);
     }
 
+    @Transactional
     public void confirmar(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
-
         Agendamento agendamento = buscarPorId(idAgendamento);
+        validarPermissaoOperacional(agendamento, usuarioLogado, "confirmar agendamentos");
+        validarStatusEditavel(agendamento);
 
-        boolean admin = usuarioLogado.getAuthorities()
-                .stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!admin) {
-
-            boolean funcionario = usuarioLogado.getAuthorities()
-                    .stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
-
-            if (!funcionario) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Apenas administradores e funcionários podem confirmar agendamentos"
-                );
-            }
-
-            Long usuarioDoProfissional =
-                    agendamento.getProfissional()
-                            .getUsuario()
-                            .getId();
-
-            if (!usuarioDoProfissional.equals(usuarioLogado.getId())) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Você não pode confirmar agendamentos de outro profissional"
-                );
-            }
-        }
-
-        StatusAgendamento statusConfirmado =
-                statusAgendamentoRepository
-                        .findByEstado("agendado")
-                        .orElseThrow(() ->
-                                new EntityNotFoundException(
-                                        "Status AGENDADO não encontrado"
-                                ));
-
-        agendamento.setStatusAgendamento(statusConfirmado);
-
-        agendamentoRepository.save(agendamento);
+        aplicarStatus(agendamento, StatusAgendamento.AGENDADO);
     }
 
+    @Transactional
     public void fazerCheckIn(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
-
         Agendamento agendamento = buscarPorId(idAgendamento);
+        validarPermissaoOperacional(agendamento, usuarioLogado, "fazer check-in nos agendamentos");
+        validarStatusEditavel(agendamento);
 
-        boolean admin = usuarioLogado.getAuthorities()
-                .stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!admin) {
-
-            boolean funcionario = usuarioLogado.getAuthorities()
-                    .stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
-
-            if (!funcionario) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Apenas administradores e funcionários podem fazer check-in nos agendamentos"
-                );
-            }
-
-            Long usuarioDoProfissional =
-                    agendamento.getProfissional()
-                            .getUsuario()
-                            .getId();
-
-            if (!usuarioDoProfissional.equals(usuarioLogado.getId())) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Você não pode fazer check-in nos agendamentos de outro profissional"
-                );
-            }
-        }
-
-        StatusAgendamento statusCheckIn =
-                statusAgendamentoRepository
-                        .findByEstado("check-in")
-                        .orElseThrow(() ->
-                                new EntityNotFoundException(
-                                        "Status CHECK-IN não encontrado"
-                                ));
-
-        agendamento.setStatusAgendamento(statusCheckIn);
-
-        agendamentoRepository.save(agendamento);
+        aplicarStatus(agendamento, StatusAgendamento.CHECK_IN);
     }
 
+    @Transactional
     public void concluir(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
-
         Agendamento agendamento = buscarPorId(idAgendamento);
+        validarPermissaoOperacional(agendamento, usuarioLogado, "concluir agendamentos");
+        validarStatusEditavel(agendamento);
 
-        boolean admin = usuarioLogado.getAuthorities()
-                .stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!admin) {
-
-            boolean funcionario = usuarioLogado.getAuthorities()
-                    .stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
-
-            if (!funcionario) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Apenas administradores e funcionários podem concluir agendamentos"
-                );
-            }
-
-            Long usuarioDoProfissional =
-                    agendamento.getProfissional()
-                            .getUsuario()
-                            .getId();
-
-            if (!usuarioDoProfissional.equals(usuarioLogado.getId())) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Você não pode concluir agendamentos de outro profissional"
-                );
-            }
-        }
-
-        StatusAgendamento statusConcluido =
-                statusAgendamentoRepository
-                        .findByEstado("concluido")
-                        .orElseThrow(() ->
-                                new EntityNotFoundException(
-                                        "Status CONCLUIDO não encontrado"
-                                ));
-
-        agendamento.setStatusAgendamento(statusConcluido);
-
-        agendamentoRepository.save(agendamento);
+        aplicarStatus(agendamento, StatusAgendamento.CONCLUIDO);
     }
 
+    @Transactional
     public void emAtendimento(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
-
         Agendamento agendamento = buscarPorId(idAgendamento);
+        validarPermissaoOperacional(agendamento, usuarioLogado, "deixar agendamentos em atendimento");
+        validarStatusEditavel(agendamento);
 
-        boolean admin = usuarioLogado.getAuthorities()
-                .stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        aplicarStatus(agendamento, StatusAgendamento.EM_ATENDIMENTO);
+    }
 
-        if (!admin) {
+    @Transactional
+    public void marcarNoShow(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
+        Agendamento agendamento = buscarPorId(idAgendamento);
+        validarPermissaoOperacional(agendamento, usuarioLogado, "marcar no-show em agendamentos");
+        validarStatusEditavel(agendamento);
 
-            boolean funcionario = usuarioLogado.getAuthorities()
-                    .stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
+        String estadoAtual = estadoDoAgendamento(agendamento);
+        Set<String> estadosPermitidos = Set.of(
+                StatusAgendamento.AGENDADO,
+                StatusAgendamento.REAGENDADO
+        );
 
-            if (!funcionario) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Apenas administradores e funcionários podem deixar agendamentos em atendimento"
-                );
-            }
-
-            Long usuarioDoProfissional =
-                    agendamento.getProfissional()
-                            .getUsuario()
-                            .getId();
-
-            if (!usuarioDoProfissional.equals(usuarioLogado.getId())) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Você não pode deixar agendamentos de outro profissional em atendimento"
-                );
-            }
+        if (!estadosPermitidos.contains(estadoAtual)) {
+            throw new EntityConflictException(
+                    "O no-show só pode ser registrado em agendamentos confirmados"
+            );
         }
 
-        StatusAgendamento statusEmAtendimento =
-                statusAgendamentoRepository
-                        .findByEstado("em atendimento")
-                        .orElseThrow(() ->
-                                new EntityNotFoundException(
-                                        "Status EM ATENDIMENTO não encontrado"
-                                ));
+        aplicarStatus(agendamento, StatusAgendamento.NO_SHOW);
+    }
 
-        agendamento.setStatusAgendamento(statusEmAtendimento);
+    @Transactional
+    public void recusar(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
+        Agendamento agendamento = buscarPorId(idAgendamento);
+        validarPermissaoOperacional(agendamento, usuarioLogado, "recusar agendamentos");
+        validarStatusEditavel(agendamento);
 
+        String estadoAtual = estadoDoAgendamento(agendamento);
+        Set<String> estadosPermitidos = Set.of(
+                StatusAgendamento.AGUARDANDO_SINAL,
+                StatusAgendamento.SOLICITAR_CONFIRMACAO
+        );
+
+        if (!estadosPermitidos.contains(estadoAtual)) {
+            throw new EntityConflictException(
+                    "Somente solicitações aguardando análise podem ser recusadas"
+            );
+        }
+
+        aplicarStatus(agendamento, StatusAgendamento.RECUSADO);
+    }
+
+    private void aplicarStatus(Agendamento agendamento, String estado) {
+        StatusAgendamento status = statusAgendamentoRepository
+                .findByEstado(estado)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Status " + estado.toUpperCase() + " não encontrado"
+                ));
+
+        agendamento.setStatusAgendamento(status);
         agendamentoRepository.save(agendamento);
+        notificacaoAgendamentoService.notificarStatus(agendamento);
+    }
+
+    private void validarPermissaoOperacional(
+            Agendamento agendamento,
+            UsuarioDetalhesDto usuarioLogado,
+            String acao
+    ) {
+        boolean admin = temPerfil(usuarioLogado, "ROLE_ADMIN");
+        boolean profissional = temPerfil(usuarioLogado, "ROLE_PROFISSIONAL");
+
+        if (!admin && !profissional) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Apenas administradores e profissionais podem " + acao
+            );
+        }
+
+        if (admin) {
+            return;
+        }
+
+        Long usuarioDoProfissional = agendamento.getProfissional() == null
+                || agendamento.getProfissional().getUsuario() == null
+                ? null
+                : agendamento.getProfissional().getUsuario().getId();
+
+        if (!usuarioLogado.getId().equals(usuarioDoProfissional)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Você não pode alterar agendamentos de outro profissional"
+            );
+        }
+    }
+
+    private boolean temPerfil(UsuarioDetalhesDto usuario, String perfil) {
+        return usuario.getAuthorities()
+                .stream()
+                .anyMatch(authority -> perfil.equals(authority.getAuthority()));
+    }
+
+    private void validarStatusEditavel(Agendamento agendamento) {
+        String estado = estadoDoAgendamento(agendamento);
+        if (Set.of(
+                StatusAgendamento.CONCLUIDO,
+                StatusAgendamento.CANCELADO,
+                StatusAgendamento.RECUSADO,
+                StatusAgendamento.NO_SHOW
+        ).contains(estado)) {
+            throw new EntityConflictException(
+                    "O agendamento já está com o status '" + estado + "' e não pode ser alterado"
+            );
+        }
+    }
+
+    private String estadoDoAgendamento(Agendamento agendamento) {
+        if (agendamento.getStatusAgendamento() == null
+                || agendamento.getStatusAgendamento().getEstado() == null) {
+            return "";
+        }
+        return agendamento.getStatusAgendamento().getEstado().trim().toLowerCase();
     }
 
 
@@ -473,34 +399,39 @@ public class AgendamentoService {
             throw new NonAuthorizedException("Erro ao cancelar agendamento");
         }
 
-        if(!(agendamentoRepository.existsById(idAgendamento))){
-            throw new EntityNotFoundException("Agendamento não encontrado");
-        }
+        Agendamento agendamento = buscarPorId(idAgendamento);
+        validarStatusEditavel(agendamento);
 
         List<AgendamentoItem> itens = agendamentoItemRepository.findByAgendamentoId(idAgendamento);
-        LocalDateTime inicioAgendamento = itens.get(0).getInicioAtendimento();
+        LocalDateTime inicioAgendamento = itens.stream()
+                .map(AgendamentoItem::getInicioAtendimento)
+                .filter(dataHora -> dataHora != null)
+                .min(LocalDateTime::compareTo)
+                .orElseThrow(() -> new EntityConflictException(
+                        "O agendamento não possui sessões cadastradas"
+                ));
+
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        Long perfilUsuario = usuario.getPerfil().getId();
+        boolean admin = usuario.getPerfil() != null
+                && "ROLE_ADMIN".equals(usuario.getPerfil().getPerfil());
 
-        if(inicioAgendamento.isBefore(LocalDateTime.now().plusHours(24)) && perfilUsuario != 1L){
+        if(inicioAgendamento.isBefore(LocalDateTime.now().plusHours(24)) && !admin){
             throw new NonAuthorizedException("Não é possível cancelar agendamento com menos de 24 horas");
         }
 
-        //agendamentoItemRepository.deleteByAgendamentoId(idAgendamento);
-
         StatusAgendamento statusCancelado = statusAgendamentoRepository
-                .findByEstado("cancelado")
+                .findByEstado(StatusAgendamento.CANCELADO)
                 .orElseThrow(() ->
-                        new RuntimeException("Status cancelado não encontrado"));
+                        new EntityNotFoundException("Status cancelado não encontrado"));
 
-        Optional<Agendamento> agendamento = agendamentoRepository.findById(idAgendamento);
-        agendamento.get().setStatusAgendamento(statusCancelado);
-        agendamento.get().setCanceladoEm(LocalDateTime.now());
-        agendamento.get().setCancelamentoMotivo(requestDto.getMotivo());
+        agendamento.setStatusAgendamento(statusCancelado);
+        agendamento.setCanceladoEm(LocalDateTime.now());
+        agendamento.setCancelamentoMotivo(requestDto.getMotivo());
 
-        agendamentoRepository.save(agendamento.get());
+        agendamentoRepository.save(agendamento);
+        notificacaoAgendamentoService.notificarStatus(agendamento);
     }
 
     public List<AgendamentoItem> criarItens(

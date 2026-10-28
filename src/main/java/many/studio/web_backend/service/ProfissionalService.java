@@ -5,6 +5,7 @@ import many.studio.web_backend.dto.profissional.*;
 import many.studio.web_backend.entity.Cliente;
 import many.studio.web_backend.entity.Profissional;
 import many.studio.web_backend.entity.ServicoProfissional;
+import many.studio.web_backend.entity.StatusAgendamento;
 import many.studio.web_backend.entity.Usuario;
 import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
@@ -59,7 +60,8 @@ public class ProfissionalService {
                     profissional.getNome(),
                     ultimaVisita,
                     totalGasto,
-                    preferido);
+                    preferido,
+                    contarNoShows(cliente.getId()));
         }).toList();
     }
 
@@ -83,7 +85,7 @@ public class ProfissionalService {
                 cliente.getTelefone(),
                 cliente.getDocumento(),
                 cliente.getUsuario().getEmail(),
-                cliente.getTotalNoShows(),
+                contarNoShows(clienteId),
                 ultimaVisita,
                 totalGasto,
                 historico
@@ -137,6 +139,16 @@ public class ProfissionalService {
 
         return profissionalOpt.get();
 
+    }
+
+    private Integer contarNoShows(Long clienteId) {
+        return agendamentoRepository
+                .findByClienteIdAndStatusAgendamentoEstado(
+                        clienteId,
+                        StatusAgendamento.NO_SHOW,
+                        null
+                )
+                .size();
     }
 
     public ProfissionalDetalhesDto getDetalhesProfissionais(Long id, String role) {

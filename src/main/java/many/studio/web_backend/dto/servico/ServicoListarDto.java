@@ -36,7 +36,7 @@ public class ServicoListarDto {
     private LocalDateTime criadoEm;
 
     @Schema(description = "Id da categoria do serviço", example = "1")
-    private Integer categoriaId;
+    private Long categoriaId;
 
     @Schema(description = "Categoria do serviço", example = "Facial")
     private String categoria;
@@ -132,11 +132,11 @@ public class ServicoListarDto {
         this.sinalValor = sinalValor;
     }
 
-    public Integer getCategoriaId() {
+    public Long getCategoriaId() {
         return categoriaId;
     }
 
-    public void setCategoriaId(Integer categoriaId) {
+    public void setCategoriaId(Long categoriaId) {
         this.categoriaId = categoriaId;
     }
 

@@ -1,7 +1,6 @@
 package many.studio.web_backend.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "clientes")
@@ -22,9 +21,6 @@ public class Cliente {
     @Column(name = "foto_url")
     private String fotoUrl;
 
-    @Column(name = "total_no_shows")
-    private Integer totalNoShows;
-
     @Column(name = "bloqueado_motivo")
     private String bloqueadoMotivo;
 
@@ -37,12 +33,19 @@ public class Cliente {
 
     public Cliente() {}
 
-    public Cliente(Long id, String nome, String telefone, String documento, Integer totalNoShows, String bloqueadoMotivo, Boolean lgpdConsentimento, LocalDateTime criadoEm, Boolean ativo, Usuario usuario) {
+    public Cliente(
+            Long id,
+            String nome,
+            String telefone,
+            String documento,
+            String bloqueadoMotivo,
+            Boolean lgpdConsentimento,
+            Usuario usuario
+    ) {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
         this.documento = documento;
-        this.totalNoShows = totalNoShows;
         this.bloqueadoMotivo = bloqueadoMotivo;
         this.lgpdConsentimento = lgpdConsentimento;
         this.usuario = usuario;
@@ -58,8 +61,6 @@ public class Cliente {
     public void setDocumento(String documento) { this.documento = documento; }
     public String getFotoUrl() { return fotoUrl; }
     public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
-    public Integer getTotalNoShows() { return totalNoShows; }
-    public void setTotalNoShows(Integer totalNoShows) { this.totalNoShows = totalNoShows; }
     public String getBloqueadoMotivo() { return bloqueadoMotivo; }
     public void setBloqueadoMotivo(String bloqueadoMotivo) { this.bloqueadoMotivo = bloqueadoMotivo; }
     public Boolean getLgpdConsentimento() { return lgpdConsentimento; }

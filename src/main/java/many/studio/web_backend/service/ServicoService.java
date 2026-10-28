@@ -242,7 +242,7 @@ public class ServicoService {
     }
 
     private CategoriaServico buscarCategoria(Long categoriaId) {
-        return categoriaServicoRepository.findById(categoriaId.intValue())
+        return categoriaServicoRepository.findById(categoriaId)
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
     }
 

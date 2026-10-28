@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Publica notificacoes de WhatsApp no RabbitMQ. O envio efetivo fica a cargo do
- * microservico de acoes.
+ * Publica notificações de WhatsApp no RabbitMQ. O envio efetivo fica a cargo do
+ * microserviço de ações.
  */
 @Service
 public class NotificacaoPublisher {

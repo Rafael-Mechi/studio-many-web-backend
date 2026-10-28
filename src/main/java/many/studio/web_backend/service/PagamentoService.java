@@ -37,6 +37,7 @@ public class PagamentoService {
     private final StatusPagamentoRepository statusPagamentoRepository;
     private final TipoPagamentoRepository tipoPagamentoRepository;
     private final ComprovanteRepository comprovanteRepository;
+    private final NotificacaoAgendamentoService notificacaoAgendamentoService;
 
     @Value("${aws.s3.bucket.comprovantes}")
     private String bucketComprovantes;
@@ -48,7 +49,8 @@ public class PagamentoService {
 
     public PagamentoService(PagamentoRepository pagamentoRepository, AgendamentoRepository agendamentoRepository,
                             StatusAgendamentoRepository statusAgendamentoRepository,
-                            StatusPagamentoRepository statusPagamentoRepository, TipoPagamentoRepository tipoPagamentoRepository, ComprovanteRepository comprovanteRepository, S3Client s3Client) {
+                            StatusPagamentoRepository statusPagamentoRepository, TipoPagamentoRepository tipoPagamentoRepository, ComprovanteRepository comprovanteRepository, S3Client s3Client,
+                            NotificacaoAgendamentoService notificacaoAgendamentoService) {
         this.pagamentoRepository = pagamentoRepository;
         this.agendamentoRepository = agendamentoRepository;
         this.statusAgendamentoRepository = statusAgendamentoRepository;
@@ -56,6 +58,7 @@ public class PagamentoService {
         this.tipoPagamentoRepository = tipoPagamentoRepository;
         this.comprovanteRepository = comprovanteRepository;
         this.s3Client = s3Client;
+        this.notificacaoAgendamentoService = notificacaoAgendamentoService;
     }
 
     @Transactional
@@ -91,7 +94,7 @@ public class PagamentoService {
 
         StatusAgendamento statusAgendamento =
                 statusAgendamentoRepository
-                        .findByEstado("solicitar confirmacao agendamento")
+                        .findByEstado(StatusAgendamento.SOLICITAR_CONFIRMACAO)
                         .orElseThrow(() ->
                                 new EntityNotFoundException(
                                         "Status de agendamento não encontrado"));
@@ -144,6 +147,7 @@ public class PagamentoService {
 
                 agendamento.setStatusAgendamento(statusAgendamento);
                 agendamentoRepository.save(agendamento);
+                notificacaoAgendamentoService.notificarStatus(agendamento);
 
                 pagamentos.add(saved);
             }

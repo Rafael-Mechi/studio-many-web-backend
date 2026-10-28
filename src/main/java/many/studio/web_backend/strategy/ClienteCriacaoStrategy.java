@@ -29,7 +29,6 @@ public class ClienteCriacaoStrategy implements UsuarioCriacaoStrategy {
         cliente.setNome(dto.getNome());
         cliente.setTelefone(dto.getTelefone());
         cliente.setDocumento(dto.getDocumento());
-        cliente.setTotalNoShows(0);
         cliente.setBloqueadoMotivo(null);
         cliente.setLgpdConsentimento(true);
         cliente.setUsuario(usuario);
