@@ -82,52 +82,45 @@ public class NotificacaoAgendamentoService {
 
             String mensagem = switch (estado) {
                 case StatusAgendamento.AGUARDANDO_SINAL -> """
-                        Olá, %s! Recebemos sua solicitação de agendamento.
-
-                        %s
-
-                        Estamos aguardando o pagamento do sinal para enviar o agendamento para confirmação.
-                        """.formatted(nomeCliente(agendamento), detalhesAgendamento(agendamento, proximaData(agendamento)));
+                Olá, *%s*! 😊
+                Recebemos sua solicitação de agendamento e estamos aguardando o pagamento do sinal para dar continuidade ao processo.
+                Assim que o pagamento for identificado, encaminharemos seu agendamento para confirmação.
+                Agradecemos pela preferência! 
+                💙 *STUDIO ESSENCIA*
+                        """.formatted(nomeCliente(agendamento));
 
                 case StatusAgendamento.SOLICITAR_CONFIRMACAO -> """
-                        Olá, %s! O sinal do seu agendamento foi recebido.
-
-                        %s
-
-                        Agora o horário está em análise pela equipe. Assim que for confirmado, avisaremos por aqui.
+                *%s*! Seu sinal foi recebido com sucesso. ✅
+                %s
+                Seu agendamento está aguardando a confirmação da equipe. Assim que o comprovante for confirmado pela equipe, avisaremos você por aqui. 
+                💙 *STUDIO ESSENCIA*
                         """.formatted(nomeCliente(agendamento), detalhesAgendamento(agendamento, proximaData(agendamento)));
 
                 case StatusAgendamento.AGENDADO -> """
-                        Olá, %s! Seu agendamento está confirmado.
-
-                        %s
-
-                        Se precisar remarcar, entre em contato com antecedência.
+                *%s*! Seu agendamento foi confirmado com sucesso. ✅
+                %s
+                Caso precise remarcar, entre em contato conosco com antecedência minima de 24 horas ou pelo site.
+                💙 *STUDIO ESSENCIA*
                         """.formatted(nomeCliente(agendamento), detalhesAgendamento(agendamento, proximaData(agendamento)));
 
                 case StatusAgendamento.REAGENDADO -> """
-                        Olá, %s! Seu agendamento foi reagendado.
-
-                        %s
-
-                        Confira a nova data e horário acima.
+                Olá, %s! Seu agendamento foi reagendado.
+                Confira a nova data e horário.
+                %s
+               💙 *STUDIO ESSENCIA*
                         """.formatted(nomeCliente(agendamento), detalhesAgendamento(agendamento, proximaData(agendamento)));
 
                 case StatusAgendamento.CANCELADO -> mensagemCancelamento(agendamento);
 
                 case StatusAgendamento.RECUSADO -> """
-                        Olá, %s. Não foi possível confirmar o agendamento solicitado.
-
+                        Olá, *%s. Não foi possível confirmar o agendamento solicitado*.
                         %s
-
-                        Entre em contato com o studio para verificar outros horários disponíveis.
+                        Entre em contato com o studio para verificar o ocorrido.
                         """.formatted(nomeCliente(agendamento), detalhesAgendamento(agendamento, proximaData(agendamento)));
 
                 case StatusAgendamento.NO_SHOW -> """
                         Olá, %s. Sentimos sua falta no atendimento.
-
                         %s
-
                         Se ainda tiver interesse, entre em contato com o studio para remarcar.
                         """.formatted(nomeCliente(agendamento), detalhesAgendamento(agendamento, proximaData(agendamento)));
 
@@ -151,6 +144,12 @@ public class NotificacaoAgendamentoService {
     public void notificarReagendamento(Agendamento agendamento, AgendamentoItem item) {
         try {
             String mensagem = """
+                Olá, %s! Seu agendamento foi reagendado.
+                Confira a nova data e horário.
+                %s
+               💙 *STUDIO ESSENCIA*
+                        """.formatted(nomeCliente(agendamento), detalhesAgendamento(agendamento, proximaData(agendamento)));
+            /*"""
                     Olá, %s! Um horário do seu agendamento foi alterado.
 
                     Pacote: %s
@@ -165,7 +164,7 @@ public class NotificacaoAgendamentoService {
                     nomeServico(item, agendamento),
                     nomeProfissional(item, agendamento),
                     formatarDataHora(item.getInicioAtendimento()));
-
+            */
             enviarParaCliente(agendamento, mensagem);
         } catch (RuntimeException ex) {
             log.error("Não foi possível montar a notificação de reagendamento do agendamento {}",
@@ -181,7 +180,6 @@ public class NotificacaoAgendamentoService {
 
         return """
                 Olá, %s. Seu agendamento foi cancelado.
-
                 %s
                 %s
                 Se precisar de ajuda para escolher um novo horário, é só chamar o studio.
