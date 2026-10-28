@@ -76,6 +76,9 @@ public class SecurityConfiguracao {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
 
+                                .requestMatchers(HttpMethod.POST, "/analise/probabilidade_no_show")
+                                .hasAnyRole("ADMIN", "PROFISSIONAL")
+
                                 .requestMatchers(URLS_PERMITIDAS).permitAll()
 
                                 // Exceção à regra de DELETE abaixo: o profissional gerencia os próprios bloqueios.
