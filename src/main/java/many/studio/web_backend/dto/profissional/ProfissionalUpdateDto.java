@@ -28,10 +28,13 @@ public class ProfissionalUpdateDto{
 
     private List<DiasDeTrabalhoDto> diasDeTrabalho;
 
+    private String fotoUrl;
+
     public static class DiasDeTrabalhoDto {
         private String diaSemana;
         private LocalTime inicio;
         private LocalTime fim;
+        private Long servicoId;
 
         public DiasDeTrabalhoDto() {}
 
@@ -58,6 +61,14 @@ public class ProfissionalUpdateDto{
             public void setFim(LocalTime fim) {
                     this.fim = fim;
             }
+
+        public Long getServicoId() {
+            return servicoId;
+        }
+
+        public void setServicoId(Long servicoId) {
+            this.servicoId = servicoId;
+        }
     }
 
     public ProfissionalUpdateDto() {}
@@ -117,4 +128,12 @@ public class ProfissionalUpdateDto{
         public void setDiasDeTrabalho(List<DiasDeTrabalhoDto> diasDeTrabalho) {
                 this.diasDeTrabalho = diasDeTrabalho;
         }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
+    }
 }

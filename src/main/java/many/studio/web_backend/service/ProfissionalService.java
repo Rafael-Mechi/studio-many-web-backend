@@ -14,9 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfissionalService {
@@ -108,7 +107,9 @@ public class ProfissionalService {
             usuario.setEmail(dto.getEmail());
         }
 
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        if(dto.getSenha() != null && !dto.getSenha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        }
 
         List<ServicoProfissional> servicosRealizados = servicoProfissionalRepository.findAllByProfissionalId(profissionalId);
         List<String> nomeServicos = new ArrayList<>();
@@ -138,32 +139,7 @@ public class ProfissionalService {
             }
         }
 
-        List<DiasDeTrabalho> diasDeTrabalho = diasDeTrabalhoRepository.findByProfissionalId(profissionalId);
-        List<ProfissionalUpdateDto.DiasDeTrabalhoDto> diasEnviados = dto.getDiasDeTrabalho();
-
-        List<String> diasSemanaEnviados = new ArrayList<>();
-        List<String> diasSemanaCadastrados = new ArrayList<>();
-
-        for(DiasDeTrabalho dias : diasDeTrabalho) {
-            diasSemanaCadastrados.add(dias.getDiaDaSemana().toString());
-        }
-
-        for(ProfissionalUpdateDto.DiasDeTrabalhoDto dias : diasEnviados) {
-            diasSemanaEnviados.add(dias.getDiaSemana());
-        }
-
-        for(ProfissionalUpdateDto.DiasDeTrabalhoDto diaEnviado : dto.getDiasDeTrabalho()) {
-            if(!diasSemanaCadastrados.contains(diaEnviado.getDiaSemana())) {
-
-                DiasDeTrabalho diaNovo = new DiasDeTrabalho();
-                diaNovo.setHoraInicio(diaEnviado.getInicio());
-                diaNovo.setHoraFim(diaEnviado.getFim());
-                diaNovo.setProfissional(profissional);
-                diaNovo.setDiaDaSemana(DayOfWeek.valueOf(diaEnviado.getDiaSemana()));
-
-                diasDeTrabalhoRepository.save(diaNovo);
-            }
-        }
+        atualizarDiasDeTrabalho(profissionalId, dto.getDiasDeTrabalho());
 
         profissionalRepository.save(profissional);
 
@@ -172,6 +148,94 @@ public class ProfissionalService {
                 profissional.getNome(),
                 usuario.getEmail()
         );
+    }
+
+    @Transactional
+    public void atualizarDiasDeTrabalho(
+            Long profissionalId,
+            List<ProfissionalUpdateDto.DiasDeTrabalhoDto> diasRecebidos
+    ) {
+        // Campo ausente: preserva os horários atuais.
+        if (diasRecebidos == null) {
+            return;
+        }
+
+        List<DiasDeTrabalho> cadastrados =
+                diasDeTrabalhoRepository.findByProfissionalId(profissionalId);
+
+        Map<String, DiasDeTrabalho> existentes = new HashMap<>();
+
+        for (DiasDeTrabalho cadastrado : cadastrados) {
+            String chave = chave(
+                    cadastrado.getDiaDaSemana().name(),
+                    cadastrado.getServico().getId()
+            );
+            existentes.put(chave, cadastrado);
+        }
+
+        Profissional profissional = profissionalRepository.findById(profissionalId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Profissional não encontrado."
+                ));
+
+        List<DiasDeTrabalho> paraSalvar = new ArrayList<>();
+        Set<String> chavesRecebidas = new HashSet<>();
+
+        for (ProfissionalUpdateDto.DiasDeTrabalhoDto dto : diasRecebidos) {
+            if (dto.getDiaSemana() == null || dto.getServicoId() == null) {
+                throw new IllegalArgumentException(
+                        "Dia da semana e serviço são obrigatórios."
+                );
+            }
+
+            DayOfWeek diaSemana = DayOfWeek.valueOf(
+                    dto.getDiaSemana().trim().toUpperCase()
+            );
+
+            String chave = chave(diaSemana.name(), dto.getServicoId());
+
+            if (!chavesRecebidas.add(chave)) {
+                throw new IllegalArgumentException(
+                        "Há horários duplicados para o mesmo serviço e dia."
+                );
+            }
+
+            if (dto.getInicio() == null
+                    || dto.getFim() == null
+                    || !dto.getInicio().isBefore(dto.getFim())) {
+                throw new IllegalArgumentException(
+                        "O início do expediente deve ser anterior ao fim."
+                );
+            }
+
+            Servico servico = servicoRepository.findById(dto.getServicoId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Serviço não encontrado: " + dto.getServicoId()
+                    ));
+
+            DiasDeTrabalho horario = existentes.remove(chave);
+
+            if (horario == null) {
+                horario = new DiasDeTrabalho();
+                horario.setProfissional(profissional);
+                horario.setServico(servico);
+                horario.setDiaDaSemana(diaSemana);
+            }
+
+            horario.setHoraInicio(dto.getInicio());
+            horario.setHoraFim(dto.getFim());
+            paraSalvar.add(horario);
+        }
+
+        // Horários que existiam, mas não foram enviados, são removidos.
+        diasDeTrabalhoRepository.deleteAll(existentes.values());
+
+        // Persiste horários novos e atualizados.
+        diasDeTrabalhoRepository.saveAll(paraSalvar);
+    }
+
+    private String chave(String diaSemana, Long servicoId) {
+        return diaSemana + ":" + servicoId;
     }
 
     @Transactional
