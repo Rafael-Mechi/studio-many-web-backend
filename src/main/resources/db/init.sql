@@ -1,23 +1,4 @@
--- ============================================================================
--- Studio Essência - banco de dados MySQL
--- ----------------------------------------------------------------------------
--- Script unico do projeto: cria a estrutura e carrega os dados minimos de
--- demonstracao. Deve ser executado em um banco ja existente (o nome do banco e
--- definido por SPRING_DATASOURCE_URL no Backend).
---
--- No deploy, o Backend o executa quando SPRING_SQL_INIT_MODE=always:
---   SPRING_SQL_INIT_DATA_LOCATIONS=classpath:db/init.sql
---
--- Os INSERTs usam IDs fixos e INSERT IGNORE para serem idempotentes.
--- Para H2/testes o schema e gerado pelo Hibernate; este arquivo e exclusivo
--- para MySQL.
--- ============================================================================
-
 SET NAMES utf8mb4;
-
--- ----------------------------------------------------------------------------
--- Tabelas de dominio
--- ----------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS perfis (
     id BIGINT NOT NULL AUTO_INCREMENT,
@@ -310,9 +291,6 @@ INSERT IGNORE INTO status_agendamentos (id, estado) VALUES
     (12, 'check-in'),
     (13, 'em atendimento');
 
--- Compatibilidade com bancos criados antes da padronizacao do nome.
--- Garante a existencia do estado canonico mesmo se o ID 10 ja estiver ocupado
--- por 'faltou'; depois reaponta os agendamentos e remove o estado antigo.
 INSERT IGNORE INTO status_agendamentos (estado) VALUES ('no-show');
 
 UPDATE agendamentos a
