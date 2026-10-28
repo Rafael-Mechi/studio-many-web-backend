@@ -42,9 +42,6 @@ public class PagamentoService {
     @Value("${aws.s3.bucket.comprovantes}")
     private String bucketComprovantes;
 
-    @Value("${aws.s3.prefix.comprovantes}")
-    private String prefixComprovantes;
-
     private final S3Client s3Client;
 
     public PagamentoService(PagamentoRepository pagamentoRepository, AgendamentoRepository agendamentoRepository,
@@ -174,7 +171,7 @@ public class PagamentoService {
                 extensao
         );
 
-        String keyName = prefixComprovantes + nomeArquivo;
+        String keyName =  nomeArquivo;
 
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucketComprovantes)
