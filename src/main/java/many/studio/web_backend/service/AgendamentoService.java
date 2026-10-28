@@ -1,5 +1,7 @@
 package many.studio.web_backend.service;
 
+import jakarta.transaction.Transactional;
+import many.studio.web_backend.mapper.PacoteMapper;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
@@ -227,8 +229,8 @@ public class AgendamentoService {
             agendamento.setStatusAgendamento(status);
             agendamento.setProfissional(profissional);
             agendamento.setCriadoPorUsuario(usuario);
-            agendamento.setPreco(pacote.getPrecoTotal());
-            agendamento.setPrecoFinal(pacote.getPrecoTotal());
+            agendamento.setPreco(PacoteMapper.precoEfetivo(pacote));
+            agendamento.setPrecoFinal(PacoteMapper.precoEfetivo(pacote));
 
             Agendamento saved = agendamentoRepository.save(agendamento);
             List<AgendamentoItem> itens = criarItens(saved, agendamentoRequest.getHorario());
