@@ -366,7 +366,7 @@ INSERT IGNORE INTO profissionais (
 ) VALUES
     (1, 'Beatriz Administradora', '11988887777', '11111111111','https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/usuarios/pngtree-avatar-icon-of-a-female-employee-wearing-suit-going-to-work-png-image_6133929.png',
        '12:00:00', '13:00:00', 1),
-    (2, 'Isabelly Profissional', '11977776666', 'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/usuarios/pngtree-avatar-the-icon-of-a-female-employee-wearing-suit-png-image_6133908.png', NULL, NULL, NULL, 2);
+    (2, 'Isabelly Profissional', '11977776666',  NULL, 'https://bucket-studio-teste-essencia-comprovante.s3.us-east-1.amazonaws.com/usuarios/pngtree-avatar-the-icon-of-a-female-employee-wearing-suit-png-image_6133908.png', NULL, NULL, 2);
 
 INSERT IGNORE INTO clientes (
     id, nome, telefone, documento, bloqueado_motivo, lgpd_consentimento, usuario_id
