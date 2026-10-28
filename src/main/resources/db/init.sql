@@ -1,5 +1,5 @@
 -- ============================================================================
--- Studio Many - banco de dados MySQL
+-- Studio Essência - banco de dados MySQL
 -- ----------------------------------------------------------------------------
 -- Script unico do projeto: cria a estrutura e carrega os dados minimos de
 -- demonstracao. Deve ser executado em um banco ja existente (o nome do banco e
@@ -368,7 +368,7 @@ INSERT IGNORE INTO pacotes (
 ) VALUES
     (1, 'Combo Verão 5x Limpeza', 5, 600.00, 90, TRUE, CURRENT_TIMESTAMP, 1),
     (2, 'Limpeza de Pele Avulsa', 1, 150.00, 30, TRUE, CURRENT_TIMESTAMP, 1),
-    (3, 'Remoção de Cravos Avulsa', 1, 700.00, 30, TRUE, CURRENT_TIMESTAMP, 2),
+    (3, 'Remoção de Cravos Avulsa', 1, 150.00, 30, TRUE, CURRENT_TIMESTAMP, 2),
     (4, 'Kit Remoção de Cravos 5x', 5, 700.00, 30, TRUE, CURRENT_TIMESTAMP, 2),
     (5, 'Kit Remoção de Cravos 10x', 10, 1500.00, 30, TRUE, CURRENT_TIMESTAMP, 2);
 
@@ -378,10 +378,10 @@ INSERT IGNORE INTO pacotes (
 -- ----------------------------------------------------------------------------
 
 INSERT IGNORE INTO usuarios (id, email, senha, perfil_id, criado_em, ativo) VALUES
-    (1, 'admin@studiomany.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 1, CURRENT_TIMESTAMP, TRUE),
-    (2, 'profissional@studiomany.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 2, CURRENT_TIMESTAMP, TRUE),
-    (3, 'cliente@studiomany.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 3, CURRENT_TIMESTAMP, TRUE),
-    (4, 'maria@studiomany.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 3, CURRENT_TIMESTAMP, TRUE);
+    (1, 'admin@studioessencia.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 1, CURRENT_TIMESTAMP, TRUE),
+    (2, 'profissional@studioessencia.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 2, CURRENT_TIMESTAMP, TRUE),
+    (3, 'cliente@studioessencia.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 3, CURRENT_TIMESTAMP, TRUE),
+    (4, 'maria@studioessencia.com', '$2b$10$zjlnKdbWb/uufCcW3ns4he6jwsM.hmLKEOhitYxjwgbyJWy1ISVHe', 3, CURRENT_TIMESTAMP, TRUE);
 
 INSERT IGNORE INTO profissionais (
     id, nome, telefone, documento, almoco_inicio, almoco_fim, usuario_id

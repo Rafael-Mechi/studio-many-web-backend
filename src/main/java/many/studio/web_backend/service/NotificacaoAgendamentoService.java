@@ -62,7 +62,7 @@ public class NotificacaoAgendamentoService {
                         Cliente: %s
                         %s
 
-                        Confirme ou recuse pelo painel do Studio Many.
+                        Confirme ou recuse pelo painel do Studio Essência.
                         """.formatted(nomeCliente(agendamento), detalhes);
 
                 enviar(agendamento.getProfissional().getTelefone(), mensagemProfissional);
@@ -158,7 +158,7 @@ public class NotificacaoAgendamentoService {
                     Profissional: %s
                     Nova data/hora: %s
 
-                    Confira os detalhes no painel do Studio Many.
+                    Confira os detalhes no painel do Studio Essência.
                     """.formatted(
                     nomeCliente(agendamento),
                     nomePacote(agendamento),

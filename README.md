@@ -1,6 +1,6 @@
-# Studio Essencia - Backend
+# Studio Essência - Backend
 
-API REST do Studio Essencia, responsável por autenticação, cadastro de clientes e profissionais, catálogo de serviços e pacotes, agenda, pagamentos, fichas de anamnese, análise gerencial e notificações de agendamento.
+API REST do Studio Essência, responsável por autenticação, cadastro de clientes e profissionais, catálogo de serviços e pacotes, agenda, pagamentos, fichas de anamnese, análise gerencial e notificações de agendamento.
 
 ## Sumário
 
@@ -364,10 +364,10 @@ Contas de demonstração criadas pelo script (senha `Studio@123`):
 
 | E-mail | Perfil |
 | --- | --- |
-| `admin@studioEssencia.com` | administrador |
-| `profissional@studioEssencia.com` | profissional |
-| `cliente@studioEssencia.com` | cliente |
-| `maria@studioEssencia.com` | cliente |
+| `admin@studioessencia.com` | administrador |
+| `profissional@studioessencia.com` | profissional |
+| `cliente@studioessencia.com` | cliente |
+| `maria@studioessencia.com` | cliente |
 
 ## Como executar
 
@@ -383,16 +383,16 @@ O H2 é usado apenas pelos testes automatizados e não é necessário para execu
 Crie o banco e um usuário MySQL, por exemplo:
 
 ```sql
-CREATE DATABASE studioEssenciadb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE studioessencia CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'studioEssencia'@'localhost' IDENTIFIED BY 'uma-senha-forte';
-GRANT ALL PRIVILEGES ON studioEssenciadb.* TO 'studioEssencia'@'localhost';
+GRANT ALL PRIVILEGES ON studioessencia.* TO 'studioEssencia'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
 No PowerShell:
 
 ```powershell
-$env:SPRING_DATASOURCE_URL = "jdbc:mysql://localhost:3306/studioEssenciadb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo"
+$env:SPRING_DATASOURCE_URL = "jdbc:mysql://localhost:3306/studioessencia?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo"
 $env:SPRING_DATASOURCE_DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver"
 $env:SPRING_DATASOURCE_USERNAME = "studioEssencia"
 $env:SPRING_DATASOURCE_PASSWORD = "uma-senha-forte"
@@ -467,7 +467,7 @@ PATCH /agendamentos/{itemId}/reagendar?novoHorario=2026-11-10T09:00:00
 
 | Variável | Padrão | Uso |
 | --- | --- | --- |
-| `SPRING_DATASOURCE_URL` | `jdbc:mysql://localhost:3306/studioEssenciadb?...` | URL JDBC do MySQL |
+| `SPRING_DATASOURCE_URL` | `jdbc:mysql://localhost:3306/studioessencia?...` | URL JDBC do MySQL |
 | `SPRING_DATASOURCE_DRIVER_CLASS_NAME` | `com.mysql.cj.jdbc.Driver` | driver JDBC |
 | `SPRING_DATASOURCE_USERNAME` | `root` | usuário do banco |
 | `SPRING_DATASOURCE_PASSWORD` | vazio | senha do banco |

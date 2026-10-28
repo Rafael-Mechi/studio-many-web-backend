@@ -1,6 +1,5 @@
 package many.studio.web_backend.service;
 
-import jakarta.transaction.Transactional;
 import many.studio.web_backend.mapper.PacoteMapper;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoRequest;
 import many.studio.web_backend.dto.agendamento.AgendamentoCriacaoResponse;
