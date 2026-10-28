@@ -103,8 +103,8 @@ public class OtpService {
         otpCodigoRepository.save(otp);
 
         notificacaoPublisher.enviarWhatsApp(destino,
-                "Seu codigo de recuperacao de senha Studio Essência: " + codigo
-                        + ". Valido por " + validadeMinutos + " minutos.");
+                "🔐 Seu código de verificação é: *" + codigo
+                        + "*\nUse este código para confirmar sua identidade. Ele expira em " + validadeMinutos + " minutos.\n ⚠️ *Não compartilhe* este código com ninguém.");
     }
 
     /**
