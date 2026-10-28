@@ -22,6 +22,7 @@ public class ProfissionalDetalhesDto {
         private String diaSemana;
         private LocalTime inicio;
         private LocalTime fim;
+        private String nomeServico;
 
         public DiasDeTrabalhoDto() {}
 
@@ -47,6 +48,14 @@ public class ProfissionalDetalhesDto {
 
         public void setFim(LocalTime fim) {
             this.fim = fim;
+        }
+
+        public String getNomeServico() {
+            return nomeServico;
+        }
+
+        public void setNomeServico(String nomeServico) {
+            this.nomeServico = nomeServico;
         }
     }
 

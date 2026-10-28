@@ -2,11 +2,7 @@ package many.studio.web_backend.service;
 
 import jakarta.transaction.Transactional;
 import many.studio.web_backend.dto.profissional.*;
-import many.studio.web_backend.entity.Cliente;
-import many.studio.web_backend.entity.Profissional;
-import many.studio.web_backend.entity.ServicoProfissional;
-import many.studio.web_backend.entity.StatusAgendamento;
-import many.studio.web_backend.entity.Usuario;
+import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.exception.ForbiddenException;
@@ -16,10 +12,10 @@ import many.studio.web_backend.repository.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfissionalService {
@@ -29,14 +25,18 @@ public class ProfissionalService {
     private final PasswordEncoder passwordEncoder;
     private final UsuarioRepository usuarioRepository;
     private final ServicoProfissionalRepository servicoProfissionalRepository;
+    private final ServicoRepository servicoRepository;
+    private final DiasDeTrabalhoRepository diasDeTrabalhoRepository;
 
-    public ProfissionalService(ClienteRepository clienteRepository, AgendamentoRepository agendamentoRepository, ProfissionalRepository profissionalRepository, PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, ServicoProfissionalRepository servicoProfissionalRepository) {
+    public ProfissionalService(ClienteRepository clienteRepository, AgendamentoRepository agendamentoRepository, ProfissionalRepository profissionalRepository, PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, ServicoProfissionalRepository servicoProfissionalRepository, ServicoRepository servicoRepository, DiasDeTrabalhoRepository diasDeTrabalhoRepository) {
         this.clienteRepository = clienteRepository;
         this.agendamentoRepository = agendamentoRepository;
         this.profissionalRepository = profissionalRepository;
         this.passwordEncoder = passwordEncoder;
         this.usuarioRepository = usuarioRepository;
         this.servicoProfissionalRepository = servicoProfissionalRepository;
+        this.servicoRepository = servicoRepository;
+        this.diasDeTrabalhoRepository = diasDeTrabalhoRepository;
     }
 
     public List<ClientePorProfissionalDto> listarClientesPorProfissionalId(Long profissionalId){
@@ -97,18 +97,50 @@ public class ProfissionalService {
         Profissional profissional = profissionalRepository.findById(profissionalId)
                 .orElseThrow(() -> new EntityNotFoundException("Profissional não encontrado"));
 
-        profissional.setNome(dto.nome());
+        profissional.setNome(dto.getNome());
 
         Usuario usuario = profissional.getUsuario();
 
-        if (dto.email() != null && !dto.email().equals(usuario.getEmail())) {
-            if (usuarioRepository.existsByEmail(dto.email())) {
+        if (dto.getEmail() != null && !dto.getEmail().equals(usuario.getEmail())) {
+            if (usuarioRepository.existsByEmail(dto.getEmail())) {
                 throw new EntityConflictException("Email já cadastrado");
             }
-            usuario.setEmail(dto.email());
+            usuario.setEmail(dto.getEmail());
         }
 
-        usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        if(dto.getSenha() != null && !dto.getSenha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        }
+
+        List<ServicoProfissional> servicosRealizados = servicoProfissionalRepository.findAllByProfissionalId(profissionalId);
+        List<String> nomeServicos = new ArrayList<>();
+
+        for(ServicoProfissional servico : servicosRealizados) {
+            nomeServicos.add(servico.getServico().getNome());
+        }
+
+        for(ServicoProfissional servico : servicosRealizados) {
+            if(!dto.getServicos().contains(servico.getServico().getNome())) {
+                servicoProfissionalRepository.delete(servico);
+            }
+        }
+
+        for(String servico : dto.getServicos()) {
+            if(!nomeServicos.contains(servico)) {
+                if(!servicoRepository.existsByNome(servico)) {
+                    throw new EntityNotFoundException("Serviço não encontrado");
+                }
+
+                Optional<Servico> servicoEncontrado = servicoRepository.findByNome(servico);
+                ServicoProfissional servicoProfissional = new ServicoProfissional();
+                servicoProfissional.setProfissional(profissional);
+                servicoProfissional.setServico(servicoEncontrado.get());
+
+                servicoProfissionalRepository.save(servicoProfissional);
+            }
+        }
+
+        atualizarDiasDeTrabalho(profissionalId, dto.getDiasDeTrabalho());
 
         profissionalRepository.save(profissional);
 
@@ -117,6 +149,94 @@ public class ProfissionalService {
                 profissional.getNome(),
                 usuario.getEmail()
         );
+    }
+
+    @Transactional
+    public void atualizarDiasDeTrabalho(
+            Long profissionalId,
+            List<ProfissionalUpdateDto.DiasDeTrabalhoDto> diasRecebidos
+    ) {
+
+        if (diasRecebidos == null) {
+            return;
+        }
+
+        List<DiasDeTrabalho> cadastrados =
+                diasDeTrabalhoRepository.findByProfissionalId(profissionalId);
+
+        Map<String, DiasDeTrabalho> existentes = new HashMap<>();
+
+        for (DiasDeTrabalho cadastrado : cadastrados) {
+            String chave = chave(
+                    cadastrado.getDiaDaSemana().name(),
+                    cadastrado.getServico().getId()
+            );
+            existentes.put(chave, cadastrado);
+        }
+
+        Profissional profissional = profissionalRepository.findById(profissionalId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Profissional não encontrado."
+                ));
+
+        List<DiasDeTrabalho> paraSalvar = new ArrayList<>();
+        Set<String> chavesRecebidas = new HashSet<>();
+
+        for (ProfissionalUpdateDto.DiasDeTrabalhoDto dto : diasRecebidos) {
+            if (dto.getDiaSemana() == null || dto.getServicoId() == null) {
+                throw new IllegalArgumentException(
+                        "Dia da semana e serviço são obrigatórios."
+                );
+            }
+
+            DayOfWeek diaSemana = DayOfWeek.valueOf(
+                    dto.getDiaSemana().trim().toUpperCase()
+            );
+
+            String chave = chave(diaSemana.name(), dto.getServicoId());
+
+            if (!chavesRecebidas.add(chave)) {
+                throw new IllegalArgumentException(
+                        "Há horários duplicados para o mesmo serviço e dia."
+                );
+            }
+
+            if (dto.getInicio() == null
+                    || dto.getFim() == null
+                    || !dto.getInicio().isBefore(dto.getFim())) {
+                throw new IllegalArgumentException(
+                        "O início do expediente deve ser anterior ao fim."
+                );
+            }
+
+            Servico servico = servicoRepository.findById(dto.getServicoId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Serviço não encontrado: " + dto.getServicoId()
+                    ));
+
+            DiasDeTrabalho horario = existentes.remove(chave);
+
+            if (horario == null) {
+                horario = new DiasDeTrabalho();
+                horario.setProfissional(profissional);
+                horario.setServico(servico);
+                horario.setDiaDaSemana(diaSemana);
+            }
+
+            horario.setHoraInicio(dto.getInicio());
+            horario.setHoraFim(dto.getFim());
+            paraSalvar.add(horario);
+        }
+
+
+        diasDeTrabalhoRepository.deleteAll(existentes.values());
+
+
+        diasDeTrabalhoRepository.saveAll(paraSalvar);
+    }
+
+    private String chave(String diaSemana, Long servicoId) {
+        return diaSemana + ":" + servicoId;
     }
 
     @Transactional

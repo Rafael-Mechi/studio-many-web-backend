@@ -13,4 +13,6 @@ public interface DiasDeTrabalhoRepository extends JpaRepository<DiasDeTrabalho, 
     List<DiasDeTrabalho> findByProfissionalIdOrderByDiaDaSemanaAscHoraInicioAsc(Long id);
 
     void deleteByProfissionalId(Long id);
+
+    Long id(Long id);
 }

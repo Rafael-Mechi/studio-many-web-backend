@@ -13,6 +13,7 @@ public class DiasDeTrabalhoMapper {
         response.setDiaSemana(diasDeTrabalho.getDiaDaSemana().toString());
         response.setInicio(diasDeTrabalho.getHoraInicio());
         response.setFim(diasDeTrabalho.getHoraFim());
+        response.setNomeServico(diasDeTrabalho.getServico().getNome());
 
         return response;
     }
