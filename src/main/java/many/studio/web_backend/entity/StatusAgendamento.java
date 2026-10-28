@@ -6,6 +6,18 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "status_agendamentos")
 public class StatusAgendamento {
+
+    public static final String AGUARDANDO_SINAL = "aguardando sinal";
+    public static final String SOLICITAR_CONFIRMACAO = "solicitar confirmacao agendamento";
+    public static final String AGENDADO = "agendado";
+    public static final String REAGENDADO = "reagendado";
+    public static final String CHECK_IN = "check-in";
+    public static final String EM_ATENDIMENTO = "em atendimento";
+    public static final String CONCLUIDO = "concluido";
+    public static final String CANCELADO = "cancelado";
+    public static final String RECUSADO = "recusado";
+    public static final String NO_SHOW = "no-show";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

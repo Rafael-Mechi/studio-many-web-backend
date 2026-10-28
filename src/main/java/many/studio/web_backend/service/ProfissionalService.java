@@ -60,7 +60,8 @@ public class ProfissionalService {
                     profissional.getNome(),
                     ultimaVisita,
                     totalGasto,
-                    preferido);
+                    preferido,
+                    contarNoShows(cliente.getId()));
         }).toList();
     }
 
@@ -84,7 +85,7 @@ public class ProfissionalService {
                 cliente.getTelefone(),
                 cliente.getDocumento(),
                 cliente.getUsuario().getEmail(),
-                cliente.getTotalNoShows(),
+                contarNoShows(clienteId),
                 ultimaVisita,
                 totalGasto,
                 historico
@@ -258,6 +259,16 @@ public class ProfissionalService {
 
         return profissionalOpt.get();
 
+    }
+
+    private Integer contarNoShows(Long clienteId) {
+        return agendamentoRepository
+                .findByClienteIdAndStatusAgendamentoEstado(
+                        clienteId,
+                        StatusAgendamento.NO_SHOW,
+                        null
+                )
+                .size();
     }
 
     public ProfissionalDetalhesDto getDetalhesProfissionais(Long id, String role) {

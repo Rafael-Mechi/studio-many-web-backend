@@ -8,22 +8,22 @@ public class CategoriaServico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String categoria;
 
-    public CategoriaServico(Integer id, String categoria) {
+    public CategoriaServico(Long id, String categoria) {
         this.id = id;
         this.categoria = categoria;
     }
 
     public CategoriaServico(){}
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

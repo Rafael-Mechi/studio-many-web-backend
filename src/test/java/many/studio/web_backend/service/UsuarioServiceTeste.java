@@ -87,7 +87,7 @@ class UsuarioServiceTeste {
 
         perfilFuncionario = new Perfil();
         perfilFuncionario.setId(2L);
-        perfilFuncionario.setPerfil("ROLE_FUNCIONARIO");
+        perfilFuncionario.setPerfil("ROLE_PROFISSIONAL");
 
         perfilCliente = new Perfil();
         perfilCliente.setId(3L);

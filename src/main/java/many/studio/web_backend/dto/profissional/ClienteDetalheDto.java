@@ -15,8 +15,8 @@ public record ClienteDetalheDto(
         String documento,
         @Schema(description = "E-mail cadastrado", example = "giovana.lopes@gmail.com")
         String email,
-        @Schema(description = "Total de faltas acumuladas", example = "0")
-        Integer totalNoShows,
+        @Schema(description = "Quantidade de no-shows acumulados", example = "0")
+        Integer qtdNoShows,
         @Schema(description = "Data da última visita", example = "2026-02-16")
         LocalDateTime ultimaVisita,
         @Schema(description = "Total financeiro investido", example = "250.00")

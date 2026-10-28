@@ -242,7 +242,7 @@ public class ServicoService {
     }
 
     private CategoriaServico buscarCategoria(Long categoriaId) {
-        return categoriaServicoRepository.findById(categoriaId.intValue())
+        return categoriaServicoRepository.findById(categoriaId)
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
     }
 
@@ -252,7 +252,9 @@ public class ServicoService {
         List<ProfissionaisPorServicoDto> profissionais = new ArrayList<>();
         for (ServicoProfissional sp : servicoProfissionalRepository.findByServicoId(s.getId())) {
             profissionais.add(new ProfissionaisPorServicoDto(
-                    sp.getProfissional().getId(), sp.getProfissional().getNome()));
+                    sp.getProfissional().getId(),
+                    sp.getProfissional().getNome(),
+                    sp.getProfissional().getFotoUrl()));
         }
         dto.setProfissionais(profissionais);
 

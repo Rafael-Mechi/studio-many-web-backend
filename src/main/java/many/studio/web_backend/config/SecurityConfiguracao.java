@@ -57,8 +57,6 @@ public class SecurityConfiguracao {
             "/usuarios/redefinir_senha",
             "/usuarios/esqueci-senha/**",
             "/usuarios/logout/**",
-            "/h2-console/**",
-            "/h2-console/*/**",
             "/error/**",
             "/servicos",
             "/agenda/*",
@@ -71,10 +69,12 @@ public class SecurityConfiguracao {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
+
+                                .requestMatchers(HttpMethod.POST, "/analise/probabilidade_no_show")
+                                .hasAnyRole("ADMIN", "PROFISSIONAL")
 
                                 .requestMatchers(URLS_PERMITIDAS).permitAll()
 

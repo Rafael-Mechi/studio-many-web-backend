@@ -16,7 +16,7 @@ public class PacoteMapper {
         response.setId(pacote.getId());
         response.setAtivo(pacote.getAtivo());
         response.setNome(pacote.getNome());
-        response.setPrecoTotal(pacote.getPrecoTotal());
+        response.setPrecoTotal(precoEfetivo(pacote));
         response.setTotalSessoes(pacote.getTotalSessoes());
         response.setValidadeDias(pacote.getValidadeDias());
 
@@ -27,7 +27,7 @@ public class PacoteMapper {
 
         Double precoOriginal = calcularPrecoOriginal(servico, pacote.getTotalSessoes());
         response.setPrecoOriginal(precoOriginal);
-        response.setDescontoPercentual(calcularDesconto(precoOriginal, pacote.getPrecoTotal()));
+        response.setDescontoPercentual(calcularDesconto(precoOriginal, precoEfetivo(pacote)));
 
         return response;
     }
@@ -50,6 +50,18 @@ public class PacoteMapper {
         entity.setPrecoTotal(dto.getPrecoTotal());
         entity.setValidadeDias(dto.getValidadeDias());
         entity.setAtivo(dto.getAtivo());
+    }
+
+    /**
+     * Preço realmente cobrado do pacote. A sessão avulsa (1 sessão) sempre acompanha
+     * o preço atual do serviço, mesmo que pacotes.preco_total esteja desatualizado.
+     */
+    public static Double precoEfetivo(Pacote pacote) {
+        if (pacote.getTotalSessoes() != null && pacote.getTotalSessoes() == 1
+                && pacote.getServico() != null && pacote.getServico().getPreco() != null) {
+            return pacote.getServico().getPreco();
+        }
+        return pacote.getPrecoTotal();
     }
 
     public static Double calcularPrecoOriginal(Servico servico, Integer totalSessoes) {

@@ -8,8 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-import java.util.List;
-
 public interface AgendamentoItemRepository extends JpaRepository<AgendamentoItem, Long> {
     @Transactional
     void deleteByAgendamentoId(Long agendamentoId);
@@ -35,7 +33,7 @@ public interface AgendamentoItemRepository extends JpaRepository<AgendamentoItem
         SELECT ai
         FROM AgendamentoItem ai
         WHERE ai.profissional.id = :profissionalId
-        AND ai.agendamento.statusAgendamento.estado NOT IN ('cancelado', 'recusado')
+        AND ai.agendamento.statusAgendamento.estado NOT IN ('cancelado', 'concluido', 'recusado', 'no-show')
     """)
         List<AgendamentoItem> findAgendamentosQueOcupamHorario(
                 @Param("profissionalId") Long profissionalId

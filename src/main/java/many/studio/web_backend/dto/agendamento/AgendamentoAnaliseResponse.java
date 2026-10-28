@@ -22,7 +22,7 @@ public class AgendamentoAnaliseResponse {
             Long idCliente,
             String nomeCliente,
             LocalDateTime dataHoraAgendamento,
-            Integer qtdNoShows,
+            Long qtdNoShows,
             Long qtdAgendamentosNaoFinalizados,
             Long qtdAgendamentosConcluidos) {
 
@@ -30,7 +30,7 @@ public class AgendamentoAnaliseResponse {
         this.idCliente = idCliente;
         this.nomeCliente = nomeCliente;
         this.dataHoraAgendamento = dataHoraAgendamento;
-        this.qtdNoShows = qtdNoShows != null ? qtdNoShows : 0;
+        this.qtdNoShows = qtdNoShows != null ? qtdNoShows.intValue() : 0;
         this.qtdAgendamentosNaoFinalizados =
                 qtdAgendamentosNaoFinalizados;
         this.qtdAgendamentosConcluidos = qtdAgendamentosConcluidos;

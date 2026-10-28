@@ -3,6 +3,7 @@ package many.studio.web_backend.service;
 import many.studio.web_backend.dto.agendamento.CancelarAgendamentoRequest;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
 import many.studio.web_backend.entity.*;
+import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.NonAuthorizedException;
 import many.studio.web_backend.repository.*;
 import many.studio.web_backend.exception.EntityNotFoundException;
@@ -44,6 +45,9 @@ public class AgendamentoTest {
     @Mock
     private UsuarioRepository usuarioRepository;
 
+    @Mock
+    private NotificacaoAgendamentoService notificacaoAgendamentoService;
+
     @InjectMocks
     private AgendamentoService service;
 
@@ -60,6 +64,7 @@ public class AgendamentoTest {
 
             Perfil perfilCliente = new Perfil();
             perfilCliente.setId(3L);
+            perfilCliente.setPerfil("ROLE_CLIENTE");
 
             Usuario usuario = new Usuario();
             usuario.setId(idUsuario);
@@ -81,9 +86,6 @@ public class AgendamentoTest {
                     .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
                     .thenReturn(true);
 
-            when(agendamentoRepository.existsById(idAgendamento))
-                    .thenReturn(true);
-
             when(agendamentoRepository.findById(idAgendamento))
                     .thenReturn(Optional.of(agendamento));
 
@@ -93,19 +95,16 @@ public class AgendamentoTest {
             when(statusAgendamentoRepository.findByEstado("cancelado"))
                     .thenReturn(Optional.of(statusCancelado));
 
-            doNothing().when(agendamentoItemRepository)
-                    .deleteByAgendamentoId(idAgendamento);
-
             service.cancelarAgendamento(idAgendamento, request, idUsuario);
-
-            verify(agendamentoItemRepository)
-                    .deleteByAgendamentoId(idAgendamento);
 
             verify(statusAgendamentoRepository)
                     .findByEstado("cancelado");
 
             verify(agendamentoRepository)
                     .save(agendamento);
+
+            verify(notificacaoAgendamentoService)
+                    .notificarStatus(agendamento);
 
             assertEquals("cancelado",
                     agendamento.getStatusAgendamento().getEstado());
@@ -127,6 +126,7 @@ public class AgendamentoTest {
 
             Perfil perfilAdmin = new Perfil();
             perfilAdmin.setId(1L);
+            perfilAdmin.setPerfil("ROLE_ADMIN");
 
             Usuario admin = new Usuario();
             admin.setId(idUsuario);
@@ -148,9 +148,6 @@ public class AgendamentoTest {
                     .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
                     .thenReturn(true);
 
-            when(agendamentoRepository.existsById(idAgendamento))
-                    .thenReturn(true);
-
             when(agendamentoRepository.findById(idAgendamento))
                     .thenReturn(Optional.of(agendamento));
 
@@ -161,9 +158,6 @@ public class AgendamentoTest {
                     .thenReturn(Optional.of(statusCancelado));
 
             service.cancelarAgendamento(idAgendamento, request, idUsuario);
-
-            verify(agendamentoItemRepository)
-                    .deleteByAgendamentoId(idAgendamento);
 
             verify(agendamentoRepository)
                     .save(agendamento);
@@ -186,6 +180,7 @@ public class AgendamentoTest {
 
             Perfil perfilAdmin = new Perfil();
             perfilAdmin.setId(1L);
+            perfilAdmin.setPerfil("ROLE_ADMIN");
 
             Usuario admin = new Usuario();
             admin.setId(idUsuario);
@@ -207,9 +202,6 @@ public class AgendamentoTest {
                     .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
                     .thenReturn(true);
 
-            when(agendamentoRepository.existsById(idAgendamento))
-                    .thenReturn(true);
-
             when(agendamentoRepository.findById(idAgendamento))
                     .thenReturn(Optional.of(agendamento));
 
@@ -220,9 +212,6 @@ public class AgendamentoTest {
                     .thenReturn(Optional.of(statusCancelado));
 
             service.cancelarAgendamento(idAgendamento, request, idUsuario);
-
-            verify(agendamentoItemRepository)
-                    .deleteByAgendamentoId(idAgendamento);
 
             verify(agendamentoRepository)
                     .save(agendamento);
@@ -241,6 +230,7 @@ public class AgendamentoTest {
 
             Perfil perfilCliente = new Perfil();
             perfilCliente.setId(3L);
+            perfilCliente.setPerfil("ROLE_CLIENTE");
 
             Usuario usuario = new Usuario();
             usuario.setId(idUsuario);
@@ -259,8 +249,8 @@ public class AgendamentoTest {
                     .isUsuarioValidoParaCancelamentoDeAgendamento(idUsuario, idAgendamento))
                     .thenReturn(true);
 
-            when(agendamentoRepository.existsById(idAgendamento))
-                    .thenReturn(true);
+            when(agendamentoRepository.findById(idAgendamento))
+                    .thenReturn(Optional.of(agendamento));
 
             when(usuarioRepository.findById(idUsuario))
                     .thenReturn(Optional.of(usuario));
@@ -402,7 +392,7 @@ public class AgendamentoTest {
                 Long idAgendamento = 1L;
 
                 Perfil perfilFuncionario = new Perfil();
-                perfilFuncionario.setPerfil("ROLE_FUNCIONARIO");
+                perfilFuncionario.setPerfil("ROLE_PROFISSIONAL");
 
                 UsuarioDetalhesDto usuario = new UsuarioDetalhesDto(
                         99L,
@@ -472,6 +462,114 @@ public class AgendamentoTest {
 
                 verify(agendamentoRepository, never())
                         .save(any());
+        }
+
+        @Test
+        void deveMarcarNoShowENotificarCliente() {
+            Long idAgendamento = 1L;
+
+            Perfil perfilAdmin = new Perfil();
+            perfilAdmin.setPerfil("ROLE_ADMIN");
+
+            UsuarioDetalhesDto usuario = new UsuarioDetalhesDto(
+                    10L,
+                    "admin@email.com",
+                    "123",
+                    perfilAdmin,
+                    true
+            );
+
+            StatusAgendamento statusAtual = new StatusAgendamento();
+            statusAtual.setEstado("agendado");
+
+            Agendamento agendamento = new Agendamento();
+            agendamento.setId(idAgendamento);
+            agendamento.setStatusAgendamento(statusAtual);
+
+            StatusAgendamento statusNoShow = new StatusAgendamento();
+            statusNoShow.setEstado("no-show");
+
+            when(agendamentoRepository.findById(idAgendamento))
+                    .thenReturn(Optional.of(agendamento));
+            when(statusAgendamentoRepository.findByEstado("no-show"))
+                    .thenReturn(Optional.of(statusNoShow));
+
+            service.marcarNoShow(idAgendamento, usuario);
+
+            assertEquals("no-show", agendamento.getStatusAgendamento().getEstado());
+            verify(agendamentoRepository).save(agendamento);
+            verify(notificacaoAgendamentoService).notificarStatus(agendamento);
+        }
+
+        @Test
+        void naoDeveMarcarNoShowDeAgendamentoEmAtendimento() {
+            Long idAgendamento = 1L;
+
+            Perfil perfilAdmin = new Perfil();
+            perfilAdmin.setPerfil("ROLE_ADMIN");
+
+            UsuarioDetalhesDto usuario = new UsuarioDetalhesDto(
+                    10L,
+                    "admin@email.com",
+                    "123",
+                    perfilAdmin,
+                    true
+            );
+
+            StatusAgendamento statusAtual = new StatusAgendamento();
+            statusAtual.setEstado("em atendimento");
+
+            Agendamento agendamento = new Agendamento();
+            agendamento.setId(idAgendamento);
+            agendamento.setStatusAgendamento(statusAtual);
+
+            when(agendamentoRepository.findById(idAgendamento))
+                    .thenReturn(Optional.of(agendamento));
+
+            assertThrows(
+                    EntityConflictException.class,
+                    () -> service.marcarNoShow(idAgendamento, usuario)
+            );
+
+            verify(agendamentoRepository, never()).save(any());
+            verify(notificacaoAgendamentoService, never()).notificarStatus(any());
+        }
+
+        @Test
+        void deveRecusarSolicitacaoENotificarCliente() {
+            Long idAgendamento = 1L;
+
+            Perfil perfilAdmin = new Perfil();
+            perfilAdmin.setPerfil("ROLE_ADMIN");
+
+            UsuarioDetalhesDto usuario = new UsuarioDetalhesDto(
+                    10L,
+                    "admin@email.com",
+                    "123",
+                    perfilAdmin,
+                    true
+            );
+
+            StatusAgendamento statusAtual = new StatusAgendamento();
+            statusAtual.setEstado("aguardando sinal");
+
+            Agendamento agendamento = new Agendamento();
+            agendamento.setId(idAgendamento);
+            agendamento.setStatusAgendamento(statusAtual);
+
+            StatusAgendamento statusRecusado = new StatusAgendamento();
+            statusRecusado.setEstado("recusado");
+
+            when(agendamentoRepository.findById(idAgendamento))
+                    .thenReturn(Optional.of(agendamento));
+            when(statusAgendamentoRepository.findByEstado("recusado"))
+                    .thenReturn(Optional.of(statusRecusado));
+
+            service.recusar(idAgendamento, usuario);
+
+            assertEquals("recusado", agendamento.getStatusAgendamento().getEstado());
+            verify(agendamentoRepository).save(agendamento);
+            verify(notificacaoAgendamentoService).notificarStatus(agendamento);
         }
     }
 }

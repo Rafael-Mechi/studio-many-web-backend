@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class AgendamentoHelper {
@@ -47,6 +48,30 @@ public class AgendamentoHelper {
         return Objects.equals(fkUsuarioAgendamento, idUsuario) || perfilUsuario.equals(1L);
     }
 
+    public boolean isUsuarioValidoParaAlterarAgendamento(Long idUsuario, Agendamento agendamento) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(idUsuario);
+        if (usuarioOpt.isEmpty() || agendamento == null) {
+            return false;
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        Long perfilUsuario = usuario.getPerfil() == null ? null : usuario.getPerfil().getId();
+
+        if (perfilUsuario != null && perfilUsuario.equals(1L)) {
+            return true;
+        }
+
+        boolean clienteDoAgendamento = agendamento.getCliente() != null
+                && agendamento.getCliente().getUsuario() != null
+                && Objects.equals(agendamento.getCliente().getUsuario().getId(), idUsuario);
+
+        boolean profissionalDoAgendamento = agendamento.getProfissional() != null
+                && agendamento.getProfissional().getUsuario() != null
+                && Objects.equals(agendamento.getProfissional().getUsuario().getId(), idUsuario);
+
+        return clienteDoAgendamento || profissionalDoAgendamento;
+    }
+
     public void validarIntegridadeUsuario(Long id, String role, Long clienteId) {
 
         if ("ROLE_CLIENTE".equals(role)) {
@@ -73,29 +98,84 @@ public class AgendamentoHelper {
         return pacote.getAtivo();
     }
 
-    public void validarConflitoHorarioAgendamento(LocalDateTime horario, Long idProfissional, Long pacoteId
+    public void validarConflitoHorarioAgendamento(LocalDateTime horario, Long idProfissional, Long pacoteId) {
+        Pacote pacote = pacoteRepository.findById(pacoteId)
+                .orElseThrow(() -> new EntityNotFoundException("Pacote não encontrado"));
+
+        Servico servico = pacote.getServico();
+        int totalSessoes = pacote.getTotalSessoes() == null ? 1 : pacote.getTotalSessoes();
+
+        for (int sessao = 0; sessao < totalSessoes; sessao++) {
+            LocalDateTime inicio = horario.plusDays(sessao * 7L);
+            validarConflitoHorario(
+                    inicio,
+                    inicio.plusMinutes(servico.getDuracaoMinutos()),
+                    idProfissional,
+                    null
+            );
+        }
+    }
+
+    public void validarConflitoHorarioItem(
+            LocalDateTime inicio,
+            Integer duracaoMinutos,
+            Long idProfissional,
+            Long idAgendamentoIgnorado
+    ) {
+        validarConflitoHorario(
+                inicio,
+                inicio.plusMinutes(duracaoMinutos),
+                idProfissional,
+                idAgendamentoIgnorado
+        );
+    }
+
+    private void validarConflitoHorario(
+            LocalDateTime novoInicio,
+            LocalDateTime novoFim,
+            Long idProfissional,
+            Long idAgendamentoIgnorado
     ) {
         List<Agendamento> agendamentos = agendamentoRepository.findByProfissionalId(idProfissional);
 
-        Pacote pacote =  pacoteRepository.findById(pacoteId).get();
+        for (Agendamento agendamento : agendamentos) {
+            if (idAgendamentoIgnorado != null
+                    && idAgendamentoIgnorado.equals(agendamento.getId())) {
+                continue;
+            }
 
-        Servico servico = pacote.getServico();
+            String status = agendamento.getStatusAgendamento() == null
+                    ? null
+                    : agendamento.getStatusAgendamento().getEstado();
 
-        LocalDateTime novoInicio = horario;
-        LocalDateTime novoFim = horario.plusMinutes(servico.getDuracaoMinutos());
+            boolean statusEncerrado = status != null && Set.of(
+                    StatusAgendamento.CANCELADO,
+                    StatusAgendamento.CONCLUIDO,
+                    StatusAgendamento.RECUSADO,
+                    StatusAgendamento.NO_SHOW
+            ).contains(status.trim().toLowerCase());
 
-        for (Agendamento a : agendamentos) {
+            if (statusEncerrado) {
+                continue;
+            }
 
-            List<AgendamentoItem> itens = agendamentoItemRepository.findByAgendamentoId(a.getId());
-            AgendamentoItem item = itens.getFirst();
+            List<AgendamentoItem> itens = agendamentoItemRepository.findByAgendamentoId(agendamento.getId());
+            for (AgendamentoItem item : itens) {
+                LocalDateTime inicioExistente = item.getInicioAtendimento();
+                LocalDateTime fimExistente = item.getFimAtendimento();
 
-            LocalDateTime inicioExistente = item.getInicioAtendimento();
-            LocalDateTime fimExistente = item.getFimAtendimento();
+                if (inicioExistente == null || fimExistente == null) {
+                    continue;
+                }
 
-            boolean conflita = novoInicio.isBefore(fimExistente) && novoFim.isAfter(inicioExistente);
+                boolean conflita = novoInicio.isBefore(fimExistente)
+                        && novoFim.isAfter(inicioExistente);
 
-            if (conflita && !a.getStatusAgendamento().equals("cancelado")) {
-                throw new EntityConflictException("O profissional já possui um agendamento nesse horário");
+                if (conflita) {
+                    throw new EntityConflictException(
+                            "O profissional já possui um agendamento nesse horário"
+                    );
+                }
             }
         }
     }

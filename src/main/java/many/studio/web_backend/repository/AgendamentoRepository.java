@@ -24,7 +24,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         JOIN a.itens ai
         WHERE a.profissional.id = :profissionalId
           AND ai.inicioAtendimento > CURRENT_TIMESTAMP
-          AND a.statusAgendamento.estado NOT IN ('cancelado', 'concluido', 'recusado', 'faltou')
+          AND a.statusAgendamento.estado NOT IN ('cancelado', 'concluido', 'recusado', 'no-show')
     """)
     List<Agendamento> findFuturosAtivosByProfissionalId(@Param("profissionalId") Long profissionalId);
 
@@ -128,7 +128,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         JOIN pac.servico s
         JOIN a.statusAgendamento sa
         WHERE s.nome = :nomeServico
-        AND sa.estado <> 'cancelado'
+        AND sa.estado NOT IN ('cancelado', 'concluido', 'recusado', 'no-show')
     """)
     List<HorarioIndisponivelDto> buscarAgendamentosIndisponiveis(String nomeServico);
 
@@ -181,6 +181,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     @Query("""
     SELECT new many.studio.web_backend.dto.agendamento.ResumoAgendamento(
         a.id,
+        ai.id,
         a.cliente.id,
         ai.inicioAtendimento,
         s.id, s.nome, s.preco, s.duracaoMinutos,
@@ -266,7 +267,14 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
             c.id,
             c.nome,
             MIN(ai.inicioAtendimento),
-            COALESCE(c.totalNoShows, 0),
+
+            (
+                SELECT COUNT(DISTINCT a4.id)
+                FROM Agendamento a4
+                JOIN a4.statusAgendamento s4
+                WHERE a4.cliente.id = c.id
+                  AND LOWER(TRIM(s4.estado)) = 'no-show'
+            ),
 
             (
                 SELECT COUNT(DISTINCT a2.id)
@@ -274,7 +282,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
                 JOIN a2.statusAgendamento s2
                 WHERE a2.cliente.id = c.id
                   AND LOWER(TRIM(s2.estado))
-                      NOT IN ('concluido', 'concluído', 'faltou')
+                      NOT IN ('concluido', 'no-show')
             ),
 
             (
@@ -282,8 +290,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
                 FROM Agendamento a3
                 JOIN a3.statusAgendamento s3
                 WHERE a3.cliente.id = c.id
-                  AND LOWER(TRIM(s3.estado))
-                      IN ('concluido', 'concluído')
+                  AND LOWER(TRIM(s3.estado)) = 'concluido'
             )
         )
         FROM Agendamento a
@@ -291,7 +298,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         JOIN a.itens ai
         WHERE ai.inicioAtendimento >= :inicio
           AND ai.inicioAtendimento < :fim
-        GROUP BY a.id, c.id, c.nome, c.totalNoShows
+        GROUP BY a.id, c.id, c.nome
         ORDER BY MIN(ai.inicioAtendimento)
         """)
     List<AgendamentoAnaliseResponse> buscarDadosParaAnalise(

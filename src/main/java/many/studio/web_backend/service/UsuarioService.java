@@ -317,7 +317,15 @@ public class UsuarioService {
             clienteResponse.setClienteDesde(u.get().getCriadoEm().toLocalDate());
             clienteResponse.setCpf(c.getDocumento());
             clienteResponse.setTelefone(c.getTelefone());
-            clienteResponse.setQtdNoShows(c.getTotalNoShows());
+            clienteResponse.setQtdNoShows(
+                    agendamentoRepository
+                            .findByClienteIdAndStatusAgendamentoEstado(
+                                    c.getId(),
+                                    StatusAgendamento.NO_SHOW,
+                                    null
+                            )
+                            .size()
+            );
 
             List<HistoricoAgendamentos> historicoAgendamentos =
                     agendamentoRepository.buscarHistoricoPorClienteEUsuarioProfissional(c.getId(), usuarioIdFiltro);

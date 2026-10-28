@@ -3,6 +3,7 @@ package many.studio.web_backend.entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "comprovantes")
 public class Comprovante {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

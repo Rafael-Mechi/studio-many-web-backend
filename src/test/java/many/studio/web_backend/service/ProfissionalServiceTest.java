@@ -69,7 +69,6 @@ class ProfissionalServiceTest {
         cliente.setNome("Giovana Lopes");
         cliente.setTelefone("(11) 98765-4321");
         cliente.setDocumento("123.456.789-01");
-        cliente.setTotalNoShows(0);
         cliente.setUsuario(usuario);
 
         // Mock da projeção de interface do banco de dados

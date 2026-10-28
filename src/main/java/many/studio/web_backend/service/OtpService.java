@@ -103,7 +103,7 @@ public class OtpService {
         otpCodigoRepository.save(otp);
 
         notificacaoPublisher.enviarWhatsApp(destino,
-                "Seu codigo de recuperacao de senha Studio Many: " + codigo
+                "Seu codigo de recuperacao de senha Studio Essência: " + codigo
                         + ". Valido por " + validadeMinutos + " minutos.");
     }
 
@@ -178,7 +178,7 @@ public class OtpService {
         otpCodigoRepository.save(otp);
 
         notificacaoPublisher.enviarWhatsApp(otp.getDestino(),
-                "Sua senha do Studio Many foi redefinida com sucesso.");
+                "Sua senha do Studio Essência foi redefinida com sucesso.");
     }
 
     private void invalidarPendentes(String destino) {

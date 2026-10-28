@@ -75,11 +75,12 @@ public class AgendamentoController {
 
     @PatchMapping("/{itemId}/reagendar")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<AgendamentoItemResponse> reagendar(@PathVariable Long itemId, LocalDateTime novoHorario) {
-        return ResponseEntity.ok(AgendamentoItemMapper.toResponse(agendamentoItemService.reagendar(itemId, novoHorario)));
+    public ResponseEntity<AgendamentoItemResponse> reagendar(@PathVariable Long itemId, @RequestParam LocalDateTime novoHorario, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+        return ResponseEntity.ok(AgendamentoItemMapper.toResponse(agendamentoItemService.reagendar(itemId, novoHorario, usuario)));
     }
 
     @PatchMapping("/{idAgendamento}/confirmar")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> confirmar(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
 
         agendamentoService.confirmar(idAgendamento, usuario);
@@ -88,6 +89,7 @@ public class AgendamentoController {
     }
 
     @PatchMapping("/{idAgendamento}/checkIn")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> fazerCheckIn(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
 
         agendamentoService.fazerCheckIn(idAgendamento, usuario);
@@ -96,6 +98,7 @@ public class AgendamentoController {
     }
 
     @PatchMapping("/{idAgendamento}/emAtendimento")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> emAtendimento(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
 
         agendamentoService.emAtendimento(idAgendamento, usuario);
@@ -104,9 +107,28 @@ public class AgendamentoController {
     }
 
     @PatchMapping("/{idAgendamento}/concluido")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> concluir(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
 
         agendamentoService.concluir(idAgendamento, usuario);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{idAgendamento}/no-show")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> marcarNoShow(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+
+        agendamentoService.marcarNoShow(idAgendamento, usuario);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{idAgendamento}/recusar")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> recusar(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
+
+        agendamentoService.recusar(idAgendamento, usuario);
 
         return ResponseEntity.ok().build();
     }

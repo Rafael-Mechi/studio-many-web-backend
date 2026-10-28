@@ -6,6 +6,7 @@ import java.time.LocalTime;
 
 public class ResumoAgendamento {
     private Long id;
+    private Long itemId;
     private Long clienteId;
     private LocalDate data;
     private LocalTime hora;
@@ -24,6 +25,7 @@ public class ResumoAgendamento {
 
     public ResumoAgendamento(
             Long id,
+            Long itemId,
             Long clienteId,
             LocalDateTime inicioAtendimento,
             Long servicoId,
@@ -38,6 +40,7 @@ public class ResumoAgendamento {
             String profissionalTelefone, String statusAgendamento
     ) {
         this.id = id;
+        this.itemId = itemId;
         this.clienteId = clienteId;
         this.data = inicioAtendimento.toLocalDate();
         this.hora = inicioAtendimento.toLocalTime();
@@ -61,6 +64,14 @@ public class ResumoAgendamento {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 
     public Long getClienteId() {

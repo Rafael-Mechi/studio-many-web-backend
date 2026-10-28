@@ -11,7 +11,8 @@ public class ProfissionalMapper {
             String nomeFuncionario,
             LocalDateTime ultimaVisita,
             Double totalGasto,
-            String servicoPreferido
+            String servicoPreferido,
+            Integer noShow
     ) {
         ClientePorProfissionalDto response = new ClientePorProfissionalDto();
 
@@ -19,7 +20,7 @@ public class ProfissionalMapper {
         response.setClienteId(cliente.getId());
         response.setNomeCliente(cliente.getNome());
         response.setTelefone(cliente.getTelefone());
-        response.setNoShow(cliente.getTotalNoShows());
+        response.setNoShow(noShow);
         response.setNomeFuncionario(nomeFuncionario);
         response.setEmail(cliente.getUsuario().getEmail());
         response.setUltimaVisita(ultimaVisita);
