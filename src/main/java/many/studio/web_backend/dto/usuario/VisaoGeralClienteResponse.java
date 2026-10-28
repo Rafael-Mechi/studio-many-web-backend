@@ -8,6 +8,7 @@ public class VisaoGeralClienteResponse {
     private String nomeUsuario;
     private String emailUsuario;
     private String telefoneUsuario;
+    private String fotoUrlUsuario;
     private Integer noShow;
     private Double totalGasto;
     private Integer atendimentosPendentes;
@@ -48,6 +49,14 @@ public class VisaoGeralClienteResponse {
 
     public void setTelefoneUsuario(String telefoneUsuario) {
         this.telefoneUsuario = telefoneUsuario;
+    }
+
+    public String getFotoUrlUsuario() {
+        return fotoUrlUsuario;
+    }
+
+    public void setFotoUrlUsuario(String fotoUrlUsuario) {
+        this.fotoUrlUsuario = fotoUrlUsuario;
     }
 
     public Integer getNoShow() {

@@ -173,6 +173,8 @@ public class AgendamentoService {
 
             response.setTelefoneUsuario(cliente.getTelefone());
 
+            response.setFotoUrlUsuario(cliente.getFotoUrl());
+
             response.setNoShow(qtdNoShows);
 
             response.setTotalGasto(somaPagamentos);

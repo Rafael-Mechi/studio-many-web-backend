@@ -21,6 +21,7 @@ public class ResumoAgendamento {
     private String profissionalEmail;
     private String profissionalNome;
     private String profissionalTelefone;
+    private String profissionalFotoUrl;
     private String statusAgendamento;
 
     public ResumoAgendamento(
@@ -37,7 +38,8 @@ public class ResumoAgendamento {
             String pacoteNome,
             Long profissionalId,
             String profissionalEmail, String profissionalNome,
-            String profissionalTelefone, String statusAgendamento
+            String profissionalTelefone, String profissionalFotoUrl,
+            String statusAgendamento
     ) {
         this.id = id;
         this.itemId = itemId;
@@ -55,6 +57,7 @@ public class ResumoAgendamento {
         this.profissionalEmail = profissionalEmail;
         this.profissionalNome = profissionalNome;
         this.profissionalTelefone = profissionalTelefone;
+        this.profissionalFotoUrl = profissionalFotoUrl;
         this.statusAgendamento = statusAgendamento;
     }
 
@@ -176,6 +179,14 @@ public class ResumoAgendamento {
 
     public void setProfissionalTelefone(String profissionalTelefone) {
         this.profissionalTelefone = profissionalTelefone;
+    }
+
+    public String getProfissionalFotoUrl() {
+        return profissionalFotoUrl;
+    }
+
+    public void setProfissionalFotoUrl(String profissionalFotoUrl) {
+        this.profissionalFotoUrl = profissionalFotoUrl;
     }
 
     public String getStatusAgendamento() {
