@@ -155,7 +155,7 @@ public class ProfissionalService {
             Long profissionalId,
             List<ProfissionalUpdateDto.DiasDeTrabalhoDto> diasRecebidos
     ) {
-        // Campo ausente: preserva os horários atuais.
+
         if (diasRecebidos == null) {
             return;
         }
@@ -227,10 +227,10 @@ public class ProfissionalService {
             paraSalvar.add(horario);
         }
 
-        // Horários que existiam, mas não foram enviados, são removidos.
+
         diasDeTrabalhoRepository.deleteAll(existentes.values());
 
-        // Persiste horários novos e atualizados.
+
         diasDeTrabalhoRepository.saveAll(paraSalvar);
     }
 
