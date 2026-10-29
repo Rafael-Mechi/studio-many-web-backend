@@ -17,6 +17,27 @@ public class AgendamentoAnaliseResponse {
 
     private long tempoDiasAteConsulta;
 
+    // Sobrecarga para IDEs/provedores que inferem os COUNTs como Integer.
+    // Mantém também o construtor com Long, usado normalmente por COUNT em JPQL.
+    public AgendamentoAnaliseResponse(
+            Long idAgendamento,
+            Long idCliente,
+            String nomeCliente,
+            LocalDateTime dataHoraAgendamento,
+            int qtdNoShows,
+            int qtdAgendamentosNaoFinalizados,
+            int qtdAgendamentosConcluidos) {
+        this(
+                idAgendamento,
+                idCliente,
+                nomeCliente,
+                dataHoraAgendamento,
+                Long.valueOf(qtdNoShows),
+                Long.valueOf(qtdAgendamentosNaoFinalizados),
+                Long.valueOf(qtdAgendamentosConcluidos)
+        );
+    }
+
     public AgendamentoAnaliseResponse(
             Long idAgendamento,
             Long idCliente,
