@@ -2,65 +2,20 @@ package many.studio.web_backend.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import many.studio.web_backend.dto.calendario.DiasDeTrabalhoCriacaoResponse;
-import many.studio.web_backend.dto.calendario.DiasDeTrabalhoRequest;
-import many.studio.web_backend.dto.calendario.SlotsResponse;
 import many.studio.web_backend.dto.profissional.*;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
-import many.studio.web_backend.mapper.calendario.DiasDeTrabalhoMapper;
-import many.studio.web_backend.service.DiasDeTrabalhoService;
 import many.studio.web_backend.service.ProfissionalService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.YearMonth;
-import java.util.List;
 
 @RestController
 @RequestMapping("/profissionais")
 public class ProfissionalController {
     private final ProfissionalService profissionalService;
-    private final DiasDeTrabalhoService diasDeTrabalhoService;
 
-    public ProfissionalController(ProfissionalService profissionalService, DiasDeTrabalhoService diasDeTrabalhoService) {
+    public ProfissionalController(ProfissionalService profissionalService) {
         this.profissionalService = profissionalService;
-        this.diasDeTrabalhoService = diasDeTrabalhoService;
-    }
-
-    @GetMapping("/{profissionalId}/clientes")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<ClientePorProfissionalDto>> listarClientesPorProfissional(
-            @PathVariable Long profissionalId
-    ){
-        List<ClientePorProfissionalDto> response = profissionalService.listarClientesPorProfissionalId(profissionalId);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{profissionalId}/clientes/{clienteId}")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<ClienteDetalheDto> listarClientePorProfissional(
-            @PathVariable Long profissionalId,
-            @PathVariable Long clienteId
-    ){
-        ClienteDetalheDto response = profissionalService.detalharClientePorProfissional(profissionalId, clienteId);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/agenda")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<DiasDeTrabalhoCriacaoResponse> registrarDiasDeTrabalho(@Valid @RequestBody DiasDeTrabalhoRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(DiasDeTrabalhoMapper.toResponse(
-                diasDeTrabalhoService.criar(DiasDeTrabalhoMapper.toEntity(request, request.getProfissionalId()))
-        ));
-    }
-
-    @GetMapping("/agenda/{profissionalId}")
-    public ResponseEntity<List<SlotsResponse>> buscarDiasDeTrabalhoPorProfissional(@PathVariable Long profissionalId,
-                                                                                   @RequestParam String mes) {
-        return ResponseEntity.ok()
-                .body(diasDeTrabalhoService.gerarDiasDisponiveisPorProfissional(profissionalId, YearMonth.parse(mes)));
     }
 
     @GetMapping("/{profissionalId}")

@@ -67,10 +67,6 @@ public class AgendamentoService {
         this.agendamentoHelper = agendamentoHelper;
     }
 
-    public List<Agendamento> buscarTodos() {
-        return agendamentoRepository.findAll();
-    }
-
     public Agendamento buscarPorId(Long id) {
         return agendamentoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Agendamento não encontrado"));
@@ -300,27 +296,6 @@ public class AgendamentoService {
         }
 
         aplicarStatus(agendamento, StatusAgendamento.NO_SHOW);
-    }
-
-    @Transactional
-    public void recusar(Long idAgendamento, UsuarioDetalhesDto usuarioLogado) {
-        Agendamento agendamento = buscarPorId(idAgendamento);
-        validarPermissaoOperacional(agendamento, usuarioLogado, "recusar agendamentos");
-        validarStatusEditavel(agendamento);
-
-        String estadoAtual = estadoDoAgendamento(agendamento);
-        Set<String> estadosPermitidos = Set.of(
-                StatusAgendamento.AGUARDANDO_SINAL,
-                StatusAgendamento.SOLICITAR_CONFIRMACAO
-        );
-
-        if (!estadosPermitidos.contains(estadoAtual)) {
-            throw new EntityConflictException(
-                    "Somente solicitações aguardando análise podem ser recusadas"
-            );
-        }
-
-        aplicarStatus(agendamento, StatusAgendamento.RECUSADO);
     }
 
     private void aplicarStatus(Agendamento agendamento, String estado) {

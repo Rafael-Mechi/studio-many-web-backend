@@ -49,12 +49,6 @@ public class ServicoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(servicoService.criar(request));
     }
 
-    @GetMapping("/profissionais/{profissionalId}")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<ServicoListarDto>> listarServicosPorProfissional(@PathVariable Long profissionalId){
-        return ResponseEntity.ok(ServicoMapper.toResponse(servicoService.listarServicosPorProfissional(profissionalId)));
-    }
-
     @PatchMapping("/{servicoId}/editar")
     @SecurityRequirement(name = "Bearer")
     @PreAuthorize("hasRole('ADMIN')")
