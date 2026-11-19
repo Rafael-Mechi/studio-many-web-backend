@@ -1,7 +1,6 @@
 package many.studio.web_backend.mapper;
 
 import many.studio.web_backend.dto.usuario.UsuarioCriacaoDto;
-import many.studio.web_backend.dto.usuario.UsuarioListarDto;
 import many.studio.web_backend.dto.usuario.UsuarioSessaoDto;
 import many.studio.web_backend.dto.usuario.UsuarioTokenDto;
 import many.studio.web_backend.entity.Usuario;
@@ -46,12 +45,4 @@ public class UsuarioMapper {
         return dto;
     }
 
-    public static UsuarioListarDto of(Usuario usuario) {
-        UsuarioListarDto dto = new UsuarioListarDto();
-
-        dto.setId(usuario.getId());
-        dto.setEmail(usuario.getEmail());
-
-        return dto;
-    }
 }

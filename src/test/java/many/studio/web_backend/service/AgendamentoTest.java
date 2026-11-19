@@ -535,41 +535,5 @@ public class AgendamentoTest {
             verify(notificacaoAgendamentoService, never()).notificarStatus(any());
         }
 
-        @Test
-        void deveRecusarSolicitacaoENotificarCliente() {
-            Long idAgendamento = 1L;
-
-            Perfil perfilAdmin = new Perfil();
-            perfilAdmin.setPerfil("ROLE_ADMIN");
-
-            UsuarioDetalhesDto usuario = new UsuarioDetalhesDto(
-                    10L,
-                    "admin@email.com",
-                    "123",
-                    perfilAdmin,
-                    true
-            );
-
-            StatusAgendamento statusAtual = new StatusAgendamento();
-            statusAtual.setEstado("aguardando sinal");
-
-            Agendamento agendamento = new Agendamento();
-            agendamento.setId(idAgendamento);
-            agendamento.setStatusAgendamento(statusAtual);
-
-            StatusAgendamento statusRecusado = new StatusAgendamento();
-            statusRecusado.setEstado("recusado");
-
-            when(agendamentoRepository.findById(idAgendamento))
-                    .thenReturn(Optional.of(agendamento));
-            when(statusAgendamentoRepository.findByEstado("recusado"))
-                    .thenReturn(Optional.of(statusRecusado));
-
-            service.recusar(idAgendamento, usuario);
-
-            assertEquals("recusado", agendamento.getStatusAgendamento().getEstado());
-            verify(agendamentoRepository).save(agendamento);
-            verify(notificacaoAgendamentoService).notificarStatus(agendamento);
-        }
     }
 }

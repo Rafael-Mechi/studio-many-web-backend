@@ -22,33 +22,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     Optional<Usuario> findUsuarioByClienteId(@Param("clienteId") Long clienteId);
 
     @Query("""
-        SELECT c as cliente, 
-               MAX(a.criadoEm) as ultimaVisita, 
-               SUM(CASE WHEN sa.estado = 'Pago' THEN a.precoFinal ELSE 0.0 END) as totalGasto 
-        FROM Cliente c 
-        JOIN Agendamento a ON a.cliente.id = c.id 
-        JOIN a.statusAgendamento sa 
-        WHERE a.profissional.id = :profissionalId 
-        GROUP BY c.id, c.nome
-    """)
-    List<ClienteAgregado> findClientesByProfissionalId(@Param("profissionalId") Long profesionalId);
-
-    @Query("""
-        SELECT c as cliente, 
-               MAX(a.criadoEm) as ultimaVisita, 
-               SUM(CASE WHEN sa.estado = 'Pago' THEN a.precoFinal ELSE 0.0 END) as totalGasto 
-        FROM Cliente c 
-        JOIN Agendamento a ON a.cliente.id = c.id 
-        JOIN a.statusAgendamento sa 
-        WHERE a.profissional.id = :profissionalId AND c.id = :clienteId 
-        GROUP BY c.id, c.nome
-    """)
-    Optional<ClienteAgregado> findClienteByProfissionalIdEClienteId(
-            @Param("profissionalId") Long profissionalId,
-            @Param("clienteId") Long clienteId
-    );
-
-    @Query("""
     SELECT DISTINCT a.cliente
     FROM Agendamento a
     JOIN a.itens ai

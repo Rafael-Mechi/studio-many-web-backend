@@ -7,7 +7,6 @@ import many.studio.web_backend.dto.agendamento.*;
 import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeRequest;
 import many.studio.web_backend.dto.selecao_agendamento.DisponibilidadeResponse;
 import many.studio.web_backend.dto.usuario.UsuarioDetalhesDto;
-import many.studio.web_backend.entity.Comprovante;
 import many.studio.web_backend.mapper.agendamento.AgendamentoItemMapper;
 import many.studio.web_backend.mapper.agendamento.AgendamentoMapper;
 import many.studio.web_backend.service.AgendamentoItemService;
@@ -21,7 +20,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -40,18 +38,6 @@ public class AgendamentoController {
         this.pagamentoService = pagamentoService;
     }
 
-
-    @GetMapping
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<AgendamentoResponse>> buscarTodos() {
-        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponseList(agendamentoService.buscarTodos()));
-    }
-
-    @GetMapping("/{id}")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<AgendamentoResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(AgendamentoMapper.toAgendamentoResponse(agendamentoService.buscarPorId(id)));
-    }
 
     @PostMapping
     @SecurityRequirement(name = "Bearer")
@@ -120,15 +106,6 @@ public class AgendamentoController {
     public ResponseEntity<Void> marcarNoShow(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
 
         agendamentoService.marcarNoShow(idAgendamento, usuario);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{idAgendamento}/recusar")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<Void> recusar(@PathVariable Long idAgendamento, @AuthenticationPrincipal UsuarioDetalhesDto usuario) {
-
-        agendamentoService.recusar(idAgendamento, usuario);
 
         return ResponseEntity.ok().build();
     }
