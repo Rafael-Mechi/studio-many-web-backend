@@ -1,17 +1,13 @@
 package many.studio.web_backend.repository;
 
-import many.studio.web_backend.dto.agendamento.AgendamentoAnaliseResponse;
 import many.studio.web_backend.dto.agendamento.ResumoAgendamento;
-import many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto;
 import many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto;
 import many.studio.web_backend.dto.usuario.HistoricoAgendamentos;
 import many.studio.web_backend.entity.Agendamento;
-import many.studio.web_backend.entity.AgendamentoItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
@@ -27,92 +23,6 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
           AND a.statusAgendamento.estado NOT IN ('cancelado', 'concluido', 'recusado', 'no-show')
     """)
     List<Agendamento> findFuturosAtivosByProfissionalId(@Param("profissionalId") Long profissionalId);
-
-    //    @Query("SELECT s.nome FROM AgendamentoItem ai " +
-//        "JOIN ai.agendamento a " +
-//        "JOIN ai.servico s " +
-//        "WHERE a.cliente.id = :clienteId " +
-//        "GROUP BY s.nome " +
-//        "ORDER BY COUNT(ai.id) DESC"
-//    )
-//    List<String> findServicoPreferidoByClienteId(@Param("clienteId") Long clienteId);
-//
-//    @Query("SELECT new many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto(" +
-//        "  s.nome, " +
-//        "  a.inicio, " +
-//        "  p.nome, " +
-//        "  sa.estado" +
-//        ") " +
-//        "FROM AgendamentoItem ai " +
-//        "JOIN ai.agendamento a " +
-//        "JOIN ai.servico s " +
-//        "JOIN ai.profissional p " +
-//        "JOIN a.statusAgendamento sa " +
-//        "WHERE a.cliente.id = :clienteId " +
-//        "ORDER BY a.inicio DESC")
-//    List<AgendamentoHistoricoDto> findHistoricoRecenteByClienteId(@Param("clienteId") Long clienteId);
-//
-//    @Query("""
-//        SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
-//            a.inicio,
-//            a.fim,
-//            p.nome,
-//            s.nome
-//        )
-//        FROM Agendamento a
-//        JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
-//        JOIN ai.profissional p
-//        JOIN ai.servico s
-//        JOIN a.statusAgendamento sa
-//        WHERE s.nome = :nomeServico
-//        AND sa.estado <> 'cancelado'
-//    """)
-//    List<HorarioIndisponivelDto> buscarAgendamentosIndisponiveis(String nomeServico);
-//
-//    @Query("""
-//        SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
-//            b.inicio,
-//            b.fim,
-//            p.nome,
-//            'BLOQUEIO'
-//        )
-//        FROM Bloqueio b
-//        JOIN b.profissional p
-//        WHERE EXISTS (
-//            SELECT sp.id
-//            FROM ServicoProfissional sp
-//            WHERE sp.profissional.id = p.id
-//            AND sp.servico.nome = :nomeServico
-//        )
-//    """)
-//    List<HorarioIndisponivelDto> buscarBloqueios(String nomeServico);
-    @Query("""
-        SELECT s.nome FROM Agendamento a
-        JOIN a.pacote pac
-        JOIN pac.servico s
-        WHERE a.cliente.id = :clienteId
-        GROUP BY s.nome
-        ORDER BY COUNT(a.id) DESC
-    """)
-    List<String> findServicoPreferidoByClienteId(@Param("clienteId") Long clienteId);
-
-    @Query("""
-        SELECT new many.studio.web_backend.dto.profissional.AgendamentoHistoricoDto(
-          s.nome,
-          ai.inicioAtendimento,
-          p.nome,
-          sa.estado
-        )
-        FROM AgendamentoItem ai\s
-        JOIN ai.agendamento a
-        JOIN a.pacote pac
-        JOIN pac.servico s
-        JOIN a.profissional p
-        JOIN a.statusAgendamento sa
-        WHERE a.cliente.id = :clienteId
-        ORDER BY ai.inicioAtendimento DESC
-    """)
-    List<AgendamentoHistoricoDto> findHistoricoRecenteByClienteId(@Param("clienteId") Long clienteId);
 
     @Query("""
         SELECT new many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto(
@@ -260,49 +170,4 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     WHERE sp.profissional.id = :profissionalId
 """)
     List<String> findCategoriasByProfissionalId(@Param("profissionalId") Long profissionalId);
-
-    @Query("""
-        SELECT new many.studio.web_backend.dto.agendamento.AgendamentoAnaliseResponse(
-            a.id,
-            c.id,
-            c.nome,
-            MIN(ai.inicioAtendimento),
-
-            (
-                SELECT COUNT(DISTINCT a4.id)
-                FROM Agendamento a4
-                JOIN a4.statusAgendamento s4
-                WHERE a4.cliente.id = c.id
-                  AND LOWER(TRIM(s4.estado)) = 'no-show'
-            ),
-
-            (
-                SELECT COUNT(DISTINCT a2.id)
-                FROM Agendamento a2
-                JOIN a2.statusAgendamento s2
-                WHERE a2.cliente.id = c.id
-                  AND LOWER(TRIM(s2.estado))
-                      NOT IN ('concluido', 'no-show')
-            ),
-
-            (
-                SELECT COUNT(DISTINCT a3.id)
-                FROM Agendamento a3
-                JOIN a3.statusAgendamento s3
-                WHERE a3.cliente.id = c.id
-                  AND LOWER(TRIM(s3.estado)) = 'concluido'
-            )
-        )
-        FROM Agendamento a
-        JOIN a.cliente c
-        JOIN a.itens ai
-        WHERE ai.inicioAtendimento >= :inicio
-          AND ai.inicioAtendimento < :fim
-        GROUP BY a.id, c.id, c.nome
-        ORDER BY MIN(ai.inicioAtendimento)
-        """)
-    List<AgendamentoAnaliseResponse> buscarDadosParaAnalise(
-            @Param("inicio") LocalDateTime inicio,
-            @Param("fim") LocalDateTime fim
-    );
 }

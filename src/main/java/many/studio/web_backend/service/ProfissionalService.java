@@ -6,21 +6,16 @@ import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.exception.ForbiddenException;
-import many.studio.web_backend.mapper.ProfissionalMapper;
 import many.studio.web_backend.mapper.profissional.ProfissionalDetalhesMapper;
 import many.studio.web_backend.repository.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProfissionalService {
-    private final ClienteRepository clienteRepository;
-    private final AgendamentoRepository agendamentoRepository;
     private final ProfissionalRepository profissionalRepository;
     private final PasswordEncoder passwordEncoder;
     private final UsuarioRepository usuarioRepository;
@@ -28,68 +23,13 @@ public class ProfissionalService {
     private final ServicoRepository servicoRepository;
     private final DiasDeTrabalhoRepository diasDeTrabalhoRepository;
 
-    public ProfissionalService(ClienteRepository clienteRepository, AgendamentoRepository agendamentoRepository, ProfissionalRepository profissionalRepository, PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, ServicoProfissionalRepository servicoProfissionalRepository, ServicoRepository servicoRepository, DiasDeTrabalhoRepository diasDeTrabalhoRepository) {
-        this.clienteRepository = clienteRepository;
-        this.agendamentoRepository = agendamentoRepository;
+    public ProfissionalService(ProfissionalRepository profissionalRepository, PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, ServicoProfissionalRepository servicoProfissionalRepository, ServicoRepository servicoRepository, DiasDeTrabalhoRepository diasDeTrabalhoRepository) {
         this.profissionalRepository = profissionalRepository;
         this.passwordEncoder = passwordEncoder;
         this.usuarioRepository = usuarioRepository;
         this.servicoProfissionalRepository = servicoProfissionalRepository;
         this.servicoRepository = servicoRepository;
         this.diasDeTrabalhoRepository = diasDeTrabalhoRepository;
-    }
-
-    public List<ClientePorProfissionalDto> listarClientesPorProfissionalId(Long profissionalId){
-        Profissional profissional = profissionalRepository.findById(profissionalId)
-                .orElseThrow(() -> new EntityNotFoundException("Profissional não existe"));
-
-        List<ClienteAgregado> agregados = clienteRepository.findClientesByProfissionalId(profissionalId);
-        if (agregados.isEmpty()){
-            throw new EntityNotFoundException("Nenhum cliente para esse profissional");
-        }
-
-        return agregados.stream().map(item -> {
-            Cliente cliente = item.getCliente();
-            LocalDateTime ultimaVisita = item.getUltimaVisita();
-            Double totalGasto = (item.getTotalGasto() != null) ? item.getTotalGasto() : 0.0;
-            List<String> servicos = agendamentoRepository.findServicoPreferidoByClienteId(cliente.getId());
-            String preferido = (!servicos.isEmpty()) ? servicos.get(0) : "Nenhum serviço";
-
-            return ProfissionalMapper.toResponse(
-                    cliente,
-                    profissional.getNome(),
-                    ultimaVisita,
-                    totalGasto,
-                    preferido,
-                    contarNoShows(cliente.getId()));
-        }).toList();
-    }
-
-    public ClienteDetalheDto detalharClientePorProfissional(Long profissionalId, Long clienteId) {
-        if (!profissionalRepository.existsById(profissionalId)) {
-            throw new EntityNotFoundException("Profissional não existe");
-        }
-
-        ClienteAgregado agregado = clienteRepository.findClienteByProfissionalIdEClienteId(profissionalId, clienteId)
-                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado para este profissional"));
-
-        Cliente cliente = agregado.getCliente();
-        LocalDateTime ultimaVisita = agregado.getUltimaVisita();
-        Double totalGasto = (agregado.getTotalGasto() != null) ? agregado.getTotalGasto() : 0.0;
-
-        List<AgendamentoHistoricoDto> historico = agendamentoRepository.findHistoricoRecenteByClienteId(clienteId);
-
-        return new ClienteDetalheDto(
-                cliente.getId(),
-                cliente.getNome(),
-                cliente.getTelefone(),
-                cliente.getDocumento(),
-                cliente.getUsuario().getEmail(),
-                contarNoShows(clienteId),
-                ultimaVisita,
-                totalGasto,
-                historico
-        );
     }
 
     @Transactional
@@ -259,16 +199,6 @@ public class ProfissionalService {
 
         return profissionalOpt.get();
 
-    }
-
-    private Integer contarNoShows(Long clienteId) {
-        return agendamentoRepository
-                .findByClienteIdAndStatusAgendamentoEstado(
-                        clienteId,
-                        StatusAgendamento.NO_SHOW,
-                        null
-                )
-                .size();
     }
 
     public ProfissionalDetalhesDto getDetalhesProfissionais(Long id, String role) {

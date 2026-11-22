@@ -2,18 +2,15 @@ package many.studio.web_backend.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
-import many.studio.web_backend.dto.agendamento.AgendamentoAnaliseResponse;
 import many.studio.web_backend.dto.agendamento.ProbabilidadeNoShowResponse;
 import many.studio.web_backend.exception.EntityNotFoundException;
 import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.repository.AgendamentoRepository;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -43,19 +40,6 @@ public class AnaliseAgendamentosService {
             S3Client s3Client) {
         this.agendamentoRepository = agendamentoRepository;
         this.s3Client = s3Client;
-    }
-
-    @Transactional(readOnly = true)
-    public List<AgendamentoAnaliseResponse> buscarPorData(
-            LocalDate data) {
-
-        LocalDateTime inicio = data.atStartOfDay();
-        LocalDateTime fim = data.plusDays(1).atStartOfDay();
-
-        return agendamentoRepository.buscarDadosParaAnalise(
-                inicio,
-                fim
-        );
     }
 
     public ProbabilidadeNoShowResponse buscarProbabilidadeNoShow(
