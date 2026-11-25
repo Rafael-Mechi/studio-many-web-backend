@@ -132,18 +132,7 @@ public class AgendamentoService {
                             )
                             .size();
 
-            List<Pagamento> pagamentosPagos =
-                    pagamentoRepository
-                            .findByAgendamentoClienteIdAndStatusPagamentoEstado(
-                                    clienteId,
-                                    "pago",
-                                    usuarioIdFiltro
-                            );
-
-            Double somaPagamentos = pagamentosPagos
-                    .stream()
-                    .mapToDouble(Pagamento::getValor)
-                    .sum();
+            Double somaPagamentos = agendamentoHelper.calcularTotalGasto(clienteId, usuarioIdFiltro);
 
             Integer qtdAgendamentosPendentes =
                     agendamentoRepository
