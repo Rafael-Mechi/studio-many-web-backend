@@ -23,6 +23,7 @@ public class ResumoAgendamento {
     private String profissionalTelefone;
     private String profissionalFotoUrl;
     private String statusAgendamento;
+    private Double sinalPago;
 
     public ResumoAgendamento(
             Long id,
@@ -39,7 +40,8 @@ public class ResumoAgendamento {
             Long profissionalId,
             String profissionalEmail, String profissionalNome,
             String profissionalTelefone, String profissionalFotoUrl,
-            String statusAgendamento
+            String statusAgendamento,
+            Double sinalPago
     ) {
         this.id = id;
         this.itemId = itemId;
@@ -59,6 +61,7 @@ public class ResumoAgendamento {
         this.profissionalTelefone = profissionalTelefone;
         this.profissionalFotoUrl = profissionalFotoUrl;
         this.statusAgendamento = statusAgendamento;
+        this.sinalPago = sinalPago;
     }
 
     public Long getId() {
@@ -203,5 +206,13 @@ public class ResumoAgendamento {
 
     public void setProfissionalNome(String profissionalNome) {
         this.profissionalNome = profissionalNome;
+    }
+
+    public Double getSinalPago() {
+        return sinalPago;
+    }
+
+    public void setSinalPago(Double sinalPago) {
+        this.sinalPago = sinalPago;
     }
 }
