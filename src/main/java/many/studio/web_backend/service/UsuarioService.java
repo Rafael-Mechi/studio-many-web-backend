@@ -10,6 +10,7 @@ import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.ForbiddenException;
 import many.studio.web_backend.mapper.UsuarioMapper;
 import many.studio.web_backend.repository.*;
+import many.studio.web_backend.service.helper.AgendamentoHelper;
 import many.studio.web_backend.strategy.UsuarioCriacaoStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,8 +43,10 @@ public class UsuarioService {
     private final AgendamentoRepository agendamentoRepository;
     private final ServicoRepository servicoRepository;
     private final AnamneseClienteRepository anamneseClienteRepository;
+    private final PagamentoRepository pagamentoRepository;
+    private final AgendamentoHelper agendamentoHelper;
 
-    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository, AgendamentoRepository agendamentoRepository, ServicoRepository servicoRepository, AnamneseClienteRepository anamneseClienteRepository) {
+    public UsuarioService(PasswordEncoder passwordEncoder, UsuarioRepository usuarioRepository, PerfilRepository perfilRepository, GerenciadorTokenJwt gerenciadorTokenJwt, AuthenticationManager authenticationManager, List<UsuarioCriacaoStrategy> strategies, ClienteRepository clienteRepository, ProfissionalRepository profissionalRepository, AgendamentoRepository agendamentoRepository, ServicoRepository servicoRepository, AnamneseClienteRepository anamneseClienteRepository, PagamentoRepository pagamentoRepository, AgendamentoHelper agendamentoHelper) {
         this.passwordEncoder = passwordEncoder;
         this.usuarioRepository = usuarioRepository;
         this.perfilRepository = perfilRepository;
@@ -55,6 +58,8 @@ public class UsuarioService {
         this.agendamentoRepository = agendamentoRepository;
         this.servicoRepository = servicoRepository;
         this.anamneseClienteRepository = anamneseClienteRepository;
+        this.pagamentoRepository = pagamentoRepository;
+        this.agendamentoHelper = agendamentoHelper;
     }
 
     public void criar(UsuarioCriacaoDto dto) {
@@ -229,6 +234,7 @@ public class UsuarioService {
             clienteResponse.setEmail(u.get().getEmail());
             clienteResponse.setFotoUrl(c.getFotoUrl());
             clienteResponse.setClienteDesde(u.get().getCriadoEm().toLocalDate());
+            clienteResponse.setContaAtiva(u.get().getAtivo());
             clienteResponse.setCpf(c.getDocumento());
             clienteResponse.setTelefone(c.getTelefone());
             clienteResponse.setQtdNoShows(
@@ -246,14 +252,9 @@ public class UsuarioService {
 
             clienteResponse.setHistoricoAgendamentos(historicoAgendamentos);
 
-            Double totalGasto = historicoAgendamentos.stream()
-                    .filter(h -> "concluido".equalsIgnoreCase(h.getStatus()))
-                    .map(HistoricoAgendamentos::getValor)
-                    .filter(Objects::nonNull)
-                    .mapToDouble(Double::doubleValue)
-                    .sum();
-
-            clienteResponse.setTotalGasto(totalGasto);
+            clienteResponse.setTotalGasto(
+                    agendamentoHelper.calcularTotalGasto(c.getId(), usuarioIdFiltro)
+            );
 
             Optional<HistoricoAgendamentos> ultimoAtendimentoRealizado = historicoAgendamentos.stream()
                     .filter(h -> "concluido".equalsIgnoreCase(h.getStatus())

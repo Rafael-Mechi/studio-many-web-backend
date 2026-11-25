@@ -1,5 +1,6 @@
 package many.studio.web_backend.service.helper;
 
+import many.studio.web_backend.dto.agendamento.TotalGastoItem;
 import many.studio.web_backend.entity.*;
 import many.studio.web_backend.exception.EntityConflictException;
 import many.studio.web_backend.exception.EntityNotFoundException;
@@ -8,9 +9,11 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class AgendamentoHelper {
@@ -22,8 +25,9 @@ public class AgendamentoHelper {
     private final ProfissionalRepository profissionalRepository;
     private final UsuarioRepository usuarioRepository;
     private final PacoteRepository pacoteRepository;
+    private final PagamentoRepository pagamentoRepository;
 
-    public AgendamentoHelper(AgendamentoRepository agendamentoRepository, AgendamentoItemRepository agendamentoItemRepository, ClienteRepository clienteRepository, StatusAgendamentoRepository statusAgendamentoRepository, ServicoRepository servicoRepository, ProfissionalRepository profissionalRepository, UsuarioRepository usuarioRepository, PacoteRepository pacoteRepository) {
+    public AgendamentoHelper(AgendamentoRepository agendamentoRepository, AgendamentoItemRepository agendamentoItemRepository, ClienteRepository clienteRepository, StatusAgendamentoRepository statusAgendamentoRepository, ServicoRepository servicoRepository, ProfissionalRepository profissionalRepository, UsuarioRepository usuarioRepository, PacoteRepository pacoteRepository, PagamentoRepository pagamentoRepository) {
         this.agendamentoRepository = agendamentoRepository;
         this.agendamentoItemRepository = agendamentoItemRepository;
         this.clienteRepository = clienteRepository;
@@ -32,6 +36,43 @@ public class AgendamentoHelper {
         this.profissionalRepository = profissionalRepository;
         this.usuarioRepository = usuarioRepository;
         this.pacoteRepository = pacoteRepository;
+        this.pagamentoRepository = pagamentoRepository;
+    }
+
+    public Double calcularTotalGasto(Long clienteId, Long usuarioId) {
+        List<TotalGastoItem> itens = agendamentoRepository.buscarItensTotalGasto(clienteId, usuarioId);
+
+        Map<Long, Double> pagosPorAgendamento = pagamentoRepository
+                .findByAgendamentoClienteIdAndStatusPagamentoEstado(clienteId, "pago", usuarioId)
+                .stream()
+                .filter(pg -> pg.getAgendamento() != null && pg.getAgendamento().getId() != null)
+                .filter(pg -> pg.getValor() != null)
+                .collect(Collectors.groupingBy(
+                        pg -> pg.getAgendamento().getId(),
+                        Collectors.summingDouble(Pagamento::getValor)
+                ));
+
+        Map<Long, List<TotalGastoItem>> itensPorAgendamento = itens.stream()
+                .collect(Collectors.groupingBy(TotalGastoItem::getAgendamentoId));
+
+        double total = 0;
+        for (Map.Entry<Long, List<TotalGastoItem>> entry : itensPorAgendamento.entrySet()) {
+            List<TotalGastoItem> itensAgendamento = entry.getValue();
+            String estado = itensAgendamento.get(0).getEstado();
+
+            boolean atendido = StatusAgendamento.CONCLUIDO.equalsIgnoreCase(estado)
+                    || StatusAgendamento.EM_ATENDIMENTO.equalsIgnoreCase(estado);
+
+            if (atendido) {
+                total += itensAgendamento.stream()
+                        .mapToDouble(i -> i.getPreco() == null ? 0 : i.getPreco())
+                        .sum();
+            } else {
+                total += pagosPorAgendamento.getOrDefault(entry.getKey(), 0.0);
+            }
+        }
+
+        return total;
     }
 
     public Boolean isUsuarioValidoParaCancelamentoDeAgendamento(Long idUsuario, Long idAgendamento){

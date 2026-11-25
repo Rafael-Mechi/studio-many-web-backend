@@ -1,6 +1,7 @@
 package many.studio.web_backend.repository;
 
 import many.studio.web_backend.dto.agendamento.ResumoAgendamento;
+import many.studio.web_backend.dto.agendamento.TotalGastoItem;
 import many.studio.web_backend.dto.agendamento.HorarioIndisponivelDto;
 import many.studio.web_backend.dto.usuario.HistoricoAgendamentos;
 import many.studio.web_backend.entity.Agendamento;
@@ -98,7 +99,8 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
         cs.categoria,
         p.id, p.nome,
         prof.id, prof.usuario.email, prof.nome, prof.telefone, prof.fotoUrl,
-        sa.estado
+        sa.estado,
+        (SELECT COALESCE(SUM(pg.valor), 0) FROM Pagamento pg WHERE pg.agendamento = a AND pg.tipoPagamento.tipo = 'sinal' AND pg.statusPagamento.estado = 'pago')
     )
     FROM Agendamento a
     JOIN AgendamentoItem ai ON ai.agendamento.id = a.id
@@ -133,11 +135,13 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
 
     @Query("""
     SELECT new many.studio.web_backend.dto.usuario.HistoricoAgendamentos(
+        a.id,
         s.nome,
         ai.inicioAtendimento,
         p.nome,
         sa.estado,
-        s.preco
+        s.preco,
+        (SELECT COALESCE(SUM(pg.valor), 0) FROM Pagamento pg WHERE pg.agendamento = a AND pg.tipoPagamento.tipo = 'sinal' AND pg.statusPagamento.estado = 'pago')
     )
     FROM Agendamento a
     JOIN a.itens ai
@@ -145,10 +149,30 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     JOIN ai.profissional p
     JOIN a.statusAgendamento sa
     WHERE a.cliente.id = :clienteId
+      AND ai.inicioAtendimento <= CURRENT_TIMESTAMP
       AND (:usuarioId IS NULL OR p.usuario.id = :usuarioId)
     ORDER BY ai.inicioAtendimento DESC
 """)
     List<HistoricoAgendamentos> buscarHistoricoPorClienteEUsuarioProfissional(
+            @Param("clienteId") Long clienteId,
+            @Param("usuarioId") Long usuarioId
+    );
+
+    @Query("""
+    SELECT new many.studio.web_backend.dto.agendamento.TotalGastoItem(
+        a.id,
+        sa.estado,
+        s.preco
+    )
+    FROM Agendamento a
+    JOIN a.itens ai
+    JOIN ai.servico s
+    JOIN ai.profissional prof
+    JOIN a.statusAgendamento sa
+    WHERE a.cliente.id = :clienteId
+      AND (:usuarioId IS NULL OR prof.usuario.id = :usuarioId)
+""")
+    List<TotalGastoItem> buscarItensTotalGasto(
             @Param("clienteId") Long clienteId,
             @Param("usuarioId") Long usuarioId
     );

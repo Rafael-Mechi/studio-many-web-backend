@@ -14,6 +14,7 @@ public class ClienteResponse {
     private Integer qtdNoShows;
     private Double totalGasto;
     private LocalDate clienteDesde;
+    private Boolean contaAtiva;
     List<HistoricoAgendamentos> historicoAgendamentos;
 
     public ClienteResponse() {}
@@ -110,6 +111,14 @@ public class ClienteResponse {
 
     public void setClienteDesde(LocalDate clienteDesde) {
         this.clienteDesde = clienteDesde;
+    }
+
+    public Boolean getContaAtiva() {
+        return contaAtiva;
+    }
+
+    public void setContaAtiva(Boolean contaAtiva) {
+        this.contaAtiva = contaAtiva;
     }
 
     public List<HistoricoAgendamentos> getHistoricoAgendamentos() {
