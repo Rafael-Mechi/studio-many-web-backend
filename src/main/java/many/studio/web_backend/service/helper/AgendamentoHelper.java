@@ -62,12 +62,13 @@ public class AgendamentoHelper {
 
             boolean atendido = StatusAgendamento.CONCLUIDO.equalsIgnoreCase(estado)
                     || StatusAgendamento.EM_ATENDIMENTO.equalsIgnoreCase(estado);
+            boolean cancelado = StatusAgendamento.CANCELADO.equalsIgnoreCase(estado);
 
             if (atendido) {
                 total += itensAgendamento.stream()
                         .mapToDouble(i -> i.getPreco() == null ? 0 : i.getPreco())
                         .sum();
-            } else {
+            } else if (!cancelado) {
                 total += pagosPorAgendamento.getOrDefault(entry.getKey(), 0.0);
             }
         }
