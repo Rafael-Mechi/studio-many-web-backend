@@ -10,7 +10,10 @@ import java.time.LocalTime;
 public class BloqueioRequest {
 
     @NotNull(message = "Data é obrigatória")
-    private LocalDate data;
+    private LocalDate dataInicio;
+
+    @NotNull(message = "Data é obrigatória")
+    private LocalDate dataFim;
 
     @NotNull(message = "Hora de início é obrigatória")
     private LocalTime horaInicio;
@@ -22,12 +25,20 @@ public class BloqueioRequest {
     @Size(min = 3, max = 255, message = "Motivo deve ter entre 3 e 255 caracteres")
     private String motivo;
 
-    public LocalDate getData() {
-        return data;
+    public LocalDate getDataInicio() {
+        return dataInicio;
     }
 
-    public void setData(LocalDate data) {
-        this.data = data;
+    public void setDataInicio(LocalDate dataInicio) {
+        this.dataInicio = dataInicio;
+    }
+
+    public LocalDate getDataFim() {
+        return dataFim;
+    }
+
+    public void setDataFim(LocalDate dataFim) {
+        this.dataFim = dataFim;
     }
 
     public LocalTime getHoraInicio() {
