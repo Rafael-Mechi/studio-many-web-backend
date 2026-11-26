@@ -48,23 +48,27 @@ public class BloqueioService {
     public BloqueioCriacaoResponse criar(Long usuarioId, BloqueioRequest request) {
         Profissional profissional = profissionalDoUsuario(usuarioId);
 
-        if (request.getData() == null || request.getHoraInicio() == null || request.getHoraFim() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data, início e fim são obrigatórios");
+        if (request.getDataInicio() == null || request.getDataFim() == null
+                || request.getHoraInicio() == null || request.getHoraFim() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datas, início e fim são obrigatórios");
         }
-        if (!request.getHoraInicio().isBefore(request.getHoraFim())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Início deve ser anterior ao fim");
+        if (request.getDataFim().isBefore(request.getDataInicio())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data final não pode ser anterior à data inicial");
         }
         String motivo = request.getMotivo() != null ? request.getMotivo().trim() : "";
         if (motivo.length() < 3 || motivo.length() > 255) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Motivo deve ter entre 3 e 255 caracteres");
         }
 
-        LocalDateTime inicio = LocalDateTime.of(request.getData(), request.getHoraInicio());
-        LocalDateTime fim = LocalDateTime.of(request.getData(), request.getHoraFim());
+        LocalDateTime inicio = LocalDateTime.of(request.getDataInicio(), request.getHoraInicio());
+        LocalDateTime fim = LocalDateTime.of(request.getDataFim(), request.getHoraFim());
+        if (!fim.isAfter(inicio)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fim deve ser posterior ao início");
+        }
         if (!fim.isAfter(LocalDateTime.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bloqueio deve ser para um período futuro");
         }
-        if (request.getData().isBefore(LocalDate.now())) {
+        if (request.getDataInicio().isBefore(LocalDate.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data do bloqueio não pode estar no passado");
         }
 
